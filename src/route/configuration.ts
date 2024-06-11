@@ -1,0 +1,79 @@
+import { Configuration } from "@/model/configuration";
+import {
+  deleteConfiguration,
+  getConfigurations,
+  getConfiguration,
+  storeConfiguration,
+  updateConfiguration,
+} from "@/service/configuration";
+import { Hono } from "hono";
+
+const app = new Hono();
+
+app.get("/", async (c) => {
+  const result = await getConfigurations();
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.get("/:name", async (c) => {
+  const name = c.req.param("name");
+  const result = await getConfiguration(name.toUpperCase());
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.post("/", async (c) => {
+  const payload = await c.req.json<Configuration<any>>();
+
+  const result = await storeConfiguration(payload);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.put("/:name", async (c) => {
+  const payload = await c.req.json<Configuration<any>>();
+  const name = c.req.param("name");
+  const result = await updateConfiguration(name.toUpperCase(), payload);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.delete("/:name", async (c) => {
+  const name = c.req.param("name");
+  const result = await deleteConfiguration(name.toUpperCase());
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+export default app;

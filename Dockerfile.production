@@ -1,0 +1,17 @@
+FROM oven/bun:1.1.12-alpine
+
+WORKDIR /app
+
+COPY package.json bun.lockb ./
+
+ENV NODE_ENV=production
+
+RUN bun install --frozen-lockfile --production
+
+COPY . .
+
+USER bun
+
+EXPOSE 4000/tcp
+
+ENTRYPOINT ["bun", "run", "start"]

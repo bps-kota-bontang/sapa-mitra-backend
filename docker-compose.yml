@@ -1,0 +1,31 @@
+version: "3.8"
+name: kontrak-backend
+
+services:
+  backend:
+    container_name: kontrak-backend
+    build:
+      context: .
+      dockerfile: Dockerfile.development
+    ports:
+      - 4000:4000
+    networks:
+      - kontrak_network
+    volumes:
+      - .:/app
+  mongo:
+    container_name: kontrak-mongo
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    networks:
+      - kontrak_network
+    volumes:
+      - kontrak_mongo_data:/data/db
+      - kontrak_mongo_config:/data/
+networks:
+  kontrak_network:
+    driver: bridge
+volumes:
+  kontrak_mongo_data:
+  kontrak_mongo_config:
