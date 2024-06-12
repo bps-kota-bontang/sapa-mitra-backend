@@ -3,11 +3,11 @@ export type Category = "COFFEE" | "PASTRY" | "ICE_CREAM";
 export type Product = {
   id: string;
   name: string;
-  name_english: string;
+  nameEnglish: string;
   note: string | null;
   category: Category;
   image: string;
   price: number;
-  price_strikethrough: number;
+  priceStrikethrough: number;
   additional: string[];
 };

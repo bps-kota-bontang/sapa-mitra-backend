@@ -4,7 +4,7 @@ import { Schema, model } from "mongoose";
 export const productSchema = new Schema<Product>(
   {
     name: { type: String, required: true },
-    name_english: { type: String, required: true },
+    nameEnglish: { type: String, required: true },
     note: { type: String, required: false },
     category: {
       type: String,
@@ -13,7 +13,7 @@ export const productSchema = new Schema<Product>(
     },
     image: { type: String, required: true },
     price: { type: Number, required: true },
-    price_strikethrough: { type: Number, required: true },
+    priceStrikethrough: { type: Number, required: true },
     additional: { type: [String], required: false },
   },
   {
