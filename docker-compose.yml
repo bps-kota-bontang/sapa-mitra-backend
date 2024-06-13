@@ -1,31 +1,31 @@
 version: "3.8"
-name: kontrak-backend
+name: sapa-mitra-backend
 
 services:
   backend:
-    container_name: kontrak-backend
+    container_name: sapa-mitra-backend
     build:
       context: .
       dockerfile: Dockerfile.development
     ports:
       - 4000:4000
     networks:
-      - kontrak_network
+      - sapa_mitra_network
     volumes:
       - .:/app
   mongo:
-    container_name: kontrak-mongo
+    container_name: sapa-mitra-mongo
     image: mongo:latest
     ports:
       - 27017:27017
     networks:
-      - kontrak_network
+      - sapa_mitra_network
     volumes:
-      - kontrak_mongo_data:/data/db
-      - kontrak_mongo_config:/data/
+      - sapa_mitra_mongo_data:/data/db
+      - sapa_mitra_mongo_config:/data/
 networks:
-  kontrak_network:
+  sapa_mitra_network:
     driver: bridge
 volumes:
-  kontrak_mongo_data:
-  kontrak_mongo_config:
+  sapa_mitra_mongo_data:
+  sapa_mitra_mongo_config:

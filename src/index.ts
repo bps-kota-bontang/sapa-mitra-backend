@@ -15,7 +15,7 @@ app.use(prettyJSON());
 app.use(etag(), logger());
 app.use(withAuth);
 app.use("/static/*", serveStatic({ root: "./" }));
-app.get("/", (c) => c.text("Kontrak API"));
+app.get("/", (c) => c.text("Sapa Mitra API"));
 
 app.notFound((c) => {
   return c.json(
