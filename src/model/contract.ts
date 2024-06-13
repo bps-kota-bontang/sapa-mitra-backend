@@ -1,22 +1,91 @@
 import { Partner } from "@/model/partner";
 import { Activity } from "@/model//activity";
+import { Document } from "mongoose";
 
-export type MonthYear = `${number}-${number}`;
+export type YearMonth = `${number}-${number}`;
 
 export type Contract = {
   number: string;
-  date: MonthYear;
-  partner: Pick<Partner, "name" | "address">;
+  date: YearMonth;
+  partner: Pick<Partner, "name" | "address"> & Document;
   activities: (Pick<Activity, "code" | "name"> & {
-    start_date: Date;
-    end_date: Date;
+    startDate: Date;
+    endDate: Date;
     volume: number;
     unit: string;
     rate: number;
     total: number;
   })[];
-  sign_date: Date;
-  handover_date: Date;
+  signDate: Date;
+  handoverDate: Date;
   penalty: number;
-  grand_total: number;
+  grandTotal: number;
+};
+
+export type ContractByActivityPayload = {
+  activity: {
+    activityId: string;
+  } & Pick<
+    Contract["activities"][number],
+    "startDate" | "endDate" | "unit" | "rate"
+  >;
+  contract: Pick<Contract, "date">;
+  partners: [
+    {
+      partnerId: string;
+    } & Pick<Contract["activities"][number], "volume">
+  ];
+};
+
+export type ContractPayload = {
+  partner: {
+    partnerId: string;
+  };
+  contract: Pick<Contract, "date">;
+  activities: [
+    {
+      activityId: string;
+    } & Pick<
+      Contract["activities"][number],
+      "startDate" | "endDate" | "volume" | "unit" | "rate"
+    >
+  ];
+};
+
+const byActivity: ContractByActivityPayload = {
+  partners: [
+    {
+      partnerId: "1",
+      volume: 1,
+    },
+  ],
+  contract: {
+    date: "2020-02",
+  },
+  activity: {
+    activityId: "xxxxx-xxxxx-xxx",
+    startDate: new Date(),
+    endDate: new Date(),
+    unit: "Bundle",
+    rate: 1000,
+  },
+};
+
+const byPartner: ContractPayload = {
+  partner: {
+    partnerId: "zzzzzz-zzzzz-zzzzzzz",
+  },
+  contract: {
+    date: "2020-02",
+  },
+  activities: [
+    {
+      activityId: "xxxxx-xxxxx-xxx",
+      startDate: new Date(),
+      endDate: new Date(),
+      volume: 1,
+      unit: "Bundle",
+      rate: 1000,
+    },
+  ],
 };
