@@ -26,7 +26,7 @@ export const calculateSignDate = (yearMonth: YearMonth) => {
   const date = new Date(year, month - 1);
 
   const signDate = new Date(date);
-  signDate.setDate(signDate.getDate() - 2);
+  signDate.setDate(signDate.getDate() - 1);
 
   return signDate;
 };
@@ -37,7 +37,7 @@ export const calculateHandOverDate = (yearMonth: YearMonth) => {
   const nextMonthDate = new Date(year, month);
 
   const handOverDate = new Date(nextMonthDate);
-  handOverDate.setDate(handOverDate.getDate() + 1);
+  handOverDate.setDate(handOverDate.getDate());
 
   return handOverDate;
 };
