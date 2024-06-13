@@ -1,3 +1,4 @@
+import { isProduction } from "@/common/utils";
 import { JWT } from "@/model/jwt";
 import { Partner } from "@/model/partner";
 import { Result } from "@/model/result";
@@ -27,7 +28,7 @@ export const storePartner = async (
   payload: Partner,
   claims: JWT
 ): Promise<Result<Partner>> => {
-  if (claims.team != "IPDS") {
+  if (claims.team != "IPDS" && isProduction) {
     return {
       data: null,
       message: "Only IPDS can create an partner",
@@ -49,7 +50,7 @@ export const updatePartner = async (
   payload: Partner,
   claims: JWT
 ): Promise<Result<Partner>> => {
-  if (claims.team != "IPDS") {
+  if (claims.team != "IPDS" && isProduction) {
     return {
       data: null,
       message: "Only IPDS can update an partner",
@@ -73,7 +74,7 @@ export const deletePartner = async (
   id: string,
   claims: JWT
 ): Promise<Result<any>> => {
-  if (claims.team != "IPDS") {
+  if (claims.team != "IPDS" && isProduction) {
     return {
       data: null,
       message: "Only IPDS can delete an partner",

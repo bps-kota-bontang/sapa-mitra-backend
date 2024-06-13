@@ -1,3 +1,4 @@
+import { isProduction } from "@/common/utils";
 import { Activity } from "@/model/activity";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
@@ -27,7 +28,7 @@ export const storeActivity = async (
   payload: Activity,
   claims: JWT
 ): Promise<Result<Activity>> => {
-  if (claims.team != "TU") {
+  if (claims.team != "TU" && isProduction) {
     return {
       data: null,
       message: "Only TU can create an activity",
@@ -48,7 +49,7 @@ export const updateActivity = async (
   payload: Activity,
   claims: JWT
 ): Promise<Result<Activity>> => {
-  if (claims.team != "TU") {
+  if (claims.team != "TU" && isProduction) {
     return {
       data: null,
       message: "Only TU can update an activity",
@@ -71,7 +72,7 @@ export const deleteActivity = async (
   id: string,
   claims: JWT
 ): Promise<Result<any>> => {
-  if (claims.team != "TU") {
+  if (claims.team != "TU" && isProduction) {
     return {
       data: null,
       message: "Only TU can update an activity",
