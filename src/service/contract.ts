@@ -19,7 +19,7 @@ export const getContracts = async (
   period: string = "",
   status: string = "",
   claims: JWT
-): Promise<Result<any>> => {
+): Promise<Result<Contract[]>> => {
   let queries: any = {};
 
   if (period) queries.period = period;
@@ -33,7 +33,17 @@ export const getContracts = async (
 
   return {
     data: contracts,
-    message: "Test",
+    message: "Successfully retrieved contracts",
+    code: 200,
+  };
+};
+
+export const getContract = async (id: string): Promise<Result<Contract>> => {
+  const contract = await ContractSchema.findById(id);
+
+  return {
+    data: contract,
+    message: "Successfully retrieved contract",
     code: 200,
   };
 };
@@ -231,5 +241,43 @@ export const storeContract = async (
     data: contract,
     message: "Successfully created contract",
     code: 201,
+  };
+};
+
+export const deletContract = async (id: string): Promise<Result<any>> => {
+  await ContractSchema.findByIdAndDelete(id);
+
+  return {
+    data: null,
+    message: "Successfully deleted contract",
+    code: 204,
+  };
+};
+
+export const deleteContractActivity = async (
+  id: string,
+  activityId: string
+): Promise<Result<Contract>> => {
+  console.log("ID:", id);
+  console.log("Activity:", activityId);
+
+  const contract = await ContractSchema.findOneAndUpdate(
+    {
+      _id: id,
+    },
+    {
+      $pull: {
+        activities: { _id: activityId },
+      },
+    },
+    {
+      new: true,
+    }
+  );
+
+  return {
+    data: contract,
+    message: "Successfully deleted contract",
+    code: 204,
   };
 };

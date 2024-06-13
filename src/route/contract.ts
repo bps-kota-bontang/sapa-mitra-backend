@@ -1,4 +1,7 @@
 import {
+  deletContract,
+  deleteContractActivity,
+  getContract,
   getContracts,
   storeContract,
   storeContractByActivity,
@@ -23,6 +26,20 @@ app.get("/", async (c) => {
   );
 });
 
+app.get("/:id", async (c) => {
+  const id = c.req.param("id");
+
+  const result = await getContract(id);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
 app.post("/", async (c) => {
   const claims = c.get("jwtPayload");
   const by = c.req.query("by");
@@ -34,6 +51,35 @@ app.post("/", async (c) => {
   } else {
     result = await storeContract(payload, claims);
   }
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.delete("/:id", async (c) => {
+  const id = c.req.param("id");
+
+  const result = await deletContract(id);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.delete("/:id/activity/:activityId", async (c) => {
+  const id = c.req.param("id");
+  const activityId = c.req.param("activityId");
+
+  const result = await deleteContractActivity(id, activityId);
 
   return c.json(
     {
