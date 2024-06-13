@@ -6,15 +6,35 @@ export const notEmpty = <TValue>(
   return value !== null && value !== undefined;
 };
 
-export const createYearMonth = (year: number, month: number): YearMonth => {
-  if (month < 1 || month > 12) {
-    throw new Error("Month must be between 1 and 12");
+export function createYearMonth(year: number, month: number): YearMonth;
+export function createYearMonth(date: Date): YearMonth;
+
+export function createYearMonth(
+  param1: number | Date,
+  param2?: number
+): YearMonth {
+  let year: number;
+  let month: number;
+
+  if (param1 instanceof Date) {
+    year = param1.getFullYear();
+    month = param1.getMonth() + 1;
+  } else if (typeof param1 === "number" && typeof param2 === "number") {
+    year = param1;
+    month = param2;
+
+    if (month < 1 || month > 12) {
+      throw new Error("Month must be between 1 and 12");
+    }
+  } else {
+    throw new Error("Invalid arguments");
   }
+
   const yearStr = year.toString().padStart(4, "0");
   const monthStr = month.toString().padStart(2, "0");
 
   return `${yearStr}-${monthStr}` as YearMonth;
-};
+}
 
 export const generateContractNumber = (): string => {
   return Math.floor(Math.random() * 10000).toString();
@@ -41,3 +61,5 @@ export const calculateHandOverDate = (yearMonth: YearMonth) => {
 
   return handOverDate;
 };
+
+export const isProduction = Bun.env.ENV === "production";
