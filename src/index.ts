@@ -5,6 +5,7 @@ import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import apiV1 from "@/api/v1";
 import connectDB from "@/config/db";
+import withAuth from "@/middleware/withAuth";
 
 const app = new Hono();
 
@@ -12,6 +13,7 @@ connectDB();
 
 app.use(prettyJSON());
 app.use(etag(), logger());
+app.use(withAuth);
 app.use("/static/*", serveStatic({ root: "./" }));
 app.get("/", (c) => c.text("Kontrak API"));
 

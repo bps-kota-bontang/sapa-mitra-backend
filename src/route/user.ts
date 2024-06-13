@@ -1,10 +1,9 @@
-import withAuth from "@/middleware/withAuth";
 import { getUsers } from "@/service/user";
 import { Hono } from "hono";
 
 const app = new Hono();
 
-app.get("/", withAuth, async (c) => {
+app.get("/", async (c) => {
   const claims = c.get("jwtPayload");
   const result = await getUsers(claims);
 
