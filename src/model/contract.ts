@@ -1,8 +1,11 @@
 import { Partner } from "@/model/partner";
 import { Activity } from "@/model//activity";
 import { Document } from "mongoose";
+import { Team } from "@/model/user";
 
 export type YearMonth = `${number}-${number}`;
+
+export type StatusContract = "UNVERIFIED" | "VERIFIED";
 
 export type Contract = {
   number: string;
@@ -15,6 +18,8 @@ export type Contract = {
     unit: string;
     rate: number;
     total: number;
+    createdBy: Team;
+    status: StatusContract;
   })[];
   signDate: Date;
   handoverDate: Date;

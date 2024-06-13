@@ -4,18 +4,16 @@ import {
   generateContractNumber,
   notEmpty,
 } from "@/common/utils";
-import {
-  Contract,
-  ContractByActivityPayload,
-  ContractPayload,
-} from "@/model/contract";
+import { ContractByActivityPayload, ContractPayload } from "@/model/contract";
+import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
 import ActivitySchema from "@/schema/activity";
 import ContractSchema from "@/schema/contract";
 import PartnerSchema from "@/schema/partner";
 
 export const storeContractByActivity = async (
-  payload: ContractByActivityPayload
+  payload: ContractByActivityPayload,
+  claims: JWT
 ): Promise<Result<any>> => {
   const { activityId, ...restActivityPayload } = payload.activity;
 
@@ -66,6 +64,7 @@ export const storeContractByActivity = async (
         ...restActivityPayload,
         volume: item.volume,
         total: item.volume * payload.activity.rate,
+        createdBy: claims.team,
       };
 
       const update = existingContract
@@ -117,7 +116,8 @@ export const storeContractByActivity = async (
 };
 
 export const storeContract = async (
-  payload: ContractPayload
+  payload: ContractPayload,
+  claims: JWT
 ): Promise<Result<any>> => {
   const number = generateContractNumber();
   const partner = await PartnerSchema.findById(
@@ -157,6 +157,7 @@ export const storeContract = async (
             ...restPayload,
             ...itemDb.toObject(),
             total: restPayload.volume * restPayload.rate,
+            createdBy: claims.team,
           }
         : null;
     })
@@ -170,7 +171,7 @@ export const storeContract = async (
   const signDate = calculateSignDate(payload.contract.date);
   const handOverDate = calculateHandOverDate(payload.contract.date);
 
-  const data: Contract = {
+  const data = {
     number: number,
     date: payload.contract.date,
     partner: partner,
