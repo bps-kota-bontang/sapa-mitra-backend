@@ -1,4 +1,5 @@
 import { Activity } from "@/model/activity";
+import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
 import ActivitySchema from "@/schema/activity";
 
@@ -23,8 +24,16 @@ export const getActivity = async (id: string): Promise<Result<Activity>> => {
 };
 
 export const storeActivity = async (
-  payload: Activity
+  payload: Activity,
+  claims: JWT
 ): Promise<Result<Activity>> => {
+  if (claims.team != "TU") {
+    return {
+      data: null,
+      message: "Only TU can create an activity",
+      code: 401,
+    };
+  }
   const activity = await ActivitySchema.create(payload);
 
   return {
@@ -36,8 +45,17 @@ export const storeActivity = async (
 
 export const updateActivity = async (
   id: string,
-  payload: Activity
+  payload: Activity,
+  claims: JWT
 ): Promise<Result<Activity>> => {
+  if (claims.team != "TU") {
+    return {
+      data: null,
+      message: "Only TU can update an activity",
+      code: 401,
+    };
+  }
+
   const activity = await ActivitySchema.findByIdAndUpdate(id, payload, {
     new: true,
   });
@@ -49,7 +67,18 @@ export const updateActivity = async (
   };
 };
 
-export const deleteActivity = async (id: string): Promise<Result<any>> => {
+export const deleteActivity = async (
+  id: string,
+  claims: JWT
+): Promise<Result<any>> => {
+  if (claims.team != "TU") {
+    return {
+      data: null,
+      message: "Only TU can update an activity",
+      code: 401,
+    };
+  }
+
   await ActivitySchema.findByIdAndDelete(id);
 
   return {

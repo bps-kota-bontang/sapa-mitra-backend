@@ -15,6 +15,14 @@ export const storeContractByActivity = async (
   payload: ContractByActivityPayload,
   claims: JWT
 ): Promise<Result<any>> => {
+  if (claims.position != "ANGGOTA") {
+    return {
+      data: null,
+      message: "Only members can create contracts",
+      code: 401,
+    };
+  }
+
   const { activityId, ...restActivityPayload } = payload.activity;
 
   const partnerIds = payload.partners.map((item) => item.partnerId);
@@ -119,6 +127,14 @@ export const storeContract = async (
   payload: ContractPayload,
   claims: JWT
 ): Promise<Result<any>> => {
+  if (claims.position != "ANGGOTA") {
+    return {
+      data: null,
+      message: "Only members can create a contract",
+      code: 401,
+    };
+  }
+
   const number = generateContractNumber();
   const partner = await PartnerSchema.findById(
     payload.partner.partnerId

@@ -36,9 +36,10 @@ app.get("/:id", async (c) => {
 });
 
 app.post("/", async (c) => {
+  const claims = c.get("jwtPayload");
   const payload = await c.req.json<Activity>();
 
-  const result = await storeActivity(payload);
+  const result = await storeActivity(payload, claims);
 
   return c.json(
     {
@@ -50,9 +51,10 @@ app.post("/", async (c) => {
 });
 
 app.put("/:id", async (c) => {
+  const claims = c.get("jwtPayload");
   const payload = await c.req.json<Activity>();
   const id = c.req.param("id");
-  const result = await updateActivity(id, payload);
+  const result = await updateActivity(id, payload, claims);
 
   return c.json(
     {
@@ -64,8 +66,9 @@ app.put("/:id", async (c) => {
 });
 
 app.delete("/:id", async (c) => {
+  const claims = c.get("jwtPayload");
   const id = c.req.param("id");
-  const result = await deleteActivity(id);
+  const result = await deleteActivity(id, claims);
 
   return c.json(
     {

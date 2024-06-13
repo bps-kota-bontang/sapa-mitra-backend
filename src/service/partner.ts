@@ -1,3 +1,4 @@
+import { JWT } from "@/model/jwt";
 import { Partner } from "@/model/partner";
 import { Result } from "@/model/result";
 import PartnerSchema from "@/schema/partner";
@@ -23,8 +24,17 @@ export const getPartner = async (id: string): Promise<Result<Partner>> => {
 };
 
 export const storePartner = async (
-  payload: Partner
+  payload: Partner,
+  claims: JWT
 ): Promise<Result<Partner>> => {
+  if (claims.team != "IPDS") {
+    return {
+      data: null,
+      message: "Only IPDS can create an partner",
+      code: 401,
+    };
+  }
+
   const partner = await PartnerSchema.create(payload);
 
   return {
@@ -36,8 +46,17 @@ export const storePartner = async (
 
 export const updatePartner = async (
   id: string,
-  payload: Partner
+  payload: Partner,
+  claims: JWT
 ): Promise<Result<Partner>> => {
+  if (claims.team != "IPDS") {
+    return {
+      data: null,
+      message: "Only IPDS can update an partner",
+      code: 401,
+    };
+  }
+
   const partner = await PartnerSchema.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
@@ -50,7 +69,18 @@ export const updatePartner = async (
   };
 };
 
-export const deletePartner = async (id: string): Promise<Result<any>> => {
+export const deletePartner = async (
+  id: string,
+  claims: JWT
+): Promise<Result<any>> => {
+  if (claims.team != "IPDS") {
+    return {
+      data: null,
+      message: "Only IPDS can delete an partner",
+      code: 401,
+    };
+  }
+
   await PartnerSchema.findByIdAndDelete(id);
 
   return {

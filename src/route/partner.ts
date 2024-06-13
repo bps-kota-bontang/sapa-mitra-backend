@@ -36,9 +36,10 @@ app.get("/:id", async (c) => {
 });
 
 app.post("/", async (c) => {
+  const claims = c.get("jwtPayload");
   const payload = await c.req.json<Partner>();
 
-  const result = await storePartner(payload);
+  const result = await storePartner(payload, claims);
 
   return c.json(
     {
@@ -50,9 +51,10 @@ app.post("/", async (c) => {
 });
 
 app.put("/:id", async (c) => {
+  const claims = c.get("jwtPayload");
   const payload = await c.req.json<Partner>();
   const id = c.req.param("id");
-  const result = await updatePartner(id, payload);
+  const result = await updatePartner(id, payload, claims);
 
   return c.json(
     {
@@ -64,8 +66,9 @@ app.put("/:id", async (c) => {
 });
 
 app.delete("/:id", async (c) => {
+  const claims = c.get("jwtPayload");
   const id = c.req.param("id");
-  const result = await deletePartner(id);
+  const result = await deletePartner(id, claims);
 
   return c.json(
     {
