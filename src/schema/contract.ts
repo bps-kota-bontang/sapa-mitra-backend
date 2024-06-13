@@ -4,7 +4,7 @@ import { Schema, model } from "mongoose";
 export const contractSchema = new Schema<Contract>(
   {
     number: { type: String, required: true, unique: true },
-    date: { type: String, required: true },
+    period: { type: String, required: true },
     partner: {
       type: {
         name: { type: String, required: true },

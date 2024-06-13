@@ -32,11 +32,11 @@ export const storeContractByActivity = async (
 
   const existingContracts = await ContractSchema.find({
     "partner._id": { $in: partnerIds },
-    date: payload.contract.date,
-  }).select(["partner._id", "date"]);
+    period: payload.contract.period,
+  }).select(["partner._id", "period"]);
 
-  const signDate = calculateSignDate(payload.contract.date);
-  const handOverDate = calculateHandOverDate(payload.contract.date);
+  const signDate = calculateSignDate(payload.contract.period);
+  const handOverDate = calculateHandOverDate(payload.contract.period);
 
   const activity = await ActivitySchema.findById(activityId).select([
     "code",
@@ -64,7 +64,7 @@ export const storeContractByActivity = async (
       const existingContract = existingContracts.find(
         (contract) =>
           contract.partner._id == item.partnerId &&
-          contract.date == payload.contract.date
+          contract.period == payload.contract.period
       );
 
       const activities = {
@@ -79,7 +79,7 @@ export const storeContractByActivity = async (
         ? { $push: { activities: activities } }
         : {
             number,
-            date: payload.contract.date,
+            period: payload.contract.period,
             partner,
             activities: [activities],
             signDate,
@@ -92,7 +92,7 @@ export const storeContractByActivity = async (
         updateOne: {
           filter: {
             "partner._id": item.partnerId,
-            date: payload.contract.date,
+            period: payload.contract.period,
           },
           update,
           upsert: !existingContract,
@@ -113,7 +113,7 @@ export const storeContractByActivity = async (
 
   const contracts = await ContractSchema.find({
     "partner._id": { $in: partnerIds },
-    date: payload.contract.date,
+    period: payload.contract.period,
   });
 
   return {
@@ -184,12 +184,12 @@ export const storeContract = async (
     0
   );
 
-  const signDate = calculateSignDate(payload.contract.date);
-  const handOverDate = calculateHandOverDate(payload.contract.date);
+  const signDate = calculateSignDate(payload.contract.period);
+  const handOverDate = calculateHandOverDate(payload.contract.period);
 
   const data = {
     number: number,
-    date: payload.contract.date,
+    period: payload.contract.period,
     partner: partner,
     activities: activities,
     signDate: signDate,

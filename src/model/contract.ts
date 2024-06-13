@@ -9,7 +9,7 @@ export type StatusContract = "UNVERIFIED" | "VERIFIED";
 
 export type Contract = {
   number: string;
-  date: YearMonth;
+  period: YearMonth;
   partner: Pick<Partner, "name" | "address"> & Document;
   activities: (Pick<Activity, "code" | "name"> & {
     startDate: Date;
@@ -34,7 +34,7 @@ export type ContractByActivityPayload = {
     Contract["activities"][number],
     "startDate" | "endDate" | "unit" | "rate"
   >;
-  contract: Pick<Contract, "date">;
+  contract: Pick<Contract, "period">;
   partners: [
     {
       partnerId: string;
@@ -46,7 +46,7 @@ export type ContractPayload = {
   partner: {
     partnerId: string;
   };
-  contract: Pick<Contract, "date">;
+  contract: Pick<Contract, "period">;
   activities: [
     {
       activityId: string;
@@ -65,7 +65,7 @@ const byActivity: ContractByActivityPayload = {
     },
   ],
   contract: {
-    date: "2020-02",
+    period: "2020-02",
   },
   activity: {
     activityId: "xxxxx-xxxxx-xxx",
@@ -81,7 +81,7 @@ const byPartner: ContractPayload = {
     partnerId: "zzzzzz-zzzzz-zzzzzzz",
   },
   contract: {
-    date: "2020-02",
+    period: "2020-02",
   },
   activities: [
     {
