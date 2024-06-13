@@ -4,17 +4,44 @@ import {
   generateContractNumber,
   notEmpty,
 } from "@/common/utils";
-import { ContractByActivityPayload, ContractPayload } from "@/model/contract";
+import {
+  Contract,
+  ContractByActivityPayload,
+  ContractPayload,
+} from "@/model/contract";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
 import ActivitySchema from "@/schema/activity";
 import ContractSchema from "@/schema/contract";
 import PartnerSchema from "@/schema/partner";
 
+export const getContracts = async (
+  period: string = "",
+  status: string = "",
+  claims: JWT
+): Promise<Result<any>> => {
+  let queries: any = {};
+
+  if (period) queries.period = period;
+  if (status) queries["activities.status"] = status;
+
+  if (status == "VERIFIED" || status == "UNVERIFIED") {
+    queries["activities.createdBy"] = claims.team;
+  }
+
+  const contracts = await ContractSchema.find(queries);
+
+  return {
+    data: contracts,
+    message: "Test",
+    code: 200,
+  };
+};
+
 export const storeContractByActivity = async (
   payload: ContractByActivityPayload,
   claims: JWT
-): Promise<Result<any>> => {
+): Promise<Result<Contract[]>> => {
   if (claims.position == "KEPALA") {
     return {
       data: null,
@@ -126,7 +153,7 @@ export const storeContractByActivity = async (
 export const storeContract = async (
   payload: ContractPayload,
   claims: JWT
-): Promise<Result<any>> => {
+): Promise<Result<Contract>> => {
   if (claims.position == "KEPALA") {
     return {
       data: null,
