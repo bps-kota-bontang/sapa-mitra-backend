@@ -258,11 +258,11 @@ export const storeContract = async (
       );
       return itemDb
         ? {
-            ...restPayload,
-            ...itemDb.toObject(),
-            total: restPayload.volume * restPayload.rate,
-            createdBy: claims.team,
-          }
+          ...restPayload,
+          ...itemDb.toObject(),
+          total: restPayload.volume * restPayload.rate,
+          createdBy: claims.team,
+        }
         : null;
     })
     .filter(notEmpty);
@@ -463,3 +463,33 @@ export const deleteContractActivity = async (
     code: 204,
   };
 };
+
+export const printContract = async (id: string): Promise<Result<Contract>> => {
+
+  const contract = await ContractSchema.findById(id);
+
+  if (!contract) {
+    return {
+      data: null,
+      message: "Contract not found",
+      code: 404,
+    };
+  }
+
+  const isCompleted = contract.activities.every(item => item.status === "VERIFIED");
+
+  if (!isCompleted) {
+    return {
+      data: null,
+      message: "Activity contract has not been fully verified",
+      code: 400,
+    };
+  }
+
+  return {
+    data: contract,
+    message: "Successfully print contract",
+    code: 200,
+  };
+
+}

@@ -3,6 +3,7 @@ import {
   deleteContractActivity,
   getContract,
   getContracts,
+  printContract,
   storeContract,
   storeContractByActivity,
 } from "@/service/contract";
@@ -89,5 +90,20 @@ app.delete("/:id/activity/:activityId", async (c) => {
     result.code
   );
 });
+
+app.get("/:id/print", async (c) => {
+  const id = c.req.param("id");
+
+  const result = await printContract(id);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+
+})
 
 export default app;
