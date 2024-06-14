@@ -20,7 +20,7 @@ export type Contract = {
     total: number;
     createdBy: Team;
     status: StatusContract;
-  })[];
+  } & Document)[];
   signDate: Date;
   handoverDate: Date;
   penalty: number;

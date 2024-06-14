@@ -70,17 +70,17 @@ export const storeContractByActivity = async (
   const existingContracts = await ContractSchema.find({
     "partner._id": { $in: partnerIds },
     period: payload.contract.period,
-  }).select(["partner._id", "period"]);
+  }).select(["partner._id", "period", "grandTotal", "activities"]);
 
   const signDate = calculateSignDate(payload.contract.period);
   const handOverDate = calculateHandOverDate(payload.contract.period);
 
-  const activity = await ActivitySchema.findById(activityId).select([
+  const activityDb = await ActivitySchema.findById(activityId).select([
     "code",
     "name",
   ]);
 
-  if (!activity) {
+  if (!activityDb) {
     return {
       data: null,
       message: "Activity not found",
@@ -104,37 +104,83 @@ export const storeContractByActivity = async (
           contract.period == payload.contract.period
       );
 
-      const activities = {
-        ...activity.toObject(),
+      const activity = {
+        ...activityDb.toObject(),
         ...restActivityPayload,
         volume: item.volume,
         total: item.volume * payload.activity.rate,
         createdBy: claims.team,
       };
 
-      const update = existingContract
-        ? { $push: { activities: activities } }
-        : {
-            number,
-            period: payload.contract.period,
-            partner,
-            activities: [activities],
-            signDate,
-            handOverDate,
-            penalty: 0,
-            grandTotal: item.volume * payload.activity.rate,
+      let update;
+
+      if (existingContract) {
+        const existingActivity = existingContract.activities.find(
+          (item) => item.id == activity._id
+        );
+
+        if (existingActivity) {
+          update = {
+            $set: {
+              grandTotal:
+                existingContract.grandTotal +
+                activity.total -
+                existingActivity.total,
+              "activities.$": activity,
+            },
           };
 
-      return {
-        updateOne: {
-          filter: {
-            "partner._id": item.partnerId,
-            period: payload.contract.period,
+          return {
+            updateMany: {
+              filter: {
+                "partner._id": item.partnerId,
+                period: payload.contract.period,
+                "activities._id": existingActivity.id,
+              },
+              update,
+            },
+          };
+        } else {
+          update = {
+            $push: { activities: activity },
+            $set: {
+              grandTotal: existingContract.grandTotal + activity.total,
+            },
+          };
+
+          return {
+            updateOne: {
+              filter: {
+                "partner._id": item.partnerId,
+                period: payload.contract.period,
+              },
+              update,
+            },
+          };
+        }
+      } else {
+        update = {
+          number,
+          period: payload.contract.period,
+          partner,
+          activities: [activity],
+          signDate,
+          handOverDate,
+          penalty: 0,
+          grandTotal: activity.total,
+        };
+
+        return {
+          updateOne: {
+            filter: {
+              "partner._id": item.partnerId,
+              period: payload.contract.period,
+            },
+            update,
+            upsert: true,
           },
-          update,
-          upsert: !existingContract,
-        },
-      };
+        };
+      }
     })
     .filter(notEmpty);
 
@@ -171,6 +217,11 @@ export const storeContract = async (
       code: 401,
     };
   }
+
+  const existingContract = await ContractSchema.findOne({
+    "partner._id": payload.partner.partnerId,
+    period: payload.contract.period,
+  }).select(["_id", "grandTotal"]);
 
   const number = generateContractNumber();
   const partner = await PartnerSchema.findById(
@@ -235,7 +286,114 @@ export const storeContract = async (
     grandTotal: grandTotal,
   };
 
-  const contract = await ContractSchema.create(data);
+  let contract;
+  if (existingContract) {
+    const activityIdsMatched = activities.map((item) => item._id);
+
+    const activityContract = await ContractSchema.findOne({
+      _id: existingContract.id,
+      "activities._id": { $in: activityIdsMatched },
+    });
+
+    if (activityContract) {
+      const newActivities = activities.filter(
+        (item) =>
+          !activityContract.activities.some((itemDb) => itemDb.id == item._id)
+      );
+
+      const existActivities = activities.filter((item) =>
+        activityContract.activities.some((itemDb) => itemDb.id == item._id)
+      );
+
+      if (newActivities.length > 0) {
+        const newGrandTotal = newActivities.reduce(
+          (total, activity) => total + activity.total,
+          0
+        );
+        await ContractSchema.findOneAndUpdate(
+          {
+            _id: existingContract.id,
+          },
+          {
+            $set: {
+              grandTotal: existingContract.grandTotal + newGrandTotal,
+            },
+            $push: { activities: newActivities },
+          },
+          {
+            new: true,
+          }
+        );
+      }
+
+      if (existActivities.length > 0) {
+        const existingContractUpdated = await ContractSchema.findById(
+          existingContract.id
+        );
+
+        if (!existingContractUpdated) {
+          return {
+            data: null,
+            message: "Something wrong",
+            code: 400,
+          };
+        }
+
+        const bulkOps = existActivities.map((activity) => {
+          const activityDb = existingContractUpdated.activities.find((item) => {
+            return item.id == activity._id.toString();
+          });
+          const grandTotal =
+            activity.total - (activityDb ? activityDb.total : 0);
+
+          const update = {
+            $inc: {
+              grandTotal: grandTotal,
+            },
+            $set: {
+              "activities.$": activity,
+            },
+          };
+
+          return {
+            updateMany: {
+              filter: {
+                _id: existingContract.id,
+                "activities._id": activity._id,
+              },
+              update,
+            },
+          };
+        });
+
+        if (bulkOps.length > 0) {
+          await ContractSchema.bulkWrite(bulkOps);
+        }
+      }
+
+      contract = await ContractSchema.findOne({
+        "partner._id": payload.partner.partnerId,
+        period: payload.contract.period,
+      });
+    } else {
+      contract = await ContractSchema.findOneAndUpdate(
+        {
+          _id: existingContract.id,
+        },
+        {
+          $set: {
+            grandTotal: existingContract.grandTotal + grandTotal,
+          },
+          $push: { activities: activities },
+        },
+        {
+          new: true,
+        }
+      );
+    }
+  } else {
+    contract = await ContractSchema.create(data);
+  }
 
   return {
     data: contract,
@@ -258,8 +416,29 @@ export const deleteContractActivity = async (
   id: string,
   activityId: string
 ): Promise<Result<Contract>> => {
-  console.log("ID:", id);
-  console.log("Activity:", activityId);
+  const existingContract = await ContractSchema.findById(id);
+
+  if (!existingContract) {
+    return {
+      data: null,
+      message: "Contract not found",
+      code: 404,
+    };
+  }
+
+  const activity = existingContract.activities.find(
+    (item) => item.id == activityId
+  );
+
+  if (!activity) {
+    return {
+      data: null,
+      message: "Activity not found",
+      code: 404,
+    };
+  }
+
+  const grandTotal = existingContract.grandTotal - activity.total;
 
   const contract = await ContractSchema.findOneAndUpdate(
     {
@@ -268,6 +447,9 @@ export const deleteContractActivity = async (
     {
       $pull: {
         activities: { _id: activityId },
+      },
+      $set: {
+        grandTotal: grandTotal,
       },
     },
     {
