@@ -294,7 +294,7 @@ export const storeContract = async (
     partner: partner,
     activities: activities,
     signDate: signDate,
-    handoverDate: handOverDate,
+    handOverDate: handOverDate,
     penalty: 0,
     grandTotal: grandTotal,
   };

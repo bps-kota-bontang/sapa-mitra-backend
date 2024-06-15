@@ -52,7 +52,7 @@ export const contractSchema = new Schema<Contract>(
       },
     ],
     signDate: { type: Date, required: true },
-    handoverDate: { type: Date, required: true },
+    handOverDate: { type: Date, required: true },
     penalty: { type: Number, required: true },
     grandTotal: { type: Number, required: true },
   },

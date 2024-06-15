@@ -24,7 +24,7 @@ export type Contract = {
     status: StatusContract;
   } & Document)[];
   signDate: Date;
-  handoverDate: Date;
+  handOverDate: Date;
   penalty: number;
   grandTotal: number;
 };
