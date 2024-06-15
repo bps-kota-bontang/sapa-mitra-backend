@@ -40,6 +40,10 @@ export const generateContractNumber = (): string => {
   return Math.floor(Math.random() * 10000).toString();
 };
 
+export const generateReportNumber = (): string => {
+  return Math.floor(Math.random() * 10000).toString();
+};
+
 export const calculateSignDate = (yearMonth: YearMonth) => {
   const [year, month] = yearMonth.split("-").map(Number);
 
