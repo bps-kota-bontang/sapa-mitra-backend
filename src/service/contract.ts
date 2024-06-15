@@ -54,10 +54,10 @@ export const storeContractByActivity = async (
   payload: ContractByActivityPayload,
   claims: JWT
 ): Promise<Result<Contract[]>> => {
-  if (claims.position == "KEPALA") {
+  if (claims.position != "ANGGOTA") {
     return {
       data: null,
-      message: "Head office can't create contracts",
+      message: "Only member can create contracts",
       code: 401,
     };
   }
@@ -217,10 +217,10 @@ export const storeContract = async (
   payload: ContractPayload,
   claims: JWT
 ): Promise<Result<Contract>> => {
-  if (claims.position == "KEPALA") {
+  if (claims.position != "ANGGOTA") {
     return {
       data: null,
-      message: "Head office can't create a contract",
+      message: "Only member can create contracts",
       code: 401,
     };
   }
