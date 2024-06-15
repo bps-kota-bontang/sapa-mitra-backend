@@ -168,7 +168,7 @@ export const storeContractByActivity = async (
         update = {
           number,
           period: payload.contract.period,
-          authority,
+          authority : authority?.value,
           partner,
           activities: [activity],
           signDate,
@@ -290,7 +290,7 @@ export const storeContract = async (
   const data = {
     number: number,
     period: payload.contract.period,
-    authority,
+    authority : authority?.value,
     partner: partner,
     activities: activities,
     signDate: signDate,
