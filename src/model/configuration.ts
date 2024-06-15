@@ -1,4 +1,4 @@
-export type TypeConfiguration = "AUTHORITIES" | "REGION";
+export type TypeConfiguration = "AUTHORITY" | "REGION";
 
 export type Configuration<T> = {
   name: TypeConfiguration;

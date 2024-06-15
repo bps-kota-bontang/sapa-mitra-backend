@@ -31,11 +31,12 @@ export const storeConfiguration = async (
 ): Promise<Result<Configuration<any>>> => {
   let value;
 
-  if (payload.name === "AUTHORITIES") {
+  if (payload.name === "AUTHORITY") {
     value =
       payload.value.name && payload.value.address
         ? {
             name: payload.value.name,
+            nip: payload.value.nip,
             address: payload.value.address,
           }
         : null;
@@ -69,11 +70,12 @@ export const updateConfiguration = async (
 ): Promise<Result<Configuration<any>>> => {
   let value;
 
-  if (name === "AUTHORITIES") {
+  if (name === "AUTHORITY") {
     value =
       payload.value.name && payload.value.address
         ? {
             name: payload.value.name,
+            nip: payload.value.nip,
             address: payload.value.address,
           }
         : null;

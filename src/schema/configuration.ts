@@ -7,7 +7,7 @@ export const configurationSchema = new Schema<Configuration<any>>(
       type: String,
       required: true,
       unique: true,
-      enum: ["AUTHORITIES", "REGION"],
+      enum: ["AUTHORITY", "REGION"],
     },
     value: {
       type: Schema.Types.Mixed,
