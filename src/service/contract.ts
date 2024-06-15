@@ -168,7 +168,7 @@ export const storeContractByActivity = async (
         update = {
           number,
           period: payload.contract.period,
-          authority : authority?.value,
+          authority: authority?.value,
           partner,
           activities: [activity],
           signDate,
@@ -238,7 +238,7 @@ export const storeContract = async (
 
   const partner = await PartnerSchema.findById(
     payload.partner.partnerId
-  ).select(["name","nik", "address"]);
+  ).select(["name", "nik", "address"]);
 
   if (!partner) {
     return {
@@ -290,7 +290,7 @@ export const storeContract = async (
   const data = {
     number: number,
     period: payload.contract.period,
-    authority : authority?.value,
+    authority: authority?.value,
     partner: partner,
     activities: activities,
     signDate: signDate,
@@ -472,7 +472,7 @@ export const deleteContractActivity = async (
 
   return {
     data: contract,
-    message: "Successfully deleted contract",
+    message: "Successfully deleted contract activity",
     code: 204,
   };
 };
@@ -552,5 +552,53 @@ export const printContracts = async (
     data: contracts,
     message: "Successfully print contract",
     code: 200,
+  };
+};
+
+export const verifyContractActivity = async (
+  id: string,
+  activityId: string
+): Promise<Result<Contract>> => {
+  const existingContract = await ContractSchema.findById(id);
+
+  if (!existingContract) {
+    return {
+      data: null,
+      message: "Contract not found",
+      code: 404,
+    };
+  }
+
+  const activity = existingContract.activities.find(
+    (item) => item.id == activityId
+  );
+
+  if (!activity) {
+    return {
+      data: null,
+      message: "Activity not found",
+      code: 404,
+    };
+  }
+
+  const contract = await ContractSchema.findOneAndUpdate(
+    {
+      _id: id,
+      "activities._id": activityId,
+    },
+    {
+      $set: {
+        "activities.$.status": "VERIFIED",
+      },
+    },
+    {
+      new: true,
+    }
+  );
+
+  return {
+    data: contract,
+    message: "Successfully verified contract activity",
+    code: 204,
   };
 };

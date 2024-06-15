@@ -7,6 +7,7 @@ import {
   printContracts,
   storeContract,
   storeContractByActivity,
+  verifyContractActivity,
 } from "@/service/contract";
 import { Hono } from "hono";
 
@@ -112,6 +113,21 @@ app.delete("/:id/activity/:activityId", async (c) => {
   const activityId = c.req.param("activityId");
 
   const result = await deleteContractActivity(id, activityId);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.get("/:id/activity/:activityId/verify", async (c) => {
+  const id = c.req.param("id");
+  const activityId = c.req.param("activityId");
+
+  const result = await verifyContractActivity(id, activityId);
 
   return c.json(
     {
