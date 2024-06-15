@@ -74,7 +74,7 @@ export const deleteReportOutput = async (
     },
     {
       $pull: {
-        output: { _id: outputId },
+        outputs: { _id: outputId },
       },
     },
     {
