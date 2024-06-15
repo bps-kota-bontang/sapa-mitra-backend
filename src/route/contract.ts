@@ -4,12 +4,43 @@ import {
   getContract,
   getContracts,
   printContract,
+  printContracts,
   storeContract,
   storeContractByActivity,
 } from "@/service/contract";
 import { Hono } from "hono";
 
 const app = new Hono();
+
+app.get("/:id/print", async (c) => {
+  const claims = c.get("jwtPayload");
+  const id = c.req.param("id");
+
+  const result = await printContract(id, claims);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.get("/print", async (c) => {
+  const claims = c.get("jwtPayload");
+  const period = c.req.query("period");
+
+  const result = await printContracts(period, claims);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
 
 app.get("/", async (c) => {
   const claims = c.get("jwtPayload");
@@ -90,20 +121,5 @@ app.delete("/:id/activity/:activityId", async (c) => {
     result.code
   );
 });
-
-app.get("/:id/print", async (c) => {
-  const id = c.req.param("id");
-
-  const result = await printContract(id);
-
-  return c.json(
-    {
-      data: result.data,
-      message: result.message,
-    },
-    result.code
-  );
-
-})
 
 export default app;

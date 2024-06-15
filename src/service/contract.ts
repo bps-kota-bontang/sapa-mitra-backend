@@ -2,6 +2,7 @@ import {
   calculateHandOverDate,
   calculateSignDate,
   generateContractNumber,
+  isProduction,
   notEmpty,
 } from "@/common/utils";
 import {
@@ -258,11 +259,11 @@ export const storeContract = async (
       );
       return itemDb
         ? {
-          ...restPayload,
-          ...itemDb.toObject(),
-          total: restPayload.volume * restPayload.rate,
-          createdBy: claims.team,
-        }
+            ...restPayload,
+            ...itemDb.toObject(),
+            total: restPayload.volume * restPayload.rate,
+            createdBy: claims.team,
+          }
         : null;
     })
     .filter(notEmpty);
@@ -464,7 +465,17 @@ export const deleteContractActivity = async (
   };
 };
 
-export const printContract = async (id: string): Promise<Result<Contract>> => {
+export const printContract = async (
+  id: string,
+  claims: JWT
+): Promise<Result<Contract>> => {
+  if (claims.team != "TU" && isProduction) {
+    return {
+      data: null,
+      message: "Only TU can print a contract",
+      code: 401,
+    };
+  }
 
   const contract = await ContractSchema.findById(id);
 
@@ -476,7 +487,9 @@ export const printContract = async (id: string): Promise<Result<Contract>> => {
     };
   }
 
-  const isCompleted = contract.activities.every(item => item.status === "VERIFIED");
+  const isCompleted = contract.activities.every(
+    (item) => item.status === "VERIFIED"
+  );
 
   if (!isCompleted) {
     return {
@@ -491,5 +504,41 @@ export const printContract = async (id: string): Promise<Result<Contract>> => {
     message: "Successfully print contract",
     code: 200,
   };
+};
 
-}
+export const printContracts = async (
+  period: string = "",
+  claims: JWT
+): Promise<Result<Contract[]>> => {
+  let queries: any = {};
+
+  if (period) queries.period = period;
+
+  queries.activities = {
+    $all: [{ $elemMatch: { status: "VERIFIED" } }],
+  };
+
+  if (claims.team != "TU" && isProduction) {
+    return {
+      data: null,
+      message: "Only TU can print a contract",
+      code: 401,
+    };
+  }
+
+  const contracts = await ContractSchema.find(queries);
+
+  if (contracts.length == 0) {
+    return {
+      data: null,
+      message: "All contracts have not been verified by activities",
+      code: 404,
+    };
+  }
+
+  return {
+    data: contracts,
+    message: "Successfully print contract",
+    code: 200,
+  };
+};
