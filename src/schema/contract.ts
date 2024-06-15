@@ -5,9 +5,17 @@ export const contractSchema = new Schema<Contract>(
   {
     number: { type: String, required: true, unique: true },
     period: { type: String, required: true },
+    authority: {
+      type: {
+        name: { type: String, required: true },
+        nip: { type: String, required: true },
+        address: { type: String, required: true },
+      },
+    },
     partner: {
       type: {
         name: { type: String, required: true },
+        nik: { type: String, required: true },
         address: { type: String, required: true },
       },
     },

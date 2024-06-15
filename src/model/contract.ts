@@ -7,10 +7,17 @@ export type YearMonth = `${number}-${number}`;
 
 export type StatusContract = "UNVERIFIED" | "VERIFIED";
 
+export type Authority = {
+  name: string;
+  nip: string;
+  address: string;
+};
+
 export type Contract = {
   number: string;
   period: YearMonth;
-  partner: Pick<Partner, "name" | "address"> & Document;
+  authority: Authority;
+  partner: Pick<Partner, "name" | "nik" | "address"> & Document;
   activities: (Pick<Activity, "code" | "name"> & {
     startDate: Date;
     endDate: Date;

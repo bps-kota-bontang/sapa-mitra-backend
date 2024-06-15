@@ -13,6 +13,7 @@ import {
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
 import ActivitySchema from "@/schema/activity";
+import ConfigurationSchema from "@/schema/configuration";
 import ContractSchema from "@/schema/contract";
 import PartnerSchema from "@/schema/partner";
 
@@ -66,7 +67,7 @@ export const storeContractByActivity = async (
   const partnerIds = payload.partners.map((item) => item.partnerId);
   const partners = await PartnerSchema.find({
     _id: { $in: partnerIds },
-  }).select(["name", "address"]);
+  }).select(["name", "nik", "address"]);
 
   const existingContracts = await ContractSchema.find({
     "partner._id": { $in: partnerIds },
@@ -75,6 +76,10 @@ export const storeContractByActivity = async (
 
   const signDate = calculateSignDate(payload.contract.period);
   const handOverDate = calculateHandOverDate(payload.contract.period);
+
+  const authority = await ConfigurationSchema.findOne({
+    name: "AUTHORITY",
+  });
 
   const activityDb = await ActivitySchema.findById(activityId).select([
     "code",
@@ -163,6 +168,7 @@ export const storeContractByActivity = async (
         update = {
           number,
           period: payload.contract.period,
+          authority,
           partner,
           activities: [activity],
           signDate,
@@ -225,9 +231,14 @@ export const storeContract = async (
   }).select(["_id", "grandTotal"]);
 
   const number = generateContractNumber();
+
+  const authority = await ConfigurationSchema.findOne({
+    name: "AUTHORITY",
+  });
+
   const partner = await PartnerSchema.findById(
     payload.partner.partnerId
-  ).select(["name", "address"]);
+  ).select(["name","nik", "address"]);
 
   if (!partner) {
     return {
@@ -279,6 +290,7 @@ export const storeContract = async (
   const data = {
     number: number,
     period: payload.contract.period,
+    authority,
     partner: partner,
     activities: activities,
     signDate: signDate,
