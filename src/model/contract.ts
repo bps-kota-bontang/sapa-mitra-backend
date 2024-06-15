@@ -2,16 +2,11 @@ import { Partner } from "@/model/partner";
 import { Activity } from "@/model//activity";
 import { Document } from "mongoose";
 import { Team } from "@/model/user";
+import { Authority } from "@/model/authority";
 
 export type YearMonth = `${number}-${number}`;
 
 export type StatusContract = "UNVERIFIED" | "VERIFIED";
-
-export type Authority = {
-  name: string;
-  nip: string;
-  address: string;
-};
 
 export type Contract = {
   number: string;
