@@ -5,14 +5,6 @@ export const activitySchema = new Schema<Activity>(
   {
     code: { type: String, required: true },
     name: { type: String, required: true },
-    output: [
-      {
-        type: {
-          name: { type: String, required: true },
-          unit: { type: String, required: true },
-        },
-      },
-    ],
   },
   {
     timestamps: true,
