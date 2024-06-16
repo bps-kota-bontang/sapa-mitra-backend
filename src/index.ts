@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { etag } from "hono/etag";
 import { logger } from "hono/logger";
+import { cors } from 'hono/cors'
 import { prettyJSON } from "hono/pretty-json";
 import apiV1 from "@/api/v1";
 import connectDB from "@/config/db";
@@ -12,6 +13,7 @@ const app = new Hono();
 connectDB();
 
 app.use(prettyJSON());
+app.use(cors())
 app.use(etag(), logger());
 app.use("/static/*", serveStatic({ root: "./" }));
 app.get("/", (c) => c.text("Sapa Mitra API"));
