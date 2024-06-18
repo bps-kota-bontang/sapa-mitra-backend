@@ -6,7 +6,7 @@ import { generateToken } from "@/service/jwt";
 export const login = async (
   email: string,
   password: string
-): Promise<Result<string>> => {
+): Promise<Result<any>> => {
   const user = await UserSchema.findOne({ email });
 
   if (!user) {
@@ -16,8 +16,10 @@ export const login = async (
       code: 404,
     };
   }
+  const { password: hashedPassword, ...restUser } = user.toObject(); // Convert the document to a plain object
 
-  const isMatch = await Bun.password.verify(password, user.password);
+
+  const isMatch = await Bun.password.verify(password, hashedPassword);
 
   if (!isMatch) {
     return {
@@ -29,8 +31,13 @@ export const login = async (
 
   const token = await generateToken(user);
 
+  const result = {
+    ...restUser,
+    token: token
+  }
+
   return {
-    data: token,
+    data: result,
     message: "Successfully logged in",
     code: 200,
   };
