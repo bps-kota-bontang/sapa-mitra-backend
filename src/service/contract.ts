@@ -270,11 +270,11 @@ export const storeContract = async (
       );
       return itemDb
         ? {
-            ...restPayload,
-            ...itemDb.toObject(),
-            total: restPayload.volume * restPayload.rate,
-            createdBy: claims.team,
-          }
+          ...restPayload,
+          ...itemDb.toObject(),
+          total: restPayload.volume * restPayload.rate,
+          createdBy: claims.team,
+        }
         : null;
     })
     .filter(notEmpty);
@@ -427,7 +427,8 @@ export const deletContract = async (id: string): Promise<Result<any>> => {
 
 export const deleteContractActivity = async (
   id: string,
-  activityId: string
+  activityId: string,
+  claims: JWT
 ): Promise<Result<Contract>> => {
   const existingContract = await ContractSchema.findById(id);
 
@@ -448,6 +449,14 @@ export const deleteContractActivity = async (
       data: null,
       message: "Activity not found",
       code: 404,
+    };
+  }
+
+  if (activity.createdBy != claims.team) {
+    return {
+      data: null,
+      message: `only ${activity.createdBy} team can delete`,
+      code: 401,
     };
   }
 
@@ -557,7 +566,8 @@ export const printContracts = async (
 
 export const verifyContractActivity = async (
   id: string,
-  activityId: string
+  activityId: string,
+  claims: JWT
 ): Promise<Result<Contract>> => {
   const existingContract = await ContractSchema.findById(id);
 
@@ -581,6 +591,14 @@ export const verifyContractActivity = async (
     };
   }
 
+  if (activity.createdBy != claims.team) {
+    return {
+      data: null,
+      message: `only ${activity.createdBy} team can verify`,
+      code: 401,
+    };
+  }
+
   const contract = await ContractSchema.findOneAndUpdate(
     {
       _id: id,
@@ -599,6 +617,6 @@ export const verifyContractActivity = async (
   return {
     data: contract,
     message: "Successfully verified contract activity",
-    code: 204,
+    code: 200,
   };
 };

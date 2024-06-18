@@ -109,10 +109,11 @@ app.delete("/:id", async (c) => {
 });
 
 app.delete("/:id/activity/:activityId", async (c) => {
+  const claims = c.get("jwtPayload");
   const id = c.req.param("id");
   const activityId = c.req.param("activityId");
 
-  const result = await deleteContractActivity(id, activityId);
+  const result = await deleteContractActivity(id, activityId, claims);
 
   return c.json(
     {
@@ -124,10 +125,11 @@ app.delete("/:id/activity/:activityId", async (c) => {
 });
 
 app.get("/:id/activity/:activityId/verify", async (c) => {
+  const claims = c.get("jwtPayload");
   const id = c.req.param("id");
   const activityId = c.req.param("activityId");
 
-  const result = await verifyContractActivity(id, activityId);
+  const result = await verifyContractActivity(id, activityId, claims);
 
   return c.json(
     {

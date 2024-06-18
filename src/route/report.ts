@@ -105,7 +105,7 @@ app.post("/", async (c) => {
   const payload = await c.req.json();
 
   let result;
-  if (by == "activity") {
+  if (by == "output") {
     result = await storeReportByOutput(payload, claims);
   } else {
     result = await storeReport(payload, claims);
