@@ -599,6 +599,14 @@ export const verifyContractActivity = async (
     };
   }
 
+  if (claims.position != "KETUA") {
+    return {
+      data: null,
+      message: `only leader team can verify`,
+      code: 401,
+    };
+  }
+
   const contract = await ContractSchema.findOneAndUpdate(
     {
       _id: id,
