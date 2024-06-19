@@ -36,9 +36,10 @@ app.get("/:name", async (c) => {
 });
 
 app.post("/", async (c) => {
+  const claims = c.get("jwtPayload");
   const payload = await c.req.json<Configuration<any>>();
 
-  const result = await storeConfiguration(payload);
+  const result = await storeConfiguration(payload, claims);
 
   return c.json(
     {
@@ -50,9 +51,10 @@ app.post("/", async (c) => {
 });
 
 app.put("/:name", async (c) => {
+  const claims = c.get("jwtPayload");
   const payload = await c.req.json<Configuration<any>>();
   const name = c.req.param("name");
-  const result = await updateConfiguration(name.toUpperCase(), payload);
+  const result = await updateConfiguration(name.toUpperCase(), payload, claims);
 
   return c.json(
     {
@@ -64,8 +66,9 @@ app.put("/:name", async (c) => {
 });
 
 app.delete("/:name", async (c) => {
+  const claims = c.get("jwtPayload");
   const name = c.req.param("name");
-  const result = await deleteConfiguration(name.toUpperCase());
+  const result = await deleteConfiguration(name.toUpperCase(), claims);
 
   return c.json(
     {

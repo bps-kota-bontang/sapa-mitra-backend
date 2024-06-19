@@ -1,4 +1,5 @@
 import { Configuration } from "@/model/configuration";
+import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
 import ConfigurationSchema from "@/schema/configuration";
 
@@ -27,8 +28,17 @@ export const getConfiguration = async (
 };
 
 export const storeConfiguration = async (
-  payload: Configuration<any>
+  payload: Configuration<any>,
+  claims: JWT
 ): Promise<Result<Configuration<any>>> => {
+  if (claims.team == "TU") {
+    return {
+      data: null,
+      message: "Configuration can only be updated by the TU team",
+      code: 400,
+    };
+  }
+
   let value;
 
   if (payload.name === "AUTHORITY") {
@@ -66,8 +76,17 @@ export const storeConfiguration = async (
 
 export const updateConfiguration = async (
   name: string,
-  payload: Configuration<any>
+  payload: Configuration<any>,
+  claims: JWT
 ): Promise<Result<Configuration<any>>> => {
+  if (claims.team == "TU") {
+    return {
+      data: null,
+      message: "Configuration can only be updated by the TU team",
+      code: 400,
+    };
+  }
+
   let value;
 
   if (name === "AUTHORITY") {
@@ -109,9 +128,17 @@ export const updateConfiguration = async (
 };
 
 export const deleteConfiguration = async (
-  name: string
+  name: string,
+  claims: JWT
 ): Promise<Result<any>> => {
-  console.log(name);
+  if (claims.team == "TU") {
+    return {
+      data: null,
+      message: "Configuration can only be updated by the TU team",
+      code: 400,
+    };
+  }
+
   await ConfigurationSchema.findOneAndDelete({ name: name });
 
   return {
