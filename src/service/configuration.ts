@@ -35,10 +35,10 @@ export const storeConfiguration = async (
     value =
       payload.value.name && payload.value.address
         ? {
-            name: payload.value.name,
-            nip: payload.value.nip,
-            address: payload.value.address,
-          }
+          name: payload.value.name,
+          nip: payload.value.nip,
+          address: payload.value.address,
+        }
         : null;
   } else if (payload.name === "REGION") {
     value = typeof payload.value === "string" ? payload.value : null;
@@ -74,10 +74,10 @@ export const updateConfiguration = async (
     value =
       payload.value.name && payload.value.address
         ? {
-            name: payload.value.name,
-            nip: payload.value.nip,
-            address: payload.value.address,
-          }
+          name: payload.value.name,
+          nip: payload.value.nip,
+          address: payload.value.address,
+        }
         : null;
   } else if (name === "REGION") {
     value = typeof payload.value === "string" ? payload.value : null;
@@ -97,6 +97,7 @@ export const updateConfiguration = async (
     {
       new: true,
       runValidators: true,
+      upsert: true
     }
   );
 
