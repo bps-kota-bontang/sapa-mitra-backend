@@ -3,6 +3,7 @@ import { Output } from "@/model/output";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
 import OutputSchema from "@/schema/output";
+import { parse } from 'csv-parse/sync';
 
 export const getOutputs = async (): Promise<Result<Output[]>> => {
   const outputs = await OutputSchema.find();
@@ -41,6 +42,50 @@ export const storeOutput = async (
   return {
     data: output,
     message: "Successfully created output",
+    code: 201,
+  };
+};
+
+export const uploadOutput = async (
+  file: File,
+  claims: JWT
+): Promise<Result<any>> => {
+  if (claims.team != "TU" && isProduction) {
+    return {
+      data: null,
+      message: "Only TU can create an output",
+      code: 401,
+    };
+  }
+
+  if (!file) {
+    return {
+      data: null,
+      message: "No file uploaded",
+      code: 400,
+    };
+  }
+
+  if (file.type != "text/csv") {
+    return {
+      data: null,
+      message: "Only accepts csv file",
+      code: 400,
+    };
+  }
+
+  const fileContent = await file.text();
+
+  const data = parse(fileContent, {
+    columns: true,
+    skip_empty_lines: true
+  });
+
+  const outputs = await OutputSchema.create(data);
+
+  return {
+    data: outputs,
+    message: "Successfully created activities",
     code: 201,
   };
 };

@@ -5,6 +5,7 @@ import {
   getOutput,
   storeOutput,
   updateOutput,
+  uploadOutput,
 } from "@/service/output";
 import { Hono } from "hono";
 
@@ -25,6 +26,21 @@ app.get("/", async (c) => {
 app.get("/:id", async (c) => {
   const id = c.req.param("id");
   const result = await getOutput(id);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.post("/upload", async (c) => {
+  const claims = c.get("jwtPayload");
+  const body = await c.req.parseBody();
+
+  const result = await uploadOutput(body['file'] as File, claims);
 
   return c.json(
     {

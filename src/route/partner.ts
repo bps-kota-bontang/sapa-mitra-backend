@@ -5,6 +5,7 @@ import {
   getPartner,
   storePartner,
   updatePartner,
+  uploadPartner,
 } from "@/service/partner";
 import { Hono } from "hono";
 
@@ -25,6 +26,21 @@ app.get("/", async (c) => {
 app.get("/:id", async (c) => {
   const id = c.req.param("id");
   const result = await getPartner(id);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.post("/upload", async (c) => {
+  const claims = c.get("jwtPayload");
+  const body = await c.req.parseBody();
+
+  const result = await uploadPartner(body['file'] as File, claims);
 
   return c.json(
     {

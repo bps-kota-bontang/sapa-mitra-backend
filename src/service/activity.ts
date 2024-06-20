@@ -3,6 +3,7 @@ import { Activity } from "@/model/activity";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
 import ActivitySchema from "@/schema/activity";
+import { parse } from 'csv-parse/sync';
 
 export const getActivities = async (): Promise<Result<Activity[]>> => {
   const activities = await ActivitySchema.find();
@@ -21,6 +22,50 @@ export const getActivity = async (id: string): Promise<Result<Activity>> => {
     data: activity,
     message: "Successfully retrieved activity",
     code: 200,
+  };
+};
+
+export const uploadActivity = async (
+  file: File,
+  claims: JWT
+): Promise<Result<any>> => {
+  if (claims.team != "TU" && isProduction) {
+    return {
+      data: null,
+      message: "Only TU can create an activity",
+      code: 401,
+    };
+  }
+
+  if (!file) {
+    return {
+      data: null,
+      message: "No file uploaded",
+      code: 400,
+    };
+  }
+
+  if (file.type != "text/csv") {
+    return {
+      data: null,
+      message: "Only accepts csv file",
+      code: 400,
+    };
+  }
+
+  const fileContent = await file.text();
+
+  const data = parse(fileContent, {
+    columns: true,
+    skip_empty_lines: true
+  });
+
+  const activities = await ActivitySchema.create(data);
+
+  return {
+    data: activities,
+    message: "Successfully created activities",
+    code: 201,
   };
 };
 

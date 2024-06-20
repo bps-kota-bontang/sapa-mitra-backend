@@ -3,6 +3,7 @@ import { JWT } from "@/model/jwt";
 import { Partner } from "@/model/partner";
 import { Result } from "@/model/result";
 import PartnerSchema from "@/schema/partner";
+import { parse } from "csv-parse/sync";
 
 export const getPartners = async (): Promise<Result<Partner[]>> => {
   const partners = await PartnerSchema.find();
@@ -28,7 +29,7 @@ export const storePartner = async (
   payload: Partner,
   claims: JWT
 ): Promise<Result<Partner>> => {
-  if (claims.team != "IPDS" && isProduction) {
+  if (!(claims.team == "IPDS" || claims.team == "TU") && isProduction) {
     return {
       data: null,
       message: "Only IPDS can create an partner",
@@ -45,12 +46,56 @@ export const storePartner = async (
   };
 };
 
+export const uploadPartner = async (
+  file: File,
+  claims: JWT
+): Promise<Result<any>> => {
+  if (!(claims.team == "IPDS" || claims.team == "TU") && isProduction) {
+    return {
+      data: null,
+      message: "Only IPDS can update an partner",
+      code: 401,
+    };
+  }
+
+  if (!file) {
+    return {
+      data: null,
+      message: "No file uploaded",
+      code: 400,
+    };
+  }
+
+  if (file.type != "text/csv") {
+    return {
+      data: null,
+      message: "Only accepts csv file",
+      code: 400,
+    };
+  }
+
+  const fileContent = await file.text();
+
+  const data = parse(fileContent, {
+    columns: true,
+    skip_empty_lines: true
+  });
+
+  const outputs = await PartnerSchema.create(data);
+
+  return {
+    data: outputs,
+    message: "Successfully added partners",
+    code: 201,
+  };
+};
+
 export const updatePartner = async (
   id: string,
   payload: Partner,
   claims: JWT
 ): Promise<Result<Partner>> => {
-  if (claims.team != "IPDS" && isProduction) {
+  if (!(claims.team == "IPDS" || claims.team == "TU") && isProduction) {
     return {
       data: null,
       message: "Only IPDS can update an partner",
@@ -74,7 +119,7 @@ export const deletePartner = async (
   id: string,
   claims: JWT
 ): Promise<Result<any>> => {
-  if (claims.team != "IPDS" && isProduction) {
+  if (!(claims.team == "IPDS" || claims.team == "TU") && isProduction) {
     return {
       data: null,
       message: "Only IPDS can delete an partner",
