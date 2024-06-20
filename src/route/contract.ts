@@ -2,6 +2,7 @@ import {
   deletContract,
   deleteContractActivity,
   getContract,
+  getContractStatistics,
   getContracts,
   printContract,
   printContracts,
@@ -33,6 +34,18 @@ app.get("/print", async (c) => {
   const period = c.req.query("period");
 
   const result = await printContracts(period, claims);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.get("/statistics", async (c) => {
+  const result = await getContractStatistics();
 
   return c.json(
     {

@@ -628,3 +628,56 @@ export const verifyContractActivity = async (
     code: 200,
   };
 };
+
+export const getContractStatistics = async (): Promise<Result<any>> => {
+  const contracts = await ContractSchema.find().select(["partner.name", "period", "activities.status", "activities._id", "activities.createdBy"]);
+
+  const result: any[] = [];
+
+  contracts.forEach(({ partner, period, activities }) => {
+    let periodData = result.find(r => r.period === period);
+    if (!periodData) {
+      periodData = {
+        period,
+        status: {
+          Verified: 0,
+          Unverified: 0,
+        },
+        partners: [],
+        activities: [],
+        teams: {
+          "SOSIAL": 0,
+          "PRODUKSI": 0,
+          "DISTRIBUSI": 0,
+          "NERWILIS": 0,
+          "IPDS": 0,
+          "TU": 0
+        }
+      };
+      result.push(periodData);
+    }
+    activities.forEach((item) => {
+      if (item.status === "VERIFIED") periodData.status.Verified++;
+      if (item.status === "UNVERIFIED") periodData.status.Unverified++;
+
+      if (item.createdBy === "SOSIAL") periodData.teams.SOSIAL++;
+      if (item.createdBy === "PRODUKSI") periodData.teams.PRODUKSI++;
+      if (item.createdBy === "DISTRIBUSI") periodData.teams.DISTRIBUSI++;
+      if (item.createdBy === "NERWILIS") periodData.teams.NERWILIS++;
+      if (item.createdBy === "IPDS") periodData.teams.IPDS++;
+      if (item.createdBy === "TU") periodData.teams.TU++;
+
+      if (!periodData.activities.includes(item.id.toString())) {
+        periodData.activities.push(item.id.toString());
+      }
+    });
+    periodData.partners.push(partner.name);
+  });
+
+  return {
+    data: result,
+    message: "Successfully verified contract activity",
+    code: 200,
+  };
+
+}
