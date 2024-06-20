@@ -85,7 +85,7 @@ export const uploadOutput = async (
 
   return {
     data: outputs,
-    message: "Successfully created activities",
+    message: "Successfully created output",
     code: 201,
   };
 };
