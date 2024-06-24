@@ -67,3 +67,5 @@ export const calculateHandOverDate = (yearMonth: YearMonth) => {
 };
 
 export const isProduction = Bun.env.APP_ENV === "production";
+
+export const mode = Bun.env.APP_ENV || "development";
