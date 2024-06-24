@@ -1,0 +1,24 @@
+name: CI/CD Sapa Mitra Backend
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    types: ["closed"]
+    branches: ["main"]
+
+jobs:
+  build:
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
+    name: Build Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Docker Auth
+        run: docker login ${{ secrets.DOCKER_REGISTRY_URL }} --username=${{ secrets.DOCKER_REGISTRY_USERNAME }} --password=${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+      - name: Build and Push Docker Image
+        run: |
+          docker build --no-cache -t sapa-mitra-backend -f Dockerfile.production .
+          docker tag sapa-mitra-backend ${{ secrets.DOCKER_REGISTRY_URL }}/sapa-mitra-backend:latest
+          docker push ${{ secrets.DOCKER_REGISTRY_URL }}/sapa-mitra-backend:latest
