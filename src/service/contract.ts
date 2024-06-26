@@ -1,14 +1,24 @@
 import {
   calculateHandOverDate,
   calculateSignDate,
+  formatDateFull,
+  formatDateText,
+  formatDayText,
+  formatMonth,
+  formatMonthText,
+  formatYear,
+  formatYearText,
   generateContractNumber,
   isProduction,
   notEmpty,
+  region,
+  toArrayBuffer,
 } from "@/common/utils";
 import {
   Contract,
   ContractByActivityPayload,
   ContractPayload,
+  ContractPdf,
 } from "@/model/contract";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
@@ -16,6 +26,10 @@ import ActivitySchema from "@/schema/activity";
 import ConfigurationSchema from "@/schema/configuration";
 import ContractSchema from "@/schema/contract";
 import PartnerSchema from "@/schema/partner";
+import hbs from "handlebars";
+import fs from "fs";
+import PuppeteerHTMLPDF from "puppeteer-html-pdf";
+import Terbilang from "terbilang-ts";
 
 export const getContracts = async (
   period: string = "",
@@ -270,11 +284,11 @@ export const storeContract = async (
       );
       return itemDb
         ? {
-          ...restPayload,
-          ...itemDb.toObject(),
-          total: restPayload.volume * restPayload.rate,
-          createdBy: claims.team,
-        }
+            ...restPayload,
+            ...itemDb.toObject(),
+            total: restPayload.volume * restPayload.rate,
+            createdBy: claims.team,
+          }
         : null;
     })
     .filter(notEmpty);
@@ -489,7 +503,7 @@ export const deleteContractActivity = async (
 export const printContract = async (
   id: string,
   claims: JWT
-): Promise<Result<Contract>> => {
+): Promise<Result<any>> => {
   if (claims.team != "TU" && isProduction) {
     return {
       data: null,
@@ -520,8 +534,62 @@ export const printContract = async (
     };
   }
 
+  const htmlPDF = new PuppeteerHTMLPDF();
+  htmlPDF.setOptions({
+    displayHeaderFooter: true,
+    format: "A4",
+    margin: {
+      left: "95",
+      right: "95",
+      top: "60",
+      bottom: "60",
+    },
+    footerTemplate: `<p style="margin: auto;font-size: 13px;"><span class="pageNumber"></span></p>`,
+  });
+
+  const html = fs.readFileSync("src/template/contract.html", "utf8");
+  const template = hbs.compile(html);
+  const payload: ContractPdf = {
+    number: contract.number,
+    period: {
+      month: formatMonth(contract.period),
+      year: formatYear(contract.period),
+    },
+    authority: {
+      name: contract.authority.name,
+      address: contract.authority.address,
+    },
+    partner: {
+      name: contract.partner.name,
+      address: contract.partner.address,
+    },
+    sign: {
+      dayText: formatDayText(contract.signDate),
+      dateText: formatDateText(contract.signDate),
+      monthText: formatMonthText(contract.signDate),
+      dateFull: formatDateFull(contract.signDate),
+      yearText: formatYearText(contract.signDate),
+    },
+    handOver: {
+      dateFull: formatDateFull(contract.handOverDate),
+    },
+    grandTotal: {
+      nominal: contract.grandTotal,
+      spell: Terbilang(contract.grandTotal),
+    },
+    region: region,
+  };
+  const content = template(payload);
+
+  const pdfBuffer = await htmlPDF.create(content);
+  const pdfArrayBuffer = toArrayBuffer(pdfBuffer);
+
   return {
-    data: contract,
+    data: {
+      file: pdfArrayBuffer,
+      period: `${payload.period.month} ${payload.period.year}`,
+      name: contract.partner.name,
+    },
     message: "Successfully print contract",
     code: 200,
   };
@@ -630,12 +698,18 @@ export const verifyContractActivity = async (
 };
 
 export const getContractStatistics = async (): Promise<Result<any>> => {
-  const contracts = await ContractSchema.find().select(["partner.name", "period", "activities.status", "activities._id", "activities.createdBy"]);
+  const contracts = await ContractSchema.find().select([
+    "partner.name",
+    "period",
+    "activities.status",
+    "activities._id",
+    "activities.createdBy",
+  ]);
 
   const result: any[] = [];
 
   contracts.forEach(({ partner, period, activities }) => {
-    let periodData = result.find(r => r.period === period);
+    let periodData = result.find((r) => r.period === period);
     if (!periodData) {
       periodData = {
         period,
@@ -646,13 +720,13 @@ export const getContractStatistics = async (): Promise<Result<any>> => {
         partners: [],
         activities: [],
         teams: {
-          "SOSIAL": 0,
-          "PRODUKSI": 0,
-          "DISTRIBUSI": 0,
-          "NERWILIS": 0,
-          "IPDS": 0,
-          "TU": 0
-        }
+          SOSIAL: 0,
+          PRODUKSI: 0,
+          DISTRIBUSI: 0,
+          NERWILIS: 0,
+          IPDS: 0,
+          TU: 0,
+        },
       };
       result.push(periodData);
     }
@@ -679,5 +753,4 @@ export const getContractStatistics = async (): Promise<Result<any>> => {
     message: "Successfully verified contract activity",
     code: 200,
   };
-
-}
+};

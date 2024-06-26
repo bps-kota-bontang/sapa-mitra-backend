@@ -20,13 +20,23 @@ app.get("/:id/print", async (c) => {
 
   const result = await printContract(id, claims);
 
-  return c.json(
-    {
-      data: result.data,
-      message: result.message,
-    },
-    result.code
+  if (result.code != 200) {
+    return c.json(
+      {
+        data: result.data,
+        message: result.message,
+      },
+      result.code
+    );
+  }
+
+  c.res.headers.set("Content-Type", "application/pdf");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename=SPK ${result.data.period} - ${result.data.name}.pdf`
   );
+
+  return c.body(result.data.file);
 });
 
 app.get("/print", async (c) => {

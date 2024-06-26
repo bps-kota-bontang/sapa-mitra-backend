@@ -96,3 +96,36 @@ const byPartner: ContractPayload = {
     },
   ],
 };
+
+export type DownloadContractsPayload = {
+  contracts: [
+    {
+      contractId: string;
+    }
+  ];
+};
+
+export type ContractPdf = {
+  number: string;
+  period: {
+    month: string;
+    year: string;
+  };
+  authority: Pick<Authority, "name" | "address">;
+  partner: Pick<Partner, "name" | "address">;
+  sign: {
+    dayText: string;
+    dateText: string;
+    monthText: string;
+    yearText: string;
+    dateFull: string;
+  };
+  handOver: {
+    dateFull: string;
+  };
+  grandTotal: {
+    nominal: number;
+    spell: string;
+  };
+  region: string;
+};

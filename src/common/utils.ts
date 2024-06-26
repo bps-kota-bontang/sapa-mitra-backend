@@ -1,4 +1,5 @@
 import { YearMonth } from "@/model/contract";
+import Terbilang from "terbilang-ts";
 
 export const notEmpty = <TValue>(
   value: TValue | null | undefined
@@ -69,3 +70,74 @@ export const calculateHandOverDate = (yearMonth: YearMonth) => {
 export const isProduction = Bun.env.APP_ENV === "production";
 
 export const mode = Bun.env.APP_ENV || "development";
+
+export const region = Bun.env.APP_REGION || "Kota Bontang";
+
+
+export const toArrayBuffer = (buffer: Buffer): ArrayBuffer => {
+  const arrayBuffer = new ArrayBuffer(buffer.length);
+  const view = new Uint8Array(arrayBuffer);
+  for (let i = 0; i < buffer.length; ++i) {
+    view[i] = buffer[i];
+  }
+  return arrayBuffer;
+};
+
+export const formatDayText = (isoDate: Date): string => {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+  };
+
+  return isoDate.toLocaleDateString("id-ID", options);
+};
+
+export const formatDateText = (isoDate: Date): string => {
+  const options: Intl.DateTimeFormatOptions = {
+    day: "numeric",
+  };
+
+  return Terbilang(Number(isoDate.toLocaleDateString("id-ID", options)));
+};
+
+export const formatMonth = (inputDate: string): string => {
+  const dateParts = inputDate.split("-");
+  const year = parseInt(dateParts[0]);
+  const month = parseInt(dateParts[1]) - 1;
+
+  const monthName = new Date(year, month).toLocaleString("id-ID", {
+    month: "long",
+  });
+  return monthName;
+};
+
+export const formatYear = (inputDate: string): string => {
+  const dateParts = inputDate.split("-");
+
+  return dateParts[0];
+};
+
+export const formatMonthText = (isoDate: Date): string => {
+  const options: Intl.DateTimeFormatOptions = {
+    month: "long",
+  };
+
+  return isoDate.toLocaleDateString("id-ID", options);
+};
+
+export const formatYearText = (isoDate: Date): string => {
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+  };
+
+  return Terbilang(Number(isoDate.toLocaleDateString("id-ID", options)));
+};
+
+export const formatDateFull = (isoDate: Date): string => {
+  const options: Intl.DateTimeFormatOptions = {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  };
+
+  return isoDate.toLocaleDateString("id-ID", options);
+};
