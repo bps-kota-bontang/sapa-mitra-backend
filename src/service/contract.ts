@@ -546,6 +546,7 @@ export const printContract = async (
       bottom: "60",
     },
     headless: true,
+    headerTemplate: `<p style="margin: auto;font-size: 13px;"></p>`,
     footerTemplate: `<p style="margin: auto;font-size: 13px;"><span class="pageNumber"></span></p>`,
   });
 
