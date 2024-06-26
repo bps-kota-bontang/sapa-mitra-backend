@@ -11,9 +11,9 @@ import {
   formatYearText,
   generateContractNumber,
   isProduction,
+  mergeBuffer,
   notEmpty,
   region,
-  toArrayBuffer,
 } from "@/common/utils";
 import {
   Contract,
@@ -535,90 +535,26 @@ export const printContract = async (
     };
   }
 
-  const htmlPDF = new PuppeteerHTMLPDF();
-  htmlPDF.setOptions({
-    displayHeaderFooter: true,
-    format: "A4",
-    margin: {
-      left: "95",
-      right: "95",
-      top: "60",
-      bottom: "60",
-    },
-    headless: true,
-    headerTemplate: `<p style="margin: auto;font-size: 13px;"></p>`,
-    footerTemplate: `<p style="margin: auto;font-size: 13px;"><span class="pageNumber"></span></p>`,
-  });
-
-  const transformedActivities = contract.activities.map((item) => ({
-    name: item.name,
-    volume: item.volume,
-    unit: item.unit,
-    date: `${formatDate(item.startDate)} - ${formatDate(item.endDate)}`,
-    total: item.total,
-    budget: 0,
-  }));
-
-  const html = fs.readFileSync("src/template/contract.html", "utf8");
-  const template = hbs.compile(html);
-  const payload: ContractPdf = {
-    number: contract.number,
-    period: {
-      month: formatMonth(contract.period),
-      year: formatYear(contract.period),
-    },
-    authority: {
-      name: contract.authority.name,
-      address: contract.authority.address,
-    },
-    partner: {
-      name: contract.partner.name,
-      address: contract.partner.address,
-    },
-    sign: {
-      dayText: formatDayText(contract.signDate),
-      dateText: formatDateText(contract.signDate),
-      monthText: formatMonthText(contract.signDate),
-      dateFull: formatDateFull(contract.signDate),
-      yearText: formatYearText(contract.signDate),
-    },
-    activities: transformedActivities,
-    handOver: {
-      dateFull: formatDateFull(contract.handOverDate),
-    },
-    grandTotal: {
-      nominal: contract.grandTotal,
-      spell: Terbilang(contract.grandTotal),
-    },
-    region: region,
-  };
-  const content = template(payload);
-
-  const pdfBuffer = await htmlPDF.create(content);
-  const pdfArrayBuffer = toArrayBuffer(pdfBuffer);
+  const result = await generateContractPdf(contract);
 
   return {
-    data: {
-      file: pdfArrayBuffer,
-      period: `${payload.period.month} ${payload.period.year}`,
-      name: contract.partner.name,
-    },
+    data: result,
     message: "Successfully print contract",
     code: 200,
   };
 };
 
 export const printContracts = async (
-  period: string = "",
+  payload: string[] = [],
   claims: JWT
-): Promise<Result<Contract[]>> => {
-  let queries: any = {};
-
-  if (period) queries.period = period;
-
-  queries.activities = {
-    $all: [{ $elemMatch: { status: "VERIFIED" } }],
-  };
+): Promise<Result<any>> => {
+  if (!payload) {
+    return {
+      data: null,
+      message: "Please select contracts",
+      code: 400,
+    };
+  }
 
   if (claims.team != "TU" && isProduction) {
     return {
@@ -628,7 +564,14 @@ export const printContracts = async (
     };
   }
 
-  const contracts = await ContractSchema.find(queries);
+  const contracts = await ContractSchema.find({
+    _id: { $in: payload },
+    activities: {
+      $all: [{ $elemMatch: { status: "VERIFIED" } }],
+    },
+  });
+
+  let files: Buffer[] = [];
 
   if (contracts.length == 0) {
     return {
@@ -638,9 +581,26 @@ export const printContracts = async (
     };
   }
 
+  const promises = contracts.map(async (contract) => {
+    const result = await generateContractPdf(contract);
+    files.push(result.file);
+  });
+
+  await Promise.all(promises);
+
+  if (files.length == 0) {
+    return {
+      data: null,
+      message: "Failed to generate contracts pdf",
+      code: 404,
+    };
+  }
+
+  const mergedFile = await mergeBuffer(files);
+
   return {
-    data: contracts,
-    message: "Successfully print contract",
+    data: mergedFile,
+    message: "Successfully print contracts",
     code: 200,
   };
 };
@@ -765,5 +725,76 @@ export const getContractStatistics = async (): Promise<Result<any>> => {
     data: result,
     message: "Successfully verified contract activity",
     code: 200,
+  };
+};
+
+const generateContractPdf = async (
+  contract: Contract
+): Promise<{ file: Buffer; period: string; name: string }> => {
+  const htmlPDF = new PuppeteerHTMLPDF();
+  htmlPDF.setOptions({
+    displayHeaderFooter: true,
+    format: "A4",
+    margin: {
+      left: "95",
+      right: "95",
+      top: "60",
+      bottom: "60",
+    },
+    headless: true,
+    headerTemplate: `<p style="margin: auto;font-size: 13px;"></p>`,
+    footerTemplate: `<p style="margin: auto;font-size: 13px;"><span class="pageNumber"></span></p>`,
+  });
+
+  const transformedActivities = contract.activities.map((item) => ({
+    name: item.name,
+    volume: item.volume,
+    unit: item.unit,
+    date: `${formatDate(item.startDate)} - ${formatDate(item.endDate)}`,
+    total: item.total,
+    budget: 0,
+  }));
+
+  const html = fs.readFileSync("src/template/contract.html", "utf8");
+  const template = hbs.compile(html);
+  const payload: ContractPdf = {
+    number: contract.number,
+    period: {
+      month: formatMonth(contract.period),
+      year: formatYear(contract.period),
+    },
+    authority: {
+      name: contract.authority.name,
+      address: contract.authority.address,
+    },
+    partner: {
+      name: contract.partner.name,
+      address: contract.partner.address,
+    },
+    sign: {
+      dayText: formatDayText(contract.signDate),
+      dateText: formatDateText(contract.signDate),
+      monthText: formatMonthText(contract.signDate),
+      dateFull: formatDateFull(contract.signDate),
+      yearText: formatYearText(contract.signDate),
+    },
+    activities: transformedActivities,
+    handOver: {
+      dateFull: formatDateFull(contract.handOverDate),
+    },
+    grandTotal: {
+      nominal: contract.grandTotal,
+      spell: Terbilang(contract.grandTotal),
+    },
+    region: region,
+  };
+  const content = template(payload);
+
+  const pdfBuffer = await htmlPDF.create(content);
+
+  return {
+    file: pdfBuffer,
+    period: `${payload.period.month} ${payload.period.year}`,
+    name: contract.partner.name,
   };
 };

@@ -1,3 +1,4 @@
+import { toArrayBuffer } from "@/common/utils";
 import {
   deletContract,
   deleteContractActivity,
@@ -36,22 +37,32 @@ app.get("/:id/print", async (c) => {
     `attachment; filename=SPK ${result.data.period} - ${result.data.name}.pdf`
   );
 
-  return c.body(result.data.file);
+  return c.body(toArrayBuffer(result.data.file));
 });
 
-app.get("/print", async (c) => {
+app.post("/print", async (c) => {
   const claims = c.get("jwtPayload");
-  const period = c.req.query("period");
+  const payload = await c.req.json<string[]>();
 
-  const result = await printContracts(period, claims);
+  const result = await printContracts(payload, claims);
 
-  return c.json(
-    {
-      data: result.data,
-      message: result.message,
-    },
-    result.code
+  if (result.code != 200) {
+    return c.json(
+      {
+        data: result.data,
+        message: result.message,
+      },
+      result.code
+    );
+  }
+
+  c.res.headers.set("Content-Type", "application/pdf");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename=SPK ${new Date().valueOf()}.pdf`
   );
+
+  return c.body(toArrayBuffer(result.data));
 });
 
 app.get("/statistics", async (c) => {

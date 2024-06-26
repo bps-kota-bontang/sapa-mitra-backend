@@ -1,5 +1,6 @@
 import { YearMonth } from "@/model/contract";
 import Terbilang from "terbilang-ts";
+import { PDFDocument } from "pdf-lib";
 
 export const notEmpty = <TValue>(
   value: TValue | null | undefined
@@ -147,4 +148,22 @@ export const formatDate = (date: Date): string => {
   const year = date.getUTCFullYear();
 
   return `${day} ${month} ${year}`;
+};
+
+export const mergeBuffer = async (buffers: Buffer[]): Promise<Buffer> => {
+  const mergedPdf = await PDFDocument.create();
+  for (const buffer of buffers) {
+    const pdfDoc = await PDFDocument.load(buffer);
+    const pages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+
+    for (const page of pages) {
+      mergedPdf.addPage(page);
+    }
+  }
+
+  const mergedPdfBytes = await mergedPdf.save();
+
+  const data = Buffer.from(mergedPdfBytes);
+
+  return data;
 };
