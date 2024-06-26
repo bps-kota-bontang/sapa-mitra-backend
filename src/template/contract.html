@@ -1,8 +1,28 @@
-<p style="text-align: center;"><strong>PERJANJIAN KERJA</strong></p>
-<p style="text-align: center; text-transform: uppercase;"><strong>MITRA STATISTIK BULAN {{period.month}}
-        {{period.year}}</strong></p>
-<p style="text-align: center; text-transform: uppercase;"><strong>PADA BADAN PUSAT STATISTIK {{region}}</strong></p>
-<p style="text-align: center;"><strong>NOMOR: {{number}}</strong></p>
+<style>
+    .bordered-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .bordered-table,
+    .bordered-table th,
+    .bordered-table td {
+        border: 1px solid black;
+    }
+
+    .bordered-table th,
+    .bordered-table td {
+        padding: 8px;
+        text-align: left;
+    }
+
+    .bordered-table th {
+        background-color: #f2f2f2;
+    }
+</style>
+<p style="text-align: center; text-transform: uppercase;"><strong>PERJANJIAN KERJA</br>MITRA STATISTIK BULAN
+        {{period.month}}
+        {{period.year}}</br>PADA BADAN PUSAT STATISTIK {{region}}</br>NOMOR: {{number}}</strong></p>
 <p style="text-align: justify;">Pada hari ini {{sign.dayText}}, tanggal {{sign.dateText}}, bulan {{sign.monthText}},
     tahun {{sign.yearText}} bertempat di Kantor BPS {{region}}, yang bertanda tangan di bawah ini:</p>
 <ol>
@@ -27,7 +47,7 @@
     ketentuan-ketentuan lainnya yang ditetapkan oleh <strong>PIHAK PERTAMA.</strong></p>
 <p style="text-align: center;"><strong>Pasal 3</strong></p>
 <p style="text-align: justify;">Jangka Waktu Perjanjian terhitung sejak ditandatangani sampai dengan
-    tanggal&nbsp;{{sign.dateFull}}</p>
+    tanggal {{sign.dateFull}}</p>
 <p style="text-align: center;"><strong>Pasal 4</strong></p>
 <ol>
     <li style="text-align: justify;"><strong>PIHAK KEDUA </strong>berkewajiban melaksanakan pekerjaan yang diberikan
@@ -122,8 +142,8 @@
 </ol>
 <p style="text-align: center;"><strong>Pasal 11</strong></p>
 <ol>
-    <li style="text-align: justify;">Apabila terjadi Keadaan Kahar, yang meliputi bencana alam, bencana non alam,&nbsp;
-        dan bencana sosial, <strong>PIHAK KEDUA </strong>memberitahukan kepada <strong>PIHAK PERTAMA </strong>dalam
+    <li style="text-align: justify;">Apabila terjadi Keadaan Kahar, yang meliputi bencana alam, bencana non alam, dan
+        bencana sosial, <strong>PIHAK KEDUA </strong>memberitahukan kepada <strong>PIHAK PERTAMA </strong>dalam
         waktu paling lambat 7 (tujuh) hari kalender sejak mengetahui atas kejadian Keadaan Kahar dengan menyertakan
         bukti.</li>
     <li style="text-align: justify;">Apabila terjadi kerusakan perangkat pencacahan yang menyebabkan pelaksanaan
@@ -179,3 +199,93 @@
         </tr>
     </tbody>
 </table>
+<div style="page-break-before: always;">
+    <p style="text-align: left; padding-left: 280px;text-transform: uppercase;">LAMPIRAN</br>PERJANJIAN KERJA MITRA
+        STATISTIK BADAN PUSAT
+        STATISTIK
+        {{region}}</br>NOMOR: {{number}}</p>
+    <p style="text-align: center;">DAFTAR URAIAN TUGAS, TARGET PEKERJAAN, JANGKA WAKTU, NILAI PERJANJIAN, DAN BEBAN
+        ANGGARAN</p>
+    <table class="bordered-table">
+        <tbody>
+            <tr>
+                <td style="text-align: center;" rowspan="2">
+                    <p>Uraian Tugas</p>
+                </td>
+                <td style="text-align: center;" colspan="2">
+                    <p>Target Pekerjaan</p>
+                </td>
+                <td style="text-align: center;" rowspan="2">
+                    <p>Jadwal Pelaksanaan</p>
+                </td>
+                <td style="text-align: center;" rowspan="2">
+                    <p>Nilai Perjanjian</p>
+                </td>
+                <td style="text-align: center;" rowspan="2">
+                    <p>Beban Anggaran</p>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">
+                    <p>Volume</p>
+                </td>
+                <td style="text-align: center;">
+                    <p>Satuan</p>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: center;">
+                    <p>(1)</p>
+                </td>
+                <td style="text-align: center;">
+                    <p>(2)</p>
+                </td>
+                <td style="text-align: center;">
+                    <p>(3)</p>
+                </td>
+                <td style="text-align: center;">
+                    <p>(4)</p>
+                </td>
+                <td style="text-align: center;">
+                    <p>(5)</p>
+                </td>
+                <td style="text-align: center;">
+                    <p>(6)</p>
+                </td>
+            </tr>
+            {{#each activities}}
+            <tr>
+                <td>
+                    <p>{{name}}</p>
+                </td>
+                <td style="text-align: center;">
+                    <p>{{volume}}</p>
+                </td>
+                <td style="text-align: center;">
+                    <p>{{unit}}</p>
+                </td>
+                <td style="text-align: center;">
+                    <p>{{date}}</p>
+                </td>
+                <td style="text-align: center;">
+                    <p>Rp {{total}}</p>
+                </td>
+                <td style="text-align: center;">
+                    <p>Rp {{budget}}</p>
+                </td>
+            </tr>
+            {{/each}}
+            <tr>
+                <td colspan="4">
+                    <p>Terbilang: {{grandTotal.spell}} Rupiah</p>
+                </td>
+                <td style="text-align: center;">
+                    <p>Rp {{grandTotal.nominal}}</p>
+                </td>
+                <td style="text-align: center;">
+                    <p>Rp 0</p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

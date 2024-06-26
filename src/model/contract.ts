@@ -120,6 +120,14 @@ export type ContractPdf = {
     yearText: string;
     dateFull: string;
   };
+  activities: {
+    name: string;
+    volume: number;
+    unit: string;
+    date: string;
+    total: number;
+    budget: number;
+  }[];
   handOver: {
     dateFull: string;
   };

@@ -73,7 +73,6 @@ export const mode = Bun.env.APP_ENV || "development";
 
 export const region = Bun.env.APP_REGION || "Kota Bontang";
 
-
 export const toArrayBuffer = (buffer: Buffer): ArrayBuffer => {
   const arrayBuffer = new ArrayBuffer(buffer.length);
   const view = new Uint8Array(arrayBuffer);
@@ -140,4 +139,12 @@ export const formatDateFull = (isoDate: Date): string => {
   };
 
   return isoDate.toLocaleDateString("id-ID", options);
+};
+
+export const formatDate = (date: Date): string => {
+  const day = date.getUTCDate();
+  const month = date.toLocaleString("id-ID", { month: "long" });
+  const year = date.getUTCFullYear();
+
+  return `${day} ${month} ${year}`;
 };

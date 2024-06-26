@@ -1,6 +1,7 @@
 import {
   calculateHandOverDate,
   calculateSignDate,
+  formatDate,
   formatDateFull,
   formatDateText,
   formatDayText,
@@ -547,6 +548,15 @@ export const printContract = async (
     footerTemplate: `<p style="margin: auto;font-size: 13px;"><span class="pageNumber"></span></p>`,
   });
 
+  const transformedActivities = contract.activities.map((item) => ({
+    name: item.name,
+    volume: item.volume,
+    unit: item.unit,
+    date: `${formatDate(item.startDate)} - ${formatDate(item.endDate)}`,
+    total: item.total,
+    budget: 0,
+  }));
+
   const html = fs.readFileSync("src/template/contract.html", "utf8");
   const template = hbs.compile(html);
   const payload: ContractPdf = {
@@ -570,6 +580,7 @@ export const printContract = async (
       dateFull: formatDateFull(contract.signDate),
       yearText: formatYearText(contract.signDate),
     },
+    activities: transformedActivities,
     handOver: {
       dateFull: formatDateFull(contract.handOverDate),
     },
