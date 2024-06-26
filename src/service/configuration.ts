@@ -31,7 +31,7 @@ export const storeConfiguration = async (
   payload: Configuration<any>,
   claims: JWT
 ): Promise<Result<Configuration<any>>> => {
-  if (claims.team == "TU") {
+  if (claims.team != "TU") {
     return {
       data: null,
       message: "Configuration can only be updated by the TU team",
@@ -45,10 +45,10 @@ export const storeConfiguration = async (
     value =
       payload.value.name && payload.value.address
         ? {
-          name: payload.value.name,
-          nip: payload.value.nip,
-          address: payload.value.address,
-        }
+            name: payload.value.name,
+            nip: payload.value.nip,
+            address: payload.value.address,
+          }
         : null;
   } else if (payload.name === "REGION") {
     value = typeof payload.value === "string" ? payload.value : null;
@@ -79,7 +79,7 @@ export const updateConfiguration = async (
   payload: Configuration<any>,
   claims: JWT
 ): Promise<Result<Configuration<any>>> => {
-  if (claims.team == "TU") {
+  if (claims.team != "TU") {
     return {
       data: null,
       message: "Configuration can only be updated by the TU team",
@@ -93,10 +93,10 @@ export const updateConfiguration = async (
     value =
       payload.value.name && payload.value.address
         ? {
-          name: payload.value.name,
-          nip: payload.value.nip,
-          address: payload.value.address,
-        }
+            name: payload.value.name,
+            nip: payload.value.nip,
+            address: payload.value.address,
+          }
         : null;
   } else if (name === "REGION") {
     value = typeof payload.value === "string" ? payload.value : null;
@@ -116,7 +116,7 @@ export const updateConfiguration = async (
     {
       new: true,
       runValidators: true,
-      upsert: true
+      upsert: true,
     }
   );
 
@@ -131,7 +131,7 @@ export const deleteConfiguration = async (
   name: string,
   claims: JWT
 ): Promise<Result<any>> => {
-  if (claims.team == "TU") {
+  if (claims.team != "TU") {
     return {
       data: null,
       message: "Configuration can only be updated by the TU team",
