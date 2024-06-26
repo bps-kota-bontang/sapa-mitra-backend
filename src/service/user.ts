@@ -14,7 +14,7 @@ export const getUsers = async (claims: JWT): Promise<Result<User[]>> => {
 };
 
 export const getUser = async (id: string): Promise<Result<User>> => {
-  const user = await UserSchema.findById(id).select(["-password"]);
+  const user = await UserSchema.findOne({ _id: id }).select(["-password"]);
 
   return {
     data: user,
