@@ -14,10 +14,10 @@ const withAuth = createMiddleware(async (c, next) => {
     return next();
   }
 
-  if (!isProduction) {
+  if (!isProduction && !c.req.header("Authorization")) {
     const user = await UserSchema.findOne();
     if (!user) {
-      return
+      return;
     }
     const payload = generatePayload(user);
 
