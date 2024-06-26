@@ -15,7 +15,7 @@ export const generateToken = async (user: User): Promise<string> => {
   return token;
 };
 
-const generatePayload = (user: User) => {
+export const generatePayload = (user: User) => {
   const now = Math.floor(Date.now() / 1000); // Current Unix timestamp
 
   const payload: JWT = {
