@@ -38,7 +38,7 @@ app.get("/:id/print", async (c) => {
   return c.body(toArrayBuffer(result.data.file));
 });
 
-app.get("/print", async (c) => {
+app.post("/print", async (c) => {
   const claims = c.get("jwtPayload");
   const payload = await c.req.json<string[]>();
 
