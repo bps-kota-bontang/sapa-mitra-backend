@@ -78,6 +78,7 @@ export const uploadOutput = async (
 
   const data = parse(fileContent, {
     columns: true,
+    delimiter: ";",
     skip_empty_lines: true,
   });
 
