@@ -67,3 +67,25 @@ const reportByOutputPayload: ReportByOutputPayload = {
     },
   ],
 };
+
+export type ReportPdf = {
+  number: string;
+  period: {
+    month: string;
+    year: string;
+  };
+  authority: Authority;
+  partner: Partner;
+  handOver: {
+    dayText: string;
+    dateText: string;
+    monthText: string;
+    yearText: string;
+  };
+  outputs: {
+    name: string;
+    unit: string;
+    total: number;
+  }[];
+  region: string;
+};

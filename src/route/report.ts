@@ -1,3 +1,4 @@
+import { toArrayBuffer } from "@/common/utils";
 import {
   deleteReport,
   deleteReportOutput,
@@ -18,28 +19,48 @@ app.get("/:id/print", async (c) => {
 
   const result = await printReport(id, claims);
 
-  return c.json(
-    {
-      data: result.data,
-      message: result.message,
-    },
-    result.code
+  if (result.code != 200) {
+    return c.json(
+      {
+        data: result.data,
+        message: result.message,
+      },
+      result.code
+    );
+  }
+
+  c.res.headers.set("Content-Type", "application/pdf");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename=BAST ${result.data.period} - ${result.data.name}.pdf`
   );
+
+  return c.body(toArrayBuffer(result.data.file));
 });
 
 app.get("/print", async (c) => {
   const claims = c.get("jwtPayload");
-  const period = c.req.query("period");
+  const payload = await c.req.json<string[]>();
 
-  const result = await printReports(period, claims);
+  const result = await printReports(payload, claims);
 
-  return c.json(
-    {
-      data: result.data,
-      message: result.message,
-    },
-    result.code
+  if (result.code != 200) {
+    return c.json(
+      {
+        data: result.data,
+        message: result.message,
+      },
+      result.code
+    );
+  }
+
+  c.res.headers.set("Content-Type", "application/pdf");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename=SPK ${new Date().valueOf()}.pdf`
   );
+
+  return c.body(toArrayBuffer(result.data));
 });
 
 app.get("/", async (c) => {

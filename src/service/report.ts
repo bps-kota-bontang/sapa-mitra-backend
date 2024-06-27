@@ -1,12 +1,32 @@
-import { generateReportNumber, isProduction, notEmpty } from "@/common/utils";
+import {
+  formatDateText,
+  formatDayText,
+  formatMonth,
+  formatMonthText,
+  formatYear,
+  formatYearText,
+  generateReportNumber,
+  isProduction,
+  mergeBuffer,
+  notEmpty,
+  region,
+} from "@/common/utils";
 import { JWT } from "@/model/jwt";
-import { Report, ReportByOutputPayload, ReportPayload } from "@/model/report";
+import {
+  Report,
+  ReportByOutputPayload,
+  ReportPayload,
+  ReportPdf,
+} from "@/model/report";
 import { Result } from "@/model/result";
 import ConfigurationSchema from "@/schema/configuration";
 import ContractSchema from "@/schema/contract";
 import OutputSchema from "@/schema/output";
 import PartnerSchema from "@/schema/partner";
 import ReportSchema from "@/schema/report";
+import hbs from "handlebars";
+import fs from "fs";
+import PuppeteerHTMLPDF from "puppeteer-html-pdf";
 
 export const getReports = async (
   period: string = ""
@@ -92,7 +112,7 @@ export const deleteReportOutput = async (
 export const printReport = async (
   id: string,
   claims: JWT
-): Promise<Result<Report>> => {
+): Promise<Result<any>> => {
   if (claims.team != "TU" && isProduction) {
     return {
       data: null,
@@ -111,20 +131,26 @@ export const printReport = async (
     };
   }
 
+  const result = await generateReportPdf(report);
+
   return {
-    data: report,
+    data: result,
     message: "Successfully print report",
     code: 200,
   };
 };
 
 export const printReports = async (
-  period: string = "",
+  payload: string[] = [],
   claims: JWT
-): Promise<Result<Report[]>> => {
-  let queries: any = {};
-
-  if (period) queries["contract.period"] = period;
+): Promise<Result<any>> => {
+  if (!payload) {
+    return {
+      data: null,
+      message: "Please select contracts",
+      code: 400,
+    };
+  }
 
   if (claims.team != "TU" && isProduction) {
     return {
@@ -134,7 +160,11 @@ export const printReports = async (
     };
   }
 
-  const reports = await ReportSchema.find(queries);
+  const reports = await ReportSchema.find({
+    _id: { $in: payload },
+  });
+
+  let files: Buffer[] = [];
 
   if (reports.length == 0) {
     return {
@@ -144,8 +174,25 @@ export const printReports = async (
     };
   }
 
+  const promises = reports.map(async (report) => {
+    const result = await generateReportPdf(report);
+    files.push(result.file);
+  });
+
+  await Promise.all(promises);
+
+  if (files.length == 0) {
+    return {
+      data: null,
+      message: "Failed to generate contracts pdf",
+      code: 404,
+    };
+  }
+
+  const mergedFile = await mergeBuffer(files);
+
   return {
-    data: reports,
+    data: mergedFile,
     message: "Successfully print reports",
     code: 200,
   };
@@ -494,5 +541,68 @@ export const storeReportByOutput = async (
     data: reports,
     message: "Successfully created reports",
     code: 201,
+  };
+};
+
+const generateReportPdf = async (
+  report: Report
+): Promise<{ file: Buffer; period: string; name: string }> => {
+  const htmlPDF = new PuppeteerHTMLPDF();
+  htmlPDF.setOptions({
+    displayHeaderFooter: true,
+    format: "A4",
+    margin: {
+      left: "95",
+      right: "95",
+      top: "30",
+      bottom: "30",
+    },
+    headless: true,
+    headerTemplate: `<p style="margin: auto;font-size: 13px;"></p>`,
+    footerTemplate: `<p style="margin: auto;font-size: 13px;"><span class="pageNumber"></span></p>`,
+  });
+
+  const transformedOutputs = report.outputs.map((item, index) => ({
+    number: index + 1,
+    name: item.name,
+    unit: item.unit,
+    total: item.total,
+  }));
+
+  const html = fs.readFileSync("src/template/report.html", "utf8");
+  const template = hbs.compile(html);
+  const payload: ReportPdf = {
+    number: report.number,
+    period: {
+      month: formatMonth(report.contract.period),
+      year: formatYear(report.contract.period),
+    },
+    authority: {
+      name: report.authority.name,
+      nip: report.authority.nip,
+      address: report.authority.address,
+    },
+    partner: {
+      name: report.partner.name,
+      nik: report.partner.nik,
+      address: report.partner.address,
+    },
+    handOver: {
+      dayText: formatDayText(report.contract.handOverDate),
+      dateText: formatDateText(report.contract.handOverDate),
+      monthText: formatMonthText(report.contract.handOverDate),
+      yearText: formatYearText(report.contract.handOverDate),
+    },
+    outputs: transformedOutputs,
+    region: region,
+  };
+  const content = template(payload);
+
+  const pdfBuffer = await htmlPDF.create(content);
+
+  return {
+    file: pdfBuffer,
+    period: `${payload.period.month} ${payload.period.year}`,
+    name: report.partner.name,
   };
 };
