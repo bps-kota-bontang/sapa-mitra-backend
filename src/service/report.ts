@@ -37,8 +37,15 @@ export const getReports = async (
 
   const reports = await ReportSchema.find(queries);
 
+  const transformedReports = reports.map((item, index) => {
+    return {
+      ...item.toObject(),
+      index: index + 1,
+    };
+  });
+
   return {
-    data: reports,
+    data: transformedReports,
     message: "Successfully retrieved reports",
     code: 200,
   };

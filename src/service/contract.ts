@@ -48,8 +48,15 @@ export const getContracts = async (
 
   const contracts = await ContractSchema.find(queries);
 
+  const transformedContracts = contracts.map((item, index) => {
+    return {
+      ...item.toObject(),
+      index: index + 1,
+    };
+  });
+
   return {
-    data: contracts,
+    data: transformedContracts,
     message: "Successfully retrieved contracts",
     code: 200,
   };

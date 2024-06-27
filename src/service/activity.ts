@@ -8,8 +8,15 @@ import { parse } from "csv-parse/sync";
 export const getActivities = async (): Promise<Result<Activity[]>> => {
   const activities = await ActivitySchema.find();
 
+  const transformedActivities = activities.map((item, index) => {
+    return {
+      ...item.toObject(),
+      index: index + 1,
+    };
+  });
+
   return {
-    data: activities,
+    data: transformedActivities,
     message: "Successfully retrieved activities",
     code: 200,
   };

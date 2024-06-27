@@ -8,8 +8,15 @@ import { parse } from "csv-parse/sync";
 export const getPartners = async (): Promise<Result<Partner[]>> => {
   const partners = await PartnerSchema.find();
 
+  const transformedPartners = partners.map((partner, index) => {
+    return {
+      ...partner.toObject(),
+      index: index + 1,
+    };
+  });
+
   return {
-    data: partners,
+    data: transformedPartners,
     message: "Successfully retrieved partners",
     code: 200,
   };

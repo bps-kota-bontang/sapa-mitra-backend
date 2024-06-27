@@ -6,8 +6,15 @@ import UserSchema from "@/schema/user";
 export const getUsers = async (claims: JWT): Promise<Result<User[]>> => {
   const users = await UserSchema.find().select(["-password"]);
 
+  const transformedUsers = users.map((item, index) => {
+    return {
+      ...item.toObject(),
+      index: index + 1,
+    };
+  });
+
   return {
-    data: users,
+    data: transformedUsers,
     message: "Successfully retrieved user",
     code: 200,
   };

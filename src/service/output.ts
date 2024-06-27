@@ -8,8 +8,15 @@ import { parse } from "csv-parse/sync";
 export const getOutputs = async (): Promise<Result<Output[]>> => {
   const outputs = await OutputSchema.find();
 
+  const transformedOutputs = outputs.map((item, index) => {
+    return {
+      ...item.toObject(),
+      index: index + 1,
+    };
+  });
+
   return {
-    data: outputs,
+    data: transformedOutputs,
     message: "Successfully retrieved outputs",
     code: 200,
   };
