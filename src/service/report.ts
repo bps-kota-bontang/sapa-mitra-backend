@@ -246,6 +246,14 @@ export const storeReport = async (
     period: payload.contract.period,
   }).select(["number", "period", "handOverDate"]);
 
+  if (!contract) {
+    return {
+      data: null,
+      message: "Contract not found",
+      code: 404,
+    };
+  }
+
   const outputIds = payload.outputs.map((item) => item.outputId);
 
   const outputsDb = await OutputSchema.find({
@@ -500,6 +508,8 @@ export const storeReportByOutput = async (
           (itemContract) => itemContract.partner.id == item.partnerId
         );
 
+        if (!contract) return null;
+
         update = {
           number,
           authority: authority.value,
@@ -525,7 +535,7 @@ export const storeReportByOutput = async (
   if (bulkOps.length == 0) {
     return {
       data: null,
-      message: "Partners not found",
+      message: "Partners/Contracts not found",
       code: 404,
     };
   }
