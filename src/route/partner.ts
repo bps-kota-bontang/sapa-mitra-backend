@@ -1,3 +1,4 @@
+import { downloadTemplate, toArrayBuffer } from "@/common/utils";
 import { Partner } from "@/model/partner";
 import {
   deletePartner,
@@ -11,6 +12,18 @@ import {
 import { Hono } from "hono";
 
 const app = new Hono();
+
+app.get("/template", async (c) => {
+  const result = await downloadTemplate("src/template/partner.csv");
+
+  c.res.headers.set("Content-Type", "text/csv");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename=Template Partner.csv`
+  );
+
+  return c.body(toArrayBuffer(result));
+});
 
 app.get("/", async (c) => {
   const result = await getPartners();

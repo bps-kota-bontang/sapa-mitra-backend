@@ -1,6 +1,7 @@
 import { YearMonth } from "@/model/contract";
 import Terbilang from "terbilang-ts";
 import { PDFDocument } from "pdf-lib";
+import { promises as fs } from "fs";
 
 export const notEmpty = <TValue>(
   value: TValue | null | undefined
@@ -166,4 +167,10 @@ export const mergeBuffer = async (buffers: Buffer[]): Promise<Buffer> => {
   const data = Buffer.from(mergedPdfBytes);
 
   return data;
+};
+
+export const downloadTemplate = async (filePath: string): Promise<Buffer> => {
+  const fileBuffer = fs.readFile(filePath);
+
+  return fileBuffer;
 };
