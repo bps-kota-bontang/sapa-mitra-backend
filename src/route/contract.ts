@@ -15,7 +15,7 @@ import { Hono } from "hono";
 
 const app = new Hono();
 
-app.get("/:id/print", async (c) => {
+app.post("/:id/print", async (c) => {
   const claims = c.get("jwtPayload");
   const id = c.req.param("id");
 
