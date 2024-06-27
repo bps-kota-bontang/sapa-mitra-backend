@@ -13,7 +13,7 @@ import { Hono } from "hono";
 
 const app = new Hono();
 
-app.get("/template", async (c) => {
+app.post("/template", async (c) => {
   const result = await downloadTemplate("src/template/output.csv");
 
   c.res.headers.set("Content-Type", "text/csv");
