@@ -22,6 +22,8 @@ RUN bun install --frozen-lockfile --production
 
 COPY . .
 
+RUN chown -R bun:bun /app
+
 USER bun
 
 EXPOSE 4000/tcp
