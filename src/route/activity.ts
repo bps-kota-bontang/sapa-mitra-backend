@@ -1,5 +1,6 @@
 import { Activity } from "@/model/activity";
 import {
+  deleteActivities,
   deleteActivity,
   getActivities,
   getActivity,
@@ -40,7 +41,7 @@ app.post("/upload", async (c) => {
   const claims = c.get("jwtPayload");
   const body = await c.req.parseBody();
 
-  const result = await uploadActivity(body['file'] as File, claims);
+  const result = await uploadActivity(body["file"] as File, claims);
 
   return c.json(
     {
@@ -71,6 +72,20 @@ app.put("/:id", async (c) => {
   const payload = await c.req.json<Activity>();
   const id = c.req.param("id");
   const result = await updateActivity(id, payload, claims);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.delete("/", async (c) => {
+  const claims = c.get("jwtPayload");
+  const payload = await c.req.json<string[]>();
+  const result = await deleteActivities(payload, claims);
 
   return c.json(
     {

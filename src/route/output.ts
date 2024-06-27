@@ -6,6 +6,7 @@ import {
   storeOutput,
   updateOutput,
   uploadOutput,
+  deleteOutputs,
 } from "@/service/output";
 import { Hono } from "hono";
 
@@ -40,7 +41,7 @@ app.post("/upload", async (c) => {
   const claims = c.get("jwtPayload");
   const body = await c.req.parseBody();
 
-  const result = await uploadOutput(body['file'] as File, claims);
+  const result = await uploadOutput(body["file"] as File, claims);
 
   return c.json(
     {
@@ -71,6 +72,20 @@ app.put("/:id", async (c) => {
   const payload = await c.req.json<Output>();
   const id = c.req.param("id");
   const result = await updateOutput(id, payload, claims);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.delete("/", async (c) => {
+  const claims = c.get("jwtPayload");
+  const payload = await c.req.json<string[]>();
+  const result = await deleteOutputs(payload, claims);
 
   return c.json(
     {

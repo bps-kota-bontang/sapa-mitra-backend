@@ -78,7 +78,7 @@ export const uploadPartner = async (
 
   const data = parse(fileContent, {
     columns: true,
-    skip_empty_lines: true
+    skip_empty_lines: true,
   });
 
   const outputs = await PartnerSchema.create(data);
@@ -115,6 +115,37 @@ export const updatePartner = async (
   };
 };
 
+export const deletePartners = async (
+  ids: string[] = [],
+  claims: JWT
+): Promise<Result<any>> => {
+  if (!(claims.team == "IPDS" || claims.team == "TU") && isProduction) {
+    return {
+      data: null,
+      message: "Only IPDS & TU can delete an partner",
+      code: 401,
+    };
+  }
+
+  if (ids.length == 0) {
+    return {
+      data: null,
+      message: "Please select partners",
+      code: 400,
+    };
+  }
+
+  await PartnerSchema.deleteMany({
+    _id: { $in: ids },
+  });
+
+  return {
+    data: null,
+    message: "Successfully deleted partners",
+    code: 204,
+  };
+};
+
 export const deletePartner = async (
   id: string,
   claims: JWT
@@ -122,7 +153,7 @@ export const deletePartner = async (
   if (!(claims.team == "IPDS" || claims.team == "TU") && isProduction) {
     return {
       data: null,
-      message: "Only IPDS can delete an partner",
+      message: "Only IPDS & TU can delete an partner",
       code: 401,
     };
   }

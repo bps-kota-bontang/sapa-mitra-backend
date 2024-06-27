@@ -6,6 +6,7 @@ import {
   storePartner,
   updatePartner,
   uploadPartner,
+  deletePartners,
 } from "@/service/partner";
 import { Hono } from "hono";
 
@@ -40,7 +41,7 @@ app.post("/upload", async (c) => {
   const claims = c.get("jwtPayload");
   const body = await c.req.parseBody();
 
-  const result = await uploadPartner(body['file'] as File, claims);
+  const result = await uploadPartner(body["file"] as File, claims);
 
   return c.json(
     {
@@ -85,6 +86,20 @@ app.delete("/:id", async (c) => {
   const claims = c.get("jwtPayload");
   const id = c.req.param("id");
   const result = await deletePartner(id, claims);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.delete("/", async (c) => {
+  const claims = c.get("jwtPayload");
+  const payload = await c.req.json<string[]>();
+  const result = await deletePartners(payload, claims);
 
   return c.json(
     {

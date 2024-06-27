@@ -3,7 +3,7 @@ import { Output } from "@/model/output";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
 import OutputSchema from "@/schema/output";
-import { parse } from 'csv-parse/sync';
+import { parse } from "csv-parse/sync";
 
 export const getOutputs = async (): Promise<Result<Output[]>> => {
   const outputs = await OutputSchema.find();
@@ -36,7 +36,7 @@ export const storeOutput = async (
       code: 401,
     };
   }
-  
+
   const output = await OutputSchema.create(payload);
 
   return {
@@ -78,7 +78,7 @@ export const uploadOutput = async (
 
   const data = parse(fileContent, {
     columns: true,
-    skip_empty_lines: true
+    skip_empty_lines: true,
   });
 
   const outputs = await OutputSchema.create(data);
@@ -131,6 +131,37 @@ export const deleteOutput = async (
   return {
     data: null,
     message: "Successfully deleted output",
+    code: 204,
+  };
+};
+
+export const deleteOutputs = async (
+  ids: string[] = [],
+  claims: JWT
+): Promise<Result<any>> => {
+  if (!(claims.team == "IPDS" || claims.team == "TU") && isProduction) {
+    return {
+      data: null,
+      message: "Only IPDS & TU can delete an outputs",
+      code: 401,
+    };
+  }
+
+  if (ids.length == 0) {
+    return {
+      data: null,
+      message: "Please select outputs",
+      code: 400,
+    };
+  }
+
+  await OutputSchema.deleteMany({
+    _id: { $in: ids },
+  });
+
+  return {
+    data: null,
+    message: "Successfully deleted outputs",
     code: 204,
   };
 };

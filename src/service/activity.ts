@@ -3,7 +3,7 @@ import { Activity } from "@/model/activity";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
 import ActivitySchema from "@/schema/activity";
-import { parse } from 'csv-parse/sync';
+import { parse } from "csv-parse/sync";
 
 export const getActivities = async (): Promise<Result<Activity[]>> => {
   const activities = await ActivitySchema.find();
@@ -57,7 +57,7 @@ export const uploadActivity = async (
 
   const data = parse(fileContent, {
     columns: true,
-    skip_empty_lines: true
+    skip_empty_lines: true,
   });
 
   const activities = await ActivitySchema.create(data);
@@ -110,6 +110,37 @@ export const updateActivity = async (
     data: activity,
     message: "Successfully updated activity",
     code: 200,
+  };
+};
+
+export const deleteActivities = async (
+  ids: string[] = [],
+  claims: JWT
+): Promise<Result<any>> => {
+  if (claims.team != "TU" && isProduction) {
+    return {
+      data: null,
+      message: "Only IPDS & TU can delete an activities",
+      code: 401,
+    };
+  }
+
+  if (ids.length == 0) {
+    return {
+      data: null,
+      message: "Please select activities",
+      code: 400,
+    };
+  }
+
+  await ActivitySchema.deleteMany({
+    _id: { $in: ids },
+  });
+
+  return {
+    data: null,
+    message: "Successfully deleted activities",
+    code: 204,
   };
 };
 
