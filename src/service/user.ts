@@ -69,25 +69,7 @@ export const uploadUsers = async (
     cast: (value) => (value === "" ? null : value),
   });
 
-  const dataSorted = data.sort((a: User, b: User) => {
-    const positionA = positionOrder[a.position] || Number.MAX_SAFE_INTEGER;
-    const positionB = positionOrder[b.position] || Number.MAX_SAFE_INTEGER;
-
-    if (positionA !== positionB) {
-      return positionA - positionB;
-    }
-
-    if (!a.team && !b.team) return 0;
-    if (!a.team) return -1;
-    if (!b.team) return 1;
-
-    if (a.team < b.team) return -1;
-    if (a.team > b.team) return 1;
-
-    return 0;
-  });
-
-  const outputs = await UserSchema.create(dataSorted);
+  const outputs = await UserSchema.create(data);
 
   return {
     data: outputs,
