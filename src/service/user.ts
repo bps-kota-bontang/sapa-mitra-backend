@@ -69,11 +69,23 @@ export const uploadUsers = async (
     cast: (value) => (value === "" ? null : value),
   });
 
-  const dataSortedByNip = data.sort((a: User, b: User) =>
-    a.nip.localeCompare(b.nip)
-  );
+  const dataSorted = data.sort((a: User, b: User) => {
+    if (!a.team && !b.team) return 0; // both null or empty string
+    if (!a.team) return -1; // a is null or empty string, comes first
+    if (!b.team) return 1; // b is null or empty string, comes first
 
-  const outputs = await UserSchema.create(dataSortedByNip);
+    // Both teams are neither null nor empty string, sort normally
+    if (a.team < b.team) return -1;
+    if (a.team > b.team) return 1;
+
+    // If teams are the same, sort by position
+    if (a.position < b.position) return -1;
+    if (a.position > b.position) return 1;
+
+    return 0;
+  });
+
+  const outputs = await UserSchema.create(dataSorted);
 
   return {
     data: outputs,
