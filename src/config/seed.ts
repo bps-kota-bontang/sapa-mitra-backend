@@ -6,7 +6,7 @@ const users: User[] = [
   {
     id: "1",
     name: "ketua",
-    nip: "0000000000000000",
+    nip: "000000000000000000",
     email: "ketua@mail.com",
     password: "$2b$10$sRL4PxTRB4n8UnGT5T.EjOexHIurt9BAF1yXDCKd4AG3M3mjNm0/W",
     team: "IPDS",
@@ -15,7 +15,7 @@ const users: User[] = [
   {
     id: "2",
     name: "anggota",
-    nip: "1111111111111111",
+    nip: "111111111111111111",
     email: "anggota@mail.com",
     password: "$2b$10$sRL4PxTRB4n8UnGT5T.EjOexHIurt9BAF1yXDCKd4AG3M3mjNm0/W",
     team: "IPDS",
