@@ -66,9 +66,14 @@ export const uploadUsers = async (
     columns: true,
     delimiter: ";",
     skip_empty_lines: true,
+    cast: (value) => (value === "" ? null : value),
   });
 
-  const outputs = await UserSchema.create(data);
+  const dataSortedByNip = data.sort((a: User, b: User) =>
+    a.nip.localeCompare(b.nip)
+  );
+
+  const outputs = await UserSchema.create(dataSortedByNip);
 
   return {
     data: outputs,
