@@ -14,7 +14,8 @@ import { Hono } from "hono";
 const app = new Hono();
 
 app.get("/", async (c) => {
-  const result = await getActivities();
+  const claims = c.get("jwtPayload");
+  const result = await getActivities(claims);
 
   return c.json(
     {

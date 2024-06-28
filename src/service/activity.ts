@@ -5,8 +5,14 @@ import { Result } from "@/model/result";
 import ActivitySchema from "@/schema/activity";
 import { parse } from "csv-parse/sync";
 
-export const getActivities = async (): Promise<Result<Activity[]>> => {
-  const activities = await ActivitySchema.find();
+export const getActivities = async (
+  claims: JWT
+): Promise<Result<Activity[]>> => {
+  let queries: any = {};
+
+  if (claims.team != "TU") queries.team = claims.team;
+
+  const activities = await ActivitySchema.find(queries);
 
   const transformedActivities = activities.map((item, index) => {
     return {

@@ -1,4 +1,7 @@
+import { Team } from "@/model/user";
+
 export type Activity = {
-  code: string;
   name: string;
+  code: string;
+  team: Team;
 };
