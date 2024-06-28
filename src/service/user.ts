@@ -1,4 +1,4 @@
-import { isProduction } from "@/common/utils";
+import { isProduction, positionOrder } from "@/common/utils";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
 import { User } from "@/model/user";
@@ -70,17 +70,19 @@ export const uploadUsers = async (
   });
 
   const dataSorted = data.sort((a: User, b: User) => {
-    if (!a.team && !b.team) return 0; // both null or empty string
-    if (!a.team) return -1; // a is null or empty string, comes first
-    if (!b.team) return 1; // b is null or empty string, comes first
+    const positionA = positionOrder[a.position] || Number.MAX_SAFE_INTEGER;
+    const positionB = positionOrder[b.position] || Number.MAX_SAFE_INTEGER;
 
-    // Both teams are neither null nor empty string, sort normally
+    if (positionA !== positionB) {
+      return positionA - positionB;
+    }
+
+    if (!a.team && !b.team) return 0;
+    if (!a.team) return -1;
+    if (!b.team) return 1;
+
     if (a.team < b.team) return -1;
     if (a.team > b.team) return 1;
-
-    // If teams are the same, sort by position
-    if (a.position < b.position) return -1;
-    if (a.position > b.position) return 1;
 
     return 0;
   });

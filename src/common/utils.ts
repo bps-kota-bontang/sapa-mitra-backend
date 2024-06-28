@@ -174,3 +174,9 @@ export const downloadTemplate = async (filePath: string): Promise<Buffer> => {
 
   return fileBuffer;
 };
+
+export const positionOrder: { [key: string]: number } = {
+  KEPALA: 1,
+  KETUA: 2,
+  ANGGOTA: 3,
+};
