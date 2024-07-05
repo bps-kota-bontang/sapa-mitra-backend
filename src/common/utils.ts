@@ -195,7 +195,7 @@ export const isValidStructure = (obj: any, fields: string[] = []): boolean => {
 export const checkRateLimits = (
   data: Contract,
   limits: Configuration<Limits>
-): boolean => {
+): any => {
   const categoryLimits = data.activities.map((activity) => {
     let limit = 0;
     const category = activity.category.toLowerCase() as keyof Limits;
@@ -209,7 +209,8 @@ export const checkRateLimits = (
 
   const minLimit = Math.min(...categoryLimits);
 
-  const isExceedingLimit = data.grandTotal > minLimit;
-
-  return isExceedingLimit;
+  return {
+    isExeeded: data.grandTotal > minLimit,
+    limit: minLimit,
+  };
 };

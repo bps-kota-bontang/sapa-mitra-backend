@@ -60,12 +60,12 @@ export const getContracts = async (
   const contracts = await ContractSchema.find(queries);
 
   const transformedContracts = contracts.map((item, index) => {
-    const isExceeded = checkRateLimits(item, limits);
+    const limit = checkRateLimits(item, limits);
 
     return {
       ...item.toObject(),
+      ...limit,
       index: index + 1,
-      isExceeded: isExceeded,
     };
   });
 
@@ -78,7 +78,7 @@ export const getContracts = async (
 
 export const getContract = async (
   id: string
-): Promise<Result<Contract & { isExceeded: boolean }>> => {
+): Promise<Result<Contract & { isExceeded: boolean } & any>> => {
   const limits = await ConfigurationSchema.findOne({ name: "RATE" });
 
   if (!limits) {
@@ -99,12 +99,12 @@ export const getContract = async (
     };
   }
 
-  const isExceeded = checkRateLimits(contract, limits);
+  const limit = checkRateLimits(contract, limits);
 
   return {
     data: {
       ...contract.toObject(),
-      isExceeded: isExceeded,
+      ...limit,
     },
     message: "Successfully retrieved contract",
     code: 200,
