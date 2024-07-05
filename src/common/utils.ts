@@ -210,7 +210,7 @@ export const checkRateLimits = (
   const minLimit = Math.min(...categoryLimits);
 
   return {
-    isExeeded: data.grandTotal > minLimit,
+    isExceeded: data.grandTotal > minLimit,
     limit: minLimit,
   };
 };
