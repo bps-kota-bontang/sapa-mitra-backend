@@ -43,27 +43,27 @@ export const storeConfiguration = async (
   let value;
 
   if (payload.name === "AUTHORITY") {
-    value =
-      payload.value.enum && payload.value.nip && payload.value.address
-        ? {
-            name: payload.value.name,
-            nip: payload.value.nip,
-            address: payload.value.address,
-          }
-        : null;
+    value = isValidStructure(payload.value, ["name", "nip", "address"])
+      ? {
+          name: payload.value.name,
+          nip: payload.value.nip,
+          address: payload.value.address,
+        }
+      : null;
   } else if (payload.name === "REGION") {
     value = typeof payload.value === "string" ? payload.value : null;
   } else if (payload.name === "RATE") {
-    value =
-      payload.value.enumeration &&
-      payload.value.supverision &&
-      payload.value.processing
-        ? {
-            enumeration: payload.value.enumeration,
-            supverision: payload.value.supverision,
-            processing: payload.value.processing,
-          }
-        : null;
+    value = isValidStructure(payload.value, [
+      "enumeration",
+      "supvision",
+      "processing",
+    ])
+      ? {
+          enumeration: payload.value.enumeration,
+          supvision: payload.value.supvision,
+          processing: payload.value.processing,
+        }
+      : null;
   }
 
   if (!value) {
@@ -114,12 +114,12 @@ export const updateConfiguration = async (
   } else if (name === "RATE") {
     value = isValidStructure(payload.value, [
       "enumeration",
-      "supverision",
+      "supvision",
       "processing",
     ])
       ? {
           enumeration: payload.value.enumeration,
-          supverision: payload.value.supverision,
+          supvision: payload.value.supvision,
           processing: payload.value.processing,
         }
       : null;
