@@ -32,7 +32,6 @@ export const login = async (
   const token = await generateToken(user);
 
   const result = {
-    ...restUser,
     token: token
   }
 
