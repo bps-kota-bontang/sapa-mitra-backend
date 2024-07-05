@@ -123,6 +123,16 @@ export const storeContractByActivity = async (
     };
   }
 
+  const limits = await ConfigurationSchema.findOne({ name: "RATE" });
+
+  if (!limits) {
+    return {
+      data: null,
+      message: "Rate limits have not been configured",
+      code: 400,
+    };
+  }
+
   const { activityId, ...restActivityPayload } = payload.activity;
 
   const partnerIds = payload.partners.map((item) => item.partnerId);
@@ -270,8 +280,17 @@ export const storeContractByActivity = async (
     period: payload.contract.period,
   });
 
+  const transformedContracts = contracts.map((item, index) => {
+    const limit = checkRateLimits(item, limits);
+
+    return {
+      ...item.toObject(),
+      ...limit,
+    };
+  });
+
   return {
-    data: contracts,
+    data: transformedContracts,
     message: "Successfully created contracts",
     code: 201,
   };
@@ -286,6 +305,16 @@ export const storeContract = async (
       data: null,
       message: "Only member can create contracts",
       code: 401,
+    };
+  }
+
+  const limits = await ConfigurationSchema.findOne({ name: "RATE" });
+
+  if (!limits) {
+    return {
+      data: null,
+      message: "Rate limits have not been configured",
+      code: 400,
     };
   }
 
@@ -471,9 +500,16 @@ export const storeContract = async (
   } else {
     contract = await ContractSchema.create(data);
   }
+  let limit;
+  if (contract) {
+    limit = checkRateLimits(contract, limits);
+  }
 
   return {
-    data: contract,
+    data: {
+      ...contract?.toObject(),
+      ...limit,
+    },
     message: "Successfully created contract",
     code: 201,
   };
@@ -864,6 +900,7 @@ const generateContractPdf = async (
     name: item.name,
     volume: item.volume,
     unit: item.unit,
+    category: item.category,
     date: `${formatDate(item.startDate)} - ${formatDate(item.endDate)}`,
     total: item.total,
     budget: 0,
