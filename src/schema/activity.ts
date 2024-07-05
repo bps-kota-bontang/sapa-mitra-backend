@@ -5,6 +5,7 @@ export const activitySchema = new Schema<Activity>(
   {
     name: { type: String, required: true },
     code: { type: String, required: true },
+    unit: { type: String, required: true },
     team: {
       type: String,
       required: true,
