@@ -106,7 +106,7 @@ export const storeContractByActivity = async (
   const activityDb = await ActivitySchema.findById(activityId).select([
     "code",
     "name",
-    "unit"
+    "unit",
   ]);
 
   if (!activityDb) {
@@ -134,8 +134,8 @@ export const storeContractByActivity = async (
       );
 
       const activity = {
-        ...activityDb.toObject(),
         ...restActivityPayload,
+        ...activityDb.toObject(),
         volume: item.volume,
         total: item.volume * payload.activity.rate,
         createdBy: claims.team,
