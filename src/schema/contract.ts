@@ -24,6 +24,11 @@ export const contractSchema = new Schema<Contract>(
         type: {
           code: { type: String, required: true },
           name: { type: String, required: true },
+          category: {
+            type: String,
+            required: true,
+            enum: ["ENUMERATION", "SUPERVISION", "PROCESSING"],
+          },
           startDate: { type: Date, required: true },
           endDate: { type: Date, required: true },
           volume: { type: Number, required: true },
