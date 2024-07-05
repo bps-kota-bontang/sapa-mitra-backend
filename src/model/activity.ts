@@ -1,11 +1,11 @@
 import { Team } from "@/model/user";
 
-export type TypeActivity = "ENUMERATION" | "SUPERVISION" | "PROCESSING";
+export type CategoryActivity = "ENUMERATION" | "SUPERVISION" | "PROCESSING";
 
 export type Activity = {
   name: string;
   code: string;
   unit: string;
-  type: TypeActivity;
+  category: CategoryActivity;
   team: Team;
 };
