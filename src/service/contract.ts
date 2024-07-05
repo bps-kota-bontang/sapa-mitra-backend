@@ -107,6 +107,7 @@ export const storeContractByActivity = async (
     "code",
     "name",
     "unit",
+    "team"
   ]);
 
   if (!activityDb) {
@@ -138,7 +139,7 @@ export const storeContractByActivity = async (
         ...activityDb.toObject(),
         volume: item.volume,
         total: item.volume * payload.activity.rate,
-        createdBy: claims.team,
+        createdBy: activityDb.team,
       };
 
       let update;
@@ -275,7 +276,7 @@ export const storeContract = async (
 
   const activitiesDb = await ActivitySchema.find({
     _id: { $in: activityIds },
-  }).select(["code", "name", "unit"]);
+  }).select(["code", "name", "unit", "team"]);
 
   if (activitiesDb.length == 0) {
     return {
@@ -296,7 +297,7 @@ export const storeContract = async (
             ...restPayload,
             ...itemDb.toObject(),
             total: restPayload.volume * restPayload.rate,
-            createdBy: claims.team,
+            createdBy: itemDb.team,
           }
         : null;
     })
