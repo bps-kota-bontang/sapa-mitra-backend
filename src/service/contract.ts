@@ -1,6 +1,7 @@
 import {
   calculateHandOverDate,
   calculateSignDate,
+  checkRateLimits,
   formatDate,
   formatDateFull,
   formatDateText,
@@ -46,12 +47,25 @@ export const getContracts = async (
     queries["activities.createdBy"] = claims.team;
   }
 
+  const limits = await ConfigurationSchema.findOne({ name: "RATE" });
+
+  if (!limits) {
+    return {
+      data: null,
+      message: "Rate limits have not been configured",
+      code: 400,
+    };
+  }
+
   const contracts = await ContractSchema.find(queries);
 
   const transformedContracts = contracts.map((item, index) => {
+    const isExceeded = checkRateLimits(item, limits);
+
     return {
       ...item.toObject(),
       index: index + 1,
+      isExceeded: isExceeded,
     };
   });
 
@@ -62,11 +76,36 @@ export const getContracts = async (
   };
 };
 
-export const getContract = async (id: string): Promise<Result<Contract>> => {
+export const getContract = async (
+  id: string
+): Promise<Result<Contract & { isExceeded: boolean }>> => {
+  const limits = await ConfigurationSchema.findOne({ name: "RATE" });
+
+  if (!limits) {
+    return {
+      data: null,
+      message: "Rate limits have not been configured",
+      code: 400,
+    };
+  }
+
   const contract = await ContractSchema.findById(id);
 
+  if (!contract) {
+    return {
+      data: null,
+      message: "Contract not found",
+      code: 404,
+    };
+  }
+
+  const isExceeded = checkRateLimits(contract, limits);
+
   return {
-    data: contract,
+    data: {
+      ...contract.toObject(),
+      isExceeded: isExceeded,
+    },
     message: "Successfully retrieved contract",
     code: 200,
   };

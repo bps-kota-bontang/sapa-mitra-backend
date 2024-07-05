@@ -1,7 +1,8 @@
-import { YearMonth } from "@/model/contract";
+import { Contract, YearMonth } from "@/model/contract";
 import Terbilang from "terbilang-ts";
 import { PDFDocument } from "pdf-lib";
 import { promises as fs } from "fs";
+import { Configuration, Limits } from "@/model/configuration";
 
 export const notEmpty = <TValue>(
   value: TValue | null | undefined
@@ -189,4 +190,26 @@ export const isValidStructure = (obj: any, fields: string[] = []): boolean => {
   return fields.every(
     (field) => typeof obj[field] === "string" || obj[field] === undefined
   );
+};
+
+export const checkRateLimits = (
+  data: Contract,
+  limits: Configuration<Limits>
+): boolean => {
+  const categoryLimits = data.activities.map((activity) => {
+    let limit = 0;
+    const category = activity.category.toLowerCase() as keyof Limits;
+
+    if (category in limits.value) {
+      limit = parseInt(limits.value[category]);
+    }
+
+    return limit;
+  });
+
+  const minLimit = Math.min(...categoryLimits);
+
+  const isExceedingLimit = data.grandTotal > minLimit;
+
+  return isExceedingLimit;
 };
