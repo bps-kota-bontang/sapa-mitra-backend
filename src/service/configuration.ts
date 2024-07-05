@@ -43,7 +43,7 @@ export const storeConfiguration = async (
 
   if (payload.name === "AUTHORITY") {
     value =
-      payload.value.name && payload.value.address
+      payload.value.enum && payload.value.nip && payload.value.address
         ? {
             name: payload.value.name,
             nip: payload.value.nip,
@@ -52,6 +52,17 @@ export const storeConfiguration = async (
         : null;
   } else if (payload.name === "REGION") {
     value = typeof payload.value === "string" ? payload.value : null;
+  } else if (payload.name === "RATE") {
+    value =
+      payload.value.enumeration &&
+      payload.value.supverision &&
+      payload.value.processing
+        ? {
+            enumeration: payload.value.enumeration,
+            supverision: payload.value.supverision,
+            processing: payload.value.processing,
+          }
+        : null;
   }
 
   if (!value) {
@@ -91,7 +102,7 @@ export const updateConfiguration = async (
 
   if (name === "AUTHORITY") {
     value =
-      payload.value.name && payload.value.address
+      payload.value.enum && payload.value.nip && payload.value.address
         ? {
             name: payload.value.name,
             nip: payload.value.nip,
@@ -100,6 +111,17 @@ export const updateConfiguration = async (
         : null;
   } else if (name === "REGION") {
     value = typeof payload.value === "string" ? payload.value : null;
+  } else if (name === "RATE") {
+    value =
+      payload.value.enumeration &&
+      payload.value.supverision &&
+      payload.value.processing
+        ? {
+            enumeration: payload.value.enumeration,
+            supverision: payload.value.supverision,
+            processing: payload.value.processing,
+          }
+        : null;
   }
 
   if (!value) {
