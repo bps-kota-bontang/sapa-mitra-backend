@@ -180,3 +180,13 @@ export const positionOrder: { [key: string]: number } = {
   KETUA: 2,
   ANGGOTA: 3,
 };
+
+export const isValidStructure = (obj: any, fields: string[] = []): boolean => {
+  if (!obj || !fields.length) {
+    return false;
+  }
+
+  return fields.every(
+    (field) => typeof obj[field] === "string" || obj[field] === undefined
+  );
+};

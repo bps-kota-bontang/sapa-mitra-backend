@@ -1,3 +1,4 @@
+import { isValidStructure } from "@/common/utils";
 import { Configuration } from "@/model/configuration";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
@@ -101,27 +102,27 @@ export const updateConfiguration = async (
   let value;
 
   if (name === "AUTHORITY") {
-    value =
-      payload.value.enum && payload.value.nip && payload.value.address
-        ? {
-            name: payload.value.name,
-            nip: payload.value.nip,
-            address: payload.value.address,
-          }
-        : null;
+    value = isValidStructure(payload.value, ["name", "nip", "address"])
+      ? {
+          name: payload.value.name,
+          nip: payload.value.nip,
+          address: payload.value.address,
+        }
+      : null;
   } else if (name === "REGION") {
     value = typeof payload.value === "string" ? payload.value : null;
   } else if (name === "RATE") {
-    value =
-      payload.value.enumeration &&
-      payload.value.supverision &&
-      payload.value.processing
-        ? {
-            enumeration: payload.value.enumeration,
-            supverision: payload.value.supverision,
-            processing: payload.value.processing,
-          }
-        : null;
+    value = isValidStructure(payload.value, [
+      "enumeration",
+      "supverision",
+      "processing",
+    ])
+      ? {
+          enumeration: payload.value.enumeration,
+          supverision: payload.value.supverision,
+          processing: payload.value.processing,
+        }
+      : null;
   }
 
   if (!value) {
