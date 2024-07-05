@@ -107,7 +107,7 @@ export const storeContractByActivity = async (
     "code",
     "name",
     "unit",
-    "team"
+    "team",
   ]);
 
   if (!activityDb) {
@@ -675,6 +675,71 @@ export const verifyContractActivity = async (
   return {
     data: contract,
     message: "Successfully verified contract activity",
+    code: 200,
+  };
+};
+
+export const cancelContractActivity = async (
+  id: string,
+  activityId: string,
+  claims: JWT
+): Promise<Result<Contract>> => {
+  const existingContract = await ContractSchema.findById(id);
+
+  if (!existingContract) {
+    return {
+      data: null,
+      message: "Contract not found",
+      code: 404,
+    };
+  }
+
+  const activity = existingContract.activities.find(
+    (item) => item.id == activityId
+  );
+
+  if (!activity) {
+    return {
+      data: null,
+      message: "Activity not found",
+      code: 404,
+    };
+  }
+
+  if (activity.createdBy != claims.team) {
+    return {
+      data: null,
+      message: `only ${activity.createdBy} team can unverify`,
+      code: 401,
+    };
+  }
+
+  if (claims.position != "KETUA") {
+    return {
+      data: null,
+      message: `only leader team can unverify`,
+      code: 401,
+    };
+  }
+
+  const contract = await ContractSchema.findOneAndUpdate(
+    {
+      _id: id,
+      "activities._id": activityId,
+    },
+    {
+      $set: {
+        "activities.$.status": "UNVERIFIED",
+      },
+    },
+    {
+      new: true,
+    }
+  );
+
+  return {
+    data: contract,
+    message: "Successfully unverified contract activity",
     code: 200,
   };
 };

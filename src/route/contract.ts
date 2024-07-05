@@ -1,5 +1,6 @@
 import { toArrayBuffer } from "@/common/utils";
 import {
+  cancelContractActivity,
   deletContract,
   deleteContractActivity,
   getContract,
@@ -164,6 +165,22 @@ app.get("/:id/activity/:activityId/verify", async (c) => {
   const activityId = c.req.param("activityId");
 
   const result = await verifyContractActivity(id, activityId, claims);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.get("/:id/activity/:activityId/cancel", async (c) => {
+  const claims = c.get("jwtPayload");
+  const id = c.req.param("id");
+  const activityId = c.req.param("activityId");
+
+  const result = await cancelContractActivity(id, activityId, claims);
 
   return c.json(
     {
