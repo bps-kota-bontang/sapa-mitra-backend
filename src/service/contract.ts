@@ -106,6 +106,7 @@ export const storeContractByActivity = async (
   const activityDb = await ActivitySchema.findById(activityId).select([
     "code",
     "name",
+    "unit"
   ]);
 
   if (!activityDb) {
@@ -274,7 +275,7 @@ export const storeContract = async (
 
   const activitiesDb = await ActivitySchema.find({
     _id: { $in: activityIds },
-  }).select(["code", "name"]);
+  }).select(["code", "name", "unit"]);
 
   if (activitiesDb.length == 0) {
     return {

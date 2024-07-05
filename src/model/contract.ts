@@ -34,7 +34,7 @@ export type ContractByActivityPayload = {
     activityId: string;
   } & Pick<
     Contract["activities"][number],
-    "startDate" | "endDate" | "unit" | "rate"
+    "startDate" | "endDate" | "rate"
   >;
   contract: Pick<Contract, "period">;
   partners: [
@@ -54,7 +54,7 @@ export type ContractPayload = {
       activityId: string;
     } & Pick<
       Contract["activities"][number],
-      "startDate" | "endDate" | "volume" | "unit" | "rate"
+      "startDate" | "endDate" | "volume" | "rate"
     >
   ];
 };
@@ -73,7 +73,6 @@ const byActivity: ContractByActivityPayload = {
     activityId: "xxxxx-xxxxx-xxx",
     startDate: new Date(),
     endDate: new Date(),
-    unit: "Bundle",
     rate: 1000,
   },
 };
@@ -91,7 +90,6 @@ const byPartner: ContractPayload = {
       startDate: new Date(),
       endDate: new Date(),
       volume: 1,
-      unit: "Bundle",
       rate: 1000,
     },
   ],
