@@ -55,12 +55,12 @@ export const storeConfiguration = async (
   } else if (payload.name === "RATE") {
     value = isValidStructure(payload.value, [
       "enumeration",
-      "supvision",
+      "supervision",
       "processing",
     ])
       ? {
           enumeration: payload.value.enumeration,
-          supvision: payload.value.supvision,
+          supervision: payload.value.supervision,
           processing: payload.value.processing,
         }
       : null;
@@ -114,12 +114,12 @@ export const updateConfiguration = async (
   } else if (name === "RATE") {
     value = isValidStructure(payload.value, [
       "enumeration",
-      "supvision",
+      "supervision",
       "processing",
     ])
       ? {
           enumeration: payload.value.enumeration,
-          supvision: payload.value.supvision,
+          supervision: payload.value.supervision,
           processing: payload.value.processing,
         }
       : null;
