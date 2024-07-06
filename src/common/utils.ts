@@ -40,12 +40,60 @@ export function createYearMonth(
   return `${yearStr}-${monthStr}` as YearMonth;
 }
 
-export const generateContractNumber = (): string => {
-  return Math.floor(Math.random() * 10000).toString();
+export async function findLastSequence(
+  period: string,
+  schema: any
+): Promise<number> {
+  const existingDocument = await schema
+    .findOne({ period })
+    .sort({ createdAt: -1 })
+    .exec();
+  let sequenceNumber = 1;
+
+  if (existingDocument && existingDocument.number) {
+    const lastNumber = parseInt(existingDocument.number.split("-")[1]);
+    sequenceNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
+  }
+
+  return sequenceNumber;
+}
+
+export const findAvailableSequence = async (
+  period: string,
+  schema: any
+): Promise<number> => {
+  const documents = await schema.find({ period }).sort("number").exec();
+  let availableSeq = 1;
+
+  for (let i = 0; i < documents.length; i++) {
+    const seq = parseInt(documents[i].number.split("-")[1]);
+    if (seq !== availableSeq) {
+      break;
+    }
+    availableSeq++;
+  }
+
+  return availableSeq;
 };
 
-export const generateReportNumber = (): string => {
-  return Math.floor(Math.random() * 10000).toString();
+const generateFormattedNumber = (
+  period: string,
+  type: string,
+  sequence: number
+): string => {
+  const [year, month] = period.split("-");
+  const mitraNumber = regionCode;
+
+  const spkNumber = String(sequence).padStart(3, "0");
+  return `${type}-${spkNumber}/MITRA-${mitraNumber}/${month}/${year}`;
+};
+
+export const generateReportNumber = (period: string, sequence: number) => {
+  return generateFormattedNumber(period, "BAST", sequence);
+};
+
+export const generateContractNumber = (period: string, sequence: number) => {
+  return generateFormattedNumber(period, "SPK", sequence);
 };
 
 export const calculateSignDate = (yearMonth: YearMonth) => {
@@ -75,6 +123,8 @@ export const isProduction = Bun.env.APP_ENV === "production";
 export const mode = Bun.env.APP_ENV || "development";
 
 export const region = Bun.env.APP_REGION || "Kota Bontang";
+
+export const regionCode = Bun.env.APP_REGION_CODE || "6474";
 
 export const toArrayBuffer = (buffer: Buffer): ArrayBuffer => {
   const arrayBuffer = new ArrayBuffer(buffer.length);

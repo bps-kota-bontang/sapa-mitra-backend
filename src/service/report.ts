@@ -1,4 +1,6 @@
 import {
+  findAvailableSequence,
+  findLastSequence,
   formatDateText,
   formatDayText,
   formatMonth,
@@ -222,7 +224,12 @@ export const storeReport = async (
     "contract.period": payload.contract.period,
   }).select(["_id"]);
 
-  const number = generateReportNumber();
+  const availableSeq = await findAvailableSequence(
+    payload.contract.period,
+    ReportSchema
+  );
+
+  const number = generateReportNumber(payload.contract.period, availableSeq);
 
   const authority = await ConfigurationSchema.findOne({
     name: "AUTHORITY",
@@ -410,6 +417,11 @@ export const storeReportByOutput = async (
     };
   }
 
+  const lastSequence = await findLastSequence(
+    payload.contract.period,
+    ReportSchema
+  );
+
   const partnerIds = payload.partners.map((item) => item.partnerId);
   const partners = await PartnerSchema.find({
     _id: { $in: partnerIds },
@@ -451,8 +463,11 @@ export const storeReportByOutput = async (
   }
 
   const bulkOps = payload.partners
-    .map((item) => {
-      const number = generateReportNumber();
+    .map((item, index) => {
+      const number = generateReportNumber(
+        payload.contract.period,
+        lastSequence + index
+      );
 
       const partner = partners.find(
         (partner) => partner._id.toString() == item.partnerId

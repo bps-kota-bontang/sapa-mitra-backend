@@ -2,6 +2,8 @@ import {
   calculateHandOverDate,
   calculateSignDate,
   checkRateLimits,
+  findAvailableSequence,
+  findLastSequence,
   formatDate,
   formatDateFull,
   formatDateText,
@@ -123,6 +125,11 @@ export const storeContractByActivity = async (
     };
   }
 
+  const lastSequence = await findLastSequence(
+    payload.contract.period,
+    ContractSchema
+  );
+
   const limits = await ConfigurationSchema.findOne({ name: "RATE" });
 
   if (!limits) {
@@ -169,8 +176,11 @@ export const storeContractByActivity = async (
   }
 
   const bulkOps = payload.partners
-    .map((item) => {
-      const number = generateContractNumber();
+    .map((item, index) => {
+      const number = generateContractNumber(
+        payload.contract.period,
+        lastSequence + index
+      );
 
       const partner = partners.find(
         (partner) => partner._id.toString() == item.partnerId
@@ -323,7 +333,12 @@ export const storeContract = async (
     period: payload.contract.period,
   }).select(["_id", "grandTotal"]);
 
-  const number = generateContractNumber();
+  const availableSeq = await findAvailableSequence(
+    payload.contract.period,
+    ContractSchema
+  );
+
+  const number = generateContractNumber(payload.contract.period, availableSeq);
 
   const authority = await ConfigurationSchema.findOne({
     name: "AUTHORITY",
