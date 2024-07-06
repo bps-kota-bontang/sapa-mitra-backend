@@ -70,6 +70,9 @@ const reportByOutputPayload: ReportByOutputPayload = {
 
 export type ReportPdf = {
   number: string;
+  contract: {
+    number: string;
+  };
   period: {
     month: string;
     year: string;

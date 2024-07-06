@@ -605,6 +605,9 @@ const generateReportPdf = async (
   const template = hbs.compile(html);
   const payload: ReportPdf = {
     number: report.number,
+    contract: {
+      number: report.contract.number
+    },
     period: {
       month: formatMonth(report.contract.period),
       year: formatYear(report.contract.period),
