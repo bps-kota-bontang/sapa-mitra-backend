@@ -8,6 +8,7 @@ import {
   updatePartner,
   uploadPartner,
   deletePartners,
+  downloadPartner,
 } from "@/service/partner";
 import { Hono } from "hono";
 
@@ -48,6 +49,28 @@ app.get("/:id", async (c) => {
     },
     result.code
   );
+});
+
+app.post("/download", async (c) => {
+  const result = await downloadPartner();
+
+  if (result.code != 200) {
+    return c.json(
+      {
+        data: result.data,
+        message: result.message,
+      },
+      result.code
+    );
+  }
+
+  c.res.headers.set("Content-Type", "text/csv");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename=Master Data Partner.csv`
+  );
+
+  return c.body(toArrayBuffer(result.data));
 });
 
 app.post("/upload", async (c) => {

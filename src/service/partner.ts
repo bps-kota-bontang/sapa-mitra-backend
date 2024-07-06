@@ -1,4 +1,4 @@
-import { isProduction } from "@/common/utils";
+import { convertToCsv, isProduction } from "@/common/utils";
 import { JWT } from "@/model/jwt";
 import { Partner } from "@/model/partner";
 import { Result } from "@/model/result";
@@ -50,6 +50,18 @@ export const storePartner = async (
     data: partner,
     message: "Successfully created partner",
     code: 201,
+  };
+};
+
+export const downloadPartner = async (): Promise<Result<any>> => {
+  const partners = await PartnerSchema.find();
+
+  const file = convertToCsv(partners);
+
+  return {
+    data: file,
+    message: "Successfully downloaded partner",
+    code: 200,
   };
 };
 

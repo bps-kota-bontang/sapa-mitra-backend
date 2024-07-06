@@ -264,3 +264,11 @@ export const checkRateLimits = (
     limit: minLimit,
   };
 };
+
+export const convertToCsv = (objects: any[]): Buffer => {
+  const headers = Object.keys(objects[0]).join(";");
+  const rows = objects.map((obj) => Object.values(obj).join(";")).join("\n");
+  const csvString = `${headers}\n${rows}`;
+
+  return Buffer.from(csvString, "utf-8");
+};
