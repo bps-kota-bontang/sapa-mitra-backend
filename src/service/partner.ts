@@ -54,7 +54,11 @@ export const storePartner = async (
 };
 
 export const downloadPartner = async (): Promise<Result<any>> => {
-  const partners = await PartnerSchema.find();
+  const partners = await PartnerSchema.find().select([
+    "name",
+    "nik",
+    "address",
+  ]);
 
   const file = convertToCsv(partners);
 

@@ -266,8 +266,10 @@ export const checkRateLimits = (
 };
 
 export const convertToCsv = (objects: any[]): Buffer => {
-  const headers = Object.keys(objects[0]).join(";");
-  const rows = objects.map((obj) => Object.values(obj).join(";")).join("\n");
+  const headers = Object.keys(objects[0].toObject()).join(";");
+  const rows = objects
+    .map((obj) => Object.values(obj.toObject()).join(";"))
+    .join("\n");
   const csvString = `${headers}\n${rows}`;
 
   return Buffer.from(csvString, "utf-8");

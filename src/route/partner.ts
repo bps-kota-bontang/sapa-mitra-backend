@@ -26,6 +26,28 @@ app.post("/template", async (c) => {
   return c.body(toArrayBuffer(result));
 });
 
+app.post("/download", async (c) => {
+  const result = await downloadPartner();
+
+  if (result.code != 200) {
+    return c.json(
+      {
+        data: result.data,
+        message: result.code,
+      },
+      result.code
+    );
+  }
+
+  c.res.headers.set("Content-Type", "text/csv");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename=Master Data Partner.csv`
+  );
+
+  return c.body(toArrayBuffer(result.data));
+});
+
 app.get("/", async (c) => {
   const result = await getPartners();
 
@@ -49,28 +71,6 @@ app.get("/:id", async (c) => {
     },
     result.code
   );
-});
-
-app.post("/download", async (c) => {
-  const result = await downloadPartner();
-
-  if (result.code != 200) {
-    return c.json(
-      {
-        data: result.data,
-        message: result.message,
-      },
-      result.code
-    );
-  }
-
-  c.res.headers.set("Content-Type", "text/csv");
-  c.res.headers.set(
-    "Content-Disposition",
-    `attachment; filename=Master Data Partner.csv`
-  );
-
-  return c.body(toArrayBuffer(result.data));
 });
 
 app.post("/upload", async (c) => {
