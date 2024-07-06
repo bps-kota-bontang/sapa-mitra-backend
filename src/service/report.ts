@@ -586,8 +586,8 @@ const generateReportPdf = async (
     margin: {
       left: "95",
       right: "95",
-      top: "30",
-      bottom: "30",
+      top: "50",
+      bottom: "50",
     },
     headless: true,
     headerTemplate: `<p style="margin: auto;font-size: 13px;"></p>`,
@@ -606,7 +606,7 @@ const generateReportPdf = async (
   const payload: ReportPdf = {
     number: report.number,
     contract: {
-      number: report.contract.number
+      number: report.contract.number,
     },
     period: {
       month: formatMonth(report.contract.period),
