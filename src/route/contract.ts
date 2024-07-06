@@ -1,4 +1,4 @@
-import { toArrayBuffer } from "@/common/utils";
+import { downloadTemplate, toArrayBuffer } from "@/common/utils";
 import {
   cancelContractActivity,
   deletContract,
@@ -39,6 +39,18 @@ app.post("/:id/print", async (c) => {
   );
 
   return c.body(toArrayBuffer(result.data.file));
+});
+
+app.post("/partner/template", async (c) => {
+  const result = await downloadTemplate("src/template/partner-in-contract.csv");
+
+  c.res.headers.set("Content-Type", "text/csv");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename=Template Partner in Contract.csv`
+  );
+
+  return c.body(toArrayBuffer(result));
 });
 
 app.post("/print", async (c) => {
