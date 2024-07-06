@@ -1,6 +1,5 @@
 import { isProduction } from "@/common/utils";
 import { Output } from "@/model/output";
-import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
 import OutputSchema from "@/schema/output";
 import { parse } from "csv-parse/sync";
@@ -33,17 +32,8 @@ export const getOutput = async (id: string): Promise<Result<Output>> => {
 };
 
 export const storeOutput = async (
-  payload: Output,
-  claims: JWT
+  payload: Output
 ): Promise<Result<Output>> => {
-  if (claims.team != "TU" && isProduction) {
-    return {
-      data: null,
-      message: "Only TU can create an output",
-      code: 401,
-    };
-  }
-
   const output = await OutputSchema.create(payload);
 
   return {
@@ -54,17 +44,8 @@ export const storeOutput = async (
 };
 
 export const uploadOutput = async (
-  file: File,
-  claims: JWT
+  file: File
 ): Promise<Result<any>> => {
-  if (claims.team != "TU" && isProduction) {
-    return {
-      data: null,
-      message: "Only TU can create an output",
-      code: 401,
-    };
-  }
-
   if (!file) {
     return {
       data: null,
@@ -100,17 +81,8 @@ export const uploadOutput = async (
 
 export const updateOutput = async (
   id: string,
-  payload: Output,
-  claims: JWT
+  payload: Output
 ): Promise<Result<Output>> => {
-  if (claims.team != "TU" && isProduction) {
-    return {
-      data: null,
-      message: "Only TU can update an output",
-      code: 401,
-    };
-  }
-
   const output = await OutputSchema.findByIdAndUpdate(id, payload, {
     new: true,
   });
@@ -123,17 +95,8 @@ export const updateOutput = async (
 };
 
 export const deleteOutput = async (
-  id: string,
-  claims: JWT
+  id: string
 ): Promise<Result<any>> => {
-  if (claims.team != "TU" && isProduction) {
-    return {
-      data: null,
-      message: "Only TU can update an output",
-      code: 401,
-    };
-  }
-
   await OutputSchema.findByIdAndDelete(id);
 
   return {
@@ -144,17 +107,8 @@ export const deleteOutput = async (
 };
 
 export const deleteOutputs = async (
-  ids: string[] = [],
-  claims: JWT
+  ids: string[] = []
 ): Promise<Result<any>> => {
-  if (!(claims.team == "IPDS" || claims.team == "TU") && isProduction) {
-    return {
-      data: null,
-      message: "Only IPDS & TU can delete an outputs",
-      code: 401,
-    };
-  }
-
   if (ids.length == 0) {
     return {
       data: null,

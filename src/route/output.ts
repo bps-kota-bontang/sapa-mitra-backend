@@ -51,10 +51,9 @@ app.get("/:id", async (c) => {
 });
 
 app.post("/upload", async (c) => {
-  const claims = c.get("jwtPayload");
   const body = await c.req.parseBody();
 
-  const result = await uploadOutput(body["file"] as File, claims);
+  const result = await uploadOutput(body["file"] as File);
 
   return c.json(
     {
@@ -66,10 +65,9 @@ app.post("/upload", async (c) => {
 });
 
 app.post("/", async (c) => {
-  const claims = c.get("jwtPayload");
   const payload = await c.req.json<Output>();
 
-  const result = await storeOutput(payload, claims);
+  const result = await storeOutput(payload);
 
   return c.json(
     {
@@ -81,10 +79,9 @@ app.post("/", async (c) => {
 });
 
 app.put("/:id", async (c) => {
-  const claims = c.get("jwtPayload");
   const payload = await c.req.json<Output>();
   const id = c.req.param("id");
-  const result = await updateOutput(id, payload, claims);
+  const result = await updateOutput(id, payload);
 
   return c.json(
     {
@@ -96,9 +93,8 @@ app.put("/:id", async (c) => {
 });
 
 app.delete("/", async (c) => {
-  const claims = c.get("jwtPayload");
   const payload = await c.req.json<string[]>();
-  const result = await deleteOutputs(payload, claims);
+  const result = await deleteOutputs(payload);
 
   return c.json(
     {
@@ -110,9 +106,8 @@ app.delete("/", async (c) => {
 });
 
 app.delete("/:id", async (c) => {
-  const claims = c.get("jwtPayload");
   const id = c.req.param("id");
-  const result = await deleteOutput(id, claims);
+  const result = await deleteOutput(id);
 
   return c.json(
     {
