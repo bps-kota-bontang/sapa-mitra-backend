@@ -3,7 +3,7 @@ import { Schema, model } from "mongoose";
 
 export const outputSchema = new Schema<Output>(
   {
-    name: { type: String, required: true },
+    name: { type: String, required: true, unique: true },
     unit: { type: String, required: true },
   },
   {
