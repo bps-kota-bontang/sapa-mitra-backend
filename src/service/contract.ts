@@ -732,18 +732,18 @@ export const verifyContractActivity = async (
     };
   }
 
-  if (activity.createdBy != claims.team) {
+  if (claims.position != "KETUA") {
     return {
       data: null,
-      message: `only ${activity.createdBy} team can verify`,
+      message: `only leader team or TU team can verify`,
       code: 401,
     };
   }
 
-  if (claims.position != "KETUA") {
+  if (activity.createdBy != claims.team && claims.team != "TU") {
     return {
       data: null,
-      message: `only leader team can verify`,
+      message: `only ${activity.createdBy} team or TU team can verify`,
       code: 401,
     };
   }
@@ -797,18 +797,18 @@ export const cancelContractActivity = async (
     };
   }
 
-  if (activity.createdBy != claims.team) {
+  if (claims.position != "KETUA") {
     return {
       data: null,
-      message: `only ${activity.createdBy} team can unverify`,
+      message: `only leader team or TU team can unverify`,
       code: 401,
     };
   }
 
-  if (claims.position != "KETUA") {
+  if (activity.createdBy != claims.team && claims.team != "TU") {
     return {
       data: null,
-      message: `only leader team can unverify`,
+      message: `only ${activity.createdBy} team or TU team can unverify`,
       code: 401,
     };
   }
