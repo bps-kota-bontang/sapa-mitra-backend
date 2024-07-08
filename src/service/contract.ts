@@ -1001,7 +1001,12 @@ export const getContractStatistics = async (): Promise<Result<any>> => {
 
 const generateContractPdf = async (
   contract: Contract
-): Promise<{ file: Buffer; period: string; name: string }> => {
+): Promise<{
+  file: Buffer;
+  fileName: string;
+  period: string;
+  name: string;
+}> => {
   const htmlPDF = new PuppeteerHTMLPDF();
   htmlPDF.setOptions({
     displayHeaderFooter: true,
@@ -1066,6 +1071,7 @@ const generateContractPdf = async (
 
   return {
     file: pdfBuffer,
+    fileName: `${payload.number}_${payload.partner.name}`,
     period: `${payload.period.month} ${payload.period.year}`,
     name: contract.partner.name,
   };

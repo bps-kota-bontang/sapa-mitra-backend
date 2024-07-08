@@ -578,7 +578,12 @@ export const storeReportByOutput = async (
 
 const generateReportPdf = async (
   report: Report
-): Promise<{ file: Buffer; period: string; name: string }> => {
+): Promise<{
+  file: Buffer;
+  fileName: string;
+  period: string;
+  name: string;
+}> => {
   const htmlPDF = new PuppeteerHTMLPDF();
   htmlPDF.setOptions({
     displayHeaderFooter: true,
@@ -637,6 +642,7 @@ const generateReportPdf = async (
 
   return {
     file: pdfBuffer,
+    fileName: `${payload.number}_${payload.partner.name}`,
     period: `${payload.period.month} ${payload.period.year}`,
     name: report.partner.name,
   };

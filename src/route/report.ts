@@ -32,7 +32,7 @@ app.post("/:id/print", async (c) => {
   c.res.headers.set("Content-Type", "application/pdf");
   c.res.headers.set(
     "Content-Disposition",
-    `attachment; filename=BAST ${result.data.period} - ${result.data.name}.pdf`
+    `attachment; filename="${result.data.fileName}.pdf"`
   );
 
   return c.body(toArrayBuffer(result.data.file));
