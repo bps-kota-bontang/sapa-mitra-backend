@@ -31,10 +31,7 @@ export type Contract = {
 export type ContractByActivityPayload = {
   activity: {
     activityId: string;
-  } & Pick<
-    Contract["activities"][number],
-    "startDate" | "endDate" | "rate"
-  >;
+  } & Pick<Contract["activities"][number], "startDate" | "endDate" | "rate">;
   contract: Pick<Contract, "period">;
   partners: [
     {
@@ -94,6 +91,10 @@ const byPartner: ContractPayload = {
   ],
 };
 
+export type ContractActivityPayload = {
+  volume: number;
+} & Pick<Contract["activities"][number], "startDate" | "endDate" | "rate">;
+
 export type DownloadContractsPayload = {
   contracts: [
     {
@@ -133,4 +134,11 @@ export type ContractPdf = {
     spell: string;
   };
   region: string;
+};
+
+export const contractActivityPayload: ContractActivityPayload = {
+  startDate: new Date(),
+  endDate: new Date(),
+  volume: 1,
+  rate: 200,
 };

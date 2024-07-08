@@ -540,6 +540,110 @@ export const deletContract = async (id: string): Promise<Result<any>> => {
   };
 };
 
+export const getContractActivity = async (
+  id: string,
+  activityId: string,
+  claims: JWT
+): Promise<Result<any>> => {
+  const existingContract = await ContractSchema.findById(id);
+
+  if (!existingContract) {
+    return {
+      data: null,
+      message: "Contract not found",
+      code: 404,
+    };
+  }
+
+  const activity = existingContract.activities.find(
+    (item) => item.id == activityId
+  );
+
+  if (!activity) {
+    return {
+      data: null,
+      message: "Activity not found",
+      code: 404,
+    };
+  }
+
+  return {
+    data: activity,
+    message: "Successfully retrived contract activity",
+    code: 200,
+  };
+};
+
+export const updateContractActivity = async (
+  id: string,
+  activityId: string,
+  payload: any,
+  claims: JWT
+): Promise<Result<any>> => {
+  const existingContract = await ContractSchema.findById(id);
+
+  if (!existingContract) {
+    return {
+      data: null,
+      message: "Contract not found",
+      code: 404,
+    };
+  }
+
+  const activity = existingContract.activities.find(
+    (item) => item.id == activityId
+  );
+
+  if (!activity) {
+    return {
+      data: null,
+      message: "Activity not found",
+      code: 404,
+    };
+  }
+
+  if (activity.createdBy != claims.team && claims.team != "TU") {
+    return {
+      data: null,
+      message: `only ${activity.createdBy} team or TU lead can delete`,
+      code: 401,
+    };
+  }
+
+  const total = payload.rate * payload.volume;
+  const grandTotal = total - activity.total;
+
+  activity.startDate = payload.startDate;
+  activity.endDate = payload.endDate;
+  activity.volume = payload.volume;
+  activity.rate = payload.rate;
+  activity.total = total;
+
+  const contract = await ContractSchema.findOneAndUpdate(
+    {
+      _id: existingContract.id,
+      "activities._id": activity._id,
+    },
+    {
+      $inc: {
+        grandTotal: grandTotal,
+      },
+      $set: {
+        "activities.$": activity,
+      },
+    },
+    {
+      upsert: true,
+    }
+  );
+
+  return {
+    data: contract,
+    message: "Successfully updated contract activity",
+    code: 200,
+  };
+};
+
 export const deleteContractActivity = async (
   id: string,
   activityId: string,
@@ -567,10 +671,10 @@ export const deleteContractActivity = async (
     };
   }
 
-  if (activity.createdBy != claims.team) {
+  if (activity.createdBy != claims.team && claims.team != "TU") {
     return {
       data: null,
-      message: `only ${activity.createdBy} team can delete`,
+      message: `only ${activity.createdBy} team or TU lead can delete`,
       code: 401,
     };
   }
