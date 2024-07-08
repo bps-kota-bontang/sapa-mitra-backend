@@ -46,7 +46,7 @@ export async function findLastSequence(
 ): Promise<number> {
   const existingDocument = await schema
     .findOne({ period })
-    .sort({ createdAt: -1 })
+    .sort({ number: -1 })
     .exec();
   let sequenceNumber = 1;
 
