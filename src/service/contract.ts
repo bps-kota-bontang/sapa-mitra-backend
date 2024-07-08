@@ -842,13 +842,15 @@ export const cancelContractActivity = async (
 };
 
 export const getContractStatistics = async (): Promise<Result<any>> => {
-  const contracts = await ContractSchema.find().select([
-    "partner.name",
-    "period",
-    "activities.status",
-    "activities._id",
-    "activities.createdBy",
-  ]);
+  const contracts = await ContractSchema.find()
+    .select([
+      "partner.name",
+      "period",
+      "activities.status",
+      "activities._id",
+      "activities.createdBy",
+    ])
+    .sort("period");
 
   const result: any[] = [];
 
