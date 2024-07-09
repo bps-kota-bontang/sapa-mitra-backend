@@ -1,4 +1,4 @@
-import { isProduction } from "@/common/utils";
+import { convertToCsv, isProduction } from "@/common/utils";
 import { Activity } from "@/model/activity";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
@@ -176,5 +176,29 @@ export const deleteActivity = async (
     data: null,
     message: "Successfully deleted activity",
     code: 204,
+  };
+};
+
+export const downloadActivities = async (
+  ids: string[] = []
+): Promise<Result<any>> => {
+  if (ids.length == 0) {
+    return {
+      data: null,
+      message: "Please select activities",
+      code: 400,
+    };
+  }
+
+  const activities = await ActivitySchema.find({
+    _id: { $in: ids },
+  });
+
+  const file = convertToCsv(activities);
+
+  return {
+    data: file,
+    message: "Successfully downloaded activities",
+    code: 200,
   };
 };

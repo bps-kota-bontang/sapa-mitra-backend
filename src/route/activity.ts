@@ -3,6 +3,7 @@ import { Activity } from "@/model/activity";
 import {
   deleteActivities,
   deleteActivity,
+  downloadActivities,
   getActivities,
   getActivity,
   storeActivity,
@@ -24,6 +25,29 @@ app.get("/", async (c) => {
     },
     result.code
   );
+});
+
+app.post("/download", async (c) => {
+  const payload = await c.req.json<string[]>();
+  const result = await downloadActivities(payload);
+
+  if (result.code != 200) {
+    return c.json(
+      {
+        data: result.data,
+        message: result.code,
+      },
+      result.code
+    );
+  }
+
+  c.res.headers.set("Content-Type", "text/csv");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename=Master Data Activity.csv`
+  );
+
+  return c.body(toArrayBuffer(result.data));
 });
 
 app.post("/template", async (c) => {
