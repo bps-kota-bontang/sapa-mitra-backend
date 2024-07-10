@@ -4,6 +4,7 @@ import {
   cancelContractActivity,
   deletContract,
   deleteContractActivity,
+  downloadContracts,
   getContract,
   getContractActivity,
   getContractStatistics,
@@ -54,6 +55,29 @@ app.post("/partner/template", async (c) => {
   );
 
   return c.body(toArrayBuffer(result));
+});
+
+app.post("/download", async (c) => {
+  const payload = await c.req.json<string[]>();
+  const result = await downloadContracts(payload);
+
+  if (result.code != 200) {
+    return c.json(
+      {
+        data: result.data,
+        message: result.code,
+      },
+      result.code
+    );
+  }
+
+  c.res.headers.set("Content-Type", "text/csv");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename=Master Data Contract.csv`
+  );
+
+  return c.body(toArrayBuffer(result.data));
 });
 
 app.post("/print", async (c) => {

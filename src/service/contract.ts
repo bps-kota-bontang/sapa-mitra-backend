@@ -2,6 +2,7 @@ import {
   calculateHandOverDate,
   calculateSignDate,
   checkRateLimits,
+  convertToCsv,
   findAvailableSequence,
   findLastSequence,
   formatDate,
@@ -1074,5 +1075,39 @@ const generateContractPdf = async (
     fileName: `${payload.number}_${payload.partner.name}`,
     period: `${payload.period.month} ${payload.period.year}`,
     name: contract.partner.name,
+  };
+};
+
+export const downloadContracts = async (
+  ids: string[] = []
+): Promise<Result<any>> => {
+  if (ids.length == 0) {
+    return {
+      data: null,
+      message: "Please select contracts",
+      code: 400,
+    };
+  }
+
+  const contracts = await ContractSchema.find({
+    _id: { $in: ids },
+  });
+
+  const transformedContracts = contracts.flatMap((contract) =>
+    contract.activities.map((activity) => ({
+      partner: contract.partner.name,
+      number: contract.number,
+      period: contract.period,
+      grandTotal: contract.grandTotal,
+      ...activity.toObject(),
+    }))
+  );
+
+  const file = convertToCsv(transformedContracts);
+
+  return {
+    data: file,
+    message: "Successfully downloaded contracts",
+    code: 200,
   };
 };

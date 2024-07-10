@@ -265,10 +265,17 @@ export const checkRateLimits = (
   };
 };
 
+const isDocument = (obj: any) => typeof obj.toObject === "function";
+
 export const convertToCsv = (objects: any[]): Buffer => {
-  const headers = Object.keys(objects[0].toObject()).join(";");
+  const headers = Object.keys(
+    isDocument(objects[0]) ? objects[0].toObject() : objects[0]
+  ).join(";");
   const rows = objects
-    .map((obj) => Object.values(obj.toObject()).join(";"))
+    .map((obj) => {
+      const data = isDocument(obj) ? obj.toObject() : obj;
+      return Object.values(data).join(";");
+    })
     .join("\n");
   const csvString = `${headers}\n${rows}`;
 
