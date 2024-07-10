@@ -1,4 +1,4 @@
-import { toArrayBuffer } from "@/common/utils";
+import { downloadTemplate, toArrayBuffer } from "@/common/utils";
 import {
   deleteReport,
   deleteReportOutput,
@@ -12,6 +12,18 @@ import {
 import { Hono } from "hono";
 
 const app = new Hono();
+
+app.post("/partner/template", async (c) => {
+  const result = await downloadTemplate("src/template/partner-in-report.csv");
+
+  c.res.headers.set("Content-Type", "text/csv");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename=Template Partner in Report.csv`
+  );
+
+  return c.body(toArrayBuffer(result));
+});
 
 app.post("/:id/print", async (c) => {
   const claims = c.get("jwtPayload");
