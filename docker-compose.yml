@@ -12,6 +12,12 @@ services:
       - sapa_mitra_network
     volumes:
       - .:/app
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://sapa-mitra-backend:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
   mongo:
     container_name: sapa-mitra-mongo
     image: mongo:latest
