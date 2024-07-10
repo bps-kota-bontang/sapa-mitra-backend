@@ -1111,3 +1111,48 @@ export const downloadContracts = async (
     code: 200,
   };
 };
+
+export const updateContract = async (
+  id: string,
+  payload: any,
+  claims: JWT
+): Promise<Result<any>> => {
+  if (claims.team !== "TU" || claims.position !== "KETUA") {
+    return {
+      data: null,
+      message: "only TU lead can edit",
+      code: 401,
+    };
+  }
+
+  const existingContract = await ContractSchema.findById(id);
+
+  if (!existingContract) {
+    return {
+      data: null,
+      message: "Contract not found",
+      code: 404,
+    };
+  }
+
+  const contract = await ContractSchema.findOneAndUpdate(
+    {
+      _id: existingContract.id,
+    },
+    {
+      $set: {
+        number: payload.number,
+        grandTotal: payload.grandTotal,
+      },
+    },
+    {
+      upsert: true,
+    }
+  );
+
+  return {
+    data: contract,
+    message: "Successfully updated a contract",
+    code: 200,
+  };
+};

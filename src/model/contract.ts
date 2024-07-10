@@ -95,6 +95,11 @@ export type ContractActivityPayload = {
   volume: number;
 } & Pick<Contract["activities"][number], "startDate" | "endDate" | "rate">;
 
+export type UpdateContractPayload = {
+  number: string;
+  grandTotal: number;
+};
+
 export type DownloadContractsPayload = {
   contracts: [
     {

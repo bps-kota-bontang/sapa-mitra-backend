@@ -1,5 +1,8 @@
 import { downloadTemplate, toArrayBuffer } from "@/common/utils";
-import { ContractActivityPayload } from "@/model/contract";
+import {
+  ContractActivityPayload,
+  UpdateContractPayload,
+} from "@/model/contract";
 import {
   cancelContractActivity,
   deletContract,
@@ -13,6 +16,7 @@ import {
   printContracts,
   storeContract,
   storeContractByActivity,
+  updateContract,
   updateContractActivity,
   verifyContractActivity,
 } from "@/service/contract";
@@ -158,6 +162,21 @@ app.post("/", async (c) => {
   } else {
     result = await storeContract(payload, claims);
   }
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.put("/:id", async (c) => {
+  const claims = c.get("jwtPayload");
+  const id = c.req.param("id");
+  const payload = await c.req.json<UpdateContractPayload>();
+  const result = await updateContract(id, payload, claims);
 
   return c.json(
     {
