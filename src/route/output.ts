@@ -1,5 +1,5 @@
 import { downloadTemplate, toArrayBuffer } from "@/common/utils";
-import { Output } from "@/model/output";
+import { OutputPayload } from "@/model/output";
 import {
   deleteOutput,
   getOutputs,
@@ -65,7 +65,7 @@ app.post("/upload", async (c) => {
 });
 
 app.post("/", async (c) => {
-  const payload = await c.req.json<Output>();
+  const payload = await c.req.json<OutputPayload>();
 
   const result = await storeOutput(payload);
 
@@ -79,7 +79,7 @@ app.post("/", async (c) => {
 });
 
 app.put("/:id", async (c) => {
-  const payload = await c.req.json<Output>();
+  const payload = await c.req.json<OutputPayload>();
   const id = c.req.param("id");
   const result = await updateOutput(id, payload);
 

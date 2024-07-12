@@ -1,6 +1,6 @@
-import { isProduction } from "@/common/utils";
-import { Output } from "@/model/output";
+import { Output, OutputPayload } from "@/model/output";
 import { Result } from "@/model/result";
+import ActivitySchema from "@/schema/activity";
 import OutputSchema from "@/schema/output";
 import { parse } from "csv-parse/sync";
 
@@ -32,9 +32,27 @@ export const getOutput = async (id: string): Promise<Result<Output>> => {
 };
 
 export const storeOutput = async (
-  payload: Output
+  payload: OutputPayload
 ): Promise<Result<Output>> => {
-  const output = await OutputSchema.create(payload);
+  const activity = await ActivitySchema.findById(
+    payload.activity.activityId
+  ).select(["name"]);
+
+  if (!activity) {
+    return {
+      data: null,
+      message: "Activity not found",
+      code: 404,
+    };
+  }
+
+  const output = await OutputSchema.create({
+    activity: {
+      ...activity,
+    },
+    name: payload.name,
+    unit: payload.unit,
+  });
 
   return {
     data: output,
@@ -43,9 +61,7 @@ export const storeOutput = async (
   };
 };
 
-export const uploadOutput = async (
-  file: File
-): Promise<Result<any>> => {
+export const uploadOutput = async (file: File): Promise<Result<any>> => {
   if (!file) {
     return {
       data: null,
@@ -70,7 +86,38 @@ export const uploadOutput = async (
     skip_empty_lines: true,
   });
 
-  const outputs = await OutputSchema.create(data);
+  const activityIds = data.map((item: any) => item.activityId);
+
+  const activities = await ActivitySchema.find({
+    _id: { $in: activityIds },
+  }).select(["name"]);
+
+  const activityMap = new Map<string, any>();
+  activities.forEach((activity) => {
+    activityMap.set(activity._id.toString(), activity);
+  });
+
+  const transformedData = data.map((item: any) => {
+    const activity = activityMap.get(item.activityId);
+
+    if (!activity) {
+      return {
+        data: null,
+        message: `Activity with ID ${item.activityId} not found`,
+        code: 400,
+      };
+    }
+
+    return {
+      activity: {
+        ...activity,
+      },
+      name: item.name,
+      unit: item.unit,
+    };
+  });
+
+  const outputs = await OutputSchema.create(transformedData);
 
   return {
     data: outputs,
@@ -81,11 +128,33 @@ export const uploadOutput = async (
 
 export const updateOutput = async (
   id: string,
-  payload: Output
+  payload: OutputPayload
 ): Promise<Result<Output>> => {
-  const output = await OutputSchema.findByIdAndUpdate(id, payload, {
-    new: true,
-  });
+  const activity = await ActivitySchema.findById(
+    payload.activity.activityId
+  ).select(["name"]);
+
+  if (!activity) {
+    return {
+      data: null,
+      message: "Activity not found",
+      code: 404,
+    };
+  }
+
+  const output = await OutputSchema.findByIdAndUpdate(
+    id,
+    {
+      activity: {
+        ...activity,
+      },
+      name: payload.name,
+      unit: payload.unit,
+    },
+    {
+      new: true,
+    }
+  );
 
   return {
     data: output,
@@ -94,9 +163,7 @@ export const updateOutput = async (
   };
 };
 
-export const deleteOutput = async (
-  id: string
-): Promise<Result<any>> => {
+export const deleteOutput = async (id: string): Promise<Result<any>> => {
   await OutputSchema.findByIdAndDelete(id);
 
   return {
