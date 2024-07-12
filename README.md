@@ -48,6 +48,8 @@ bun install
 
 4. Konfigurasi .env :
 
+Ubah _file_ .env.example menjadi .env, silahkan ubah file .env sesuai kebutuhan anda.
+
 ```sh
 APP_NAME=SAPAMITRA
 APP_ENV=development
@@ -59,7 +61,17 @@ JWT_DURATION=3600
 MONGO_URI=mongodb://sapa-mitra-mongo:27017/sapa_mitra_db
 ```
 
-5. Menjalankan di lingkungan _local_:
+Default Mongo URI menggunakan Docker, jika anda tidak menggunakan Docker silahkan ubah Mongo URI, contoh: `mongodb://localhost:27017/sapa_mitra_db`
+
+5. Melakukan _seed_ untuk menambahkan pengguna bawaan:
+
+Seeding database cukup dilakukan satu kali saja.
+
+```sh
+bun run seed
+```
+
+6. Menjalankan di lingkungan _local_:
 
 - Tanpa menggunakan Docker
 
