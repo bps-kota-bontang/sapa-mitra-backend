@@ -19,6 +19,9 @@ COPY package.json bun.lockb ./
 
 ENV NODE_ENV=production
 
+ARG BUILD_HASH
+ENV APP_BUILD_HASH=${BUILD_HASH}
+
 RUN bun install --frozen-lockfile --production
 
 COPY . .

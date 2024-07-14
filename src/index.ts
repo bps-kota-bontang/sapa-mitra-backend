@@ -16,7 +16,12 @@ app.use(prettyJSON());
 app.use(cors());
 app.use(etag(), logger());
 app.use("/static/*", serveStatic({ root: "./" }));
-app.get("/", (c) => c.text(`Sapa Mitra ${Bun.env.APP_ENV} API`.toUpperCase()));
+app.get("/", (c) =>
+  c.text(
+    `${Bun.env.APP_NAME} ${Bun.env.APP_ENV} API`.toUpperCase() +
+      ` (Build: ${Bun.env.APP_BUILD_HASH})`
+  )
+);
 app.get("/health", (c) => c.json("OK"));
 app.use("/v1/*", withAuth);
 
