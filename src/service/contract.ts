@@ -128,7 +128,7 @@ export const storeContractByActivity = async (
 
   const lastSequence = await findLastSequence(
     payload.contract.period,
-    ContractSchema
+    "contract"
   );
 
   const limits = await ConfigurationSchema.findOne({ name: "RATE" });

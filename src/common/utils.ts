@@ -44,12 +44,21 @@ export function createYearMonth(
 
 export async function findLastSequence(
   period: string,
-  schema: any
+  model: "contract" | "report"
 ): Promise<number> {
-  const existingDocument = await schema
-    .findOne({ period })
-    .sort({ number: -1 })
-    .exec();
+  let existingDocument;
+  if (model == "contract") {
+    existingDocument = await ContractSchema.findOne({ period })
+      .sort({ number: -1 })
+      .exec();
+  } else if (model == "report") {
+    existingDocument = await ReportSchema.findOne({
+      "contract.period": period,
+    })
+      .sort({ number: -1 })
+      .exec();
+  }
+
   let sequenceNumber = 1;
 
   if (existingDocument && existingDocument.number) {

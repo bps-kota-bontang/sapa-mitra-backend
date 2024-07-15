@@ -419,7 +419,7 @@ export const storeReportByOutput = async (
 
   const lastSequence = await findLastSequence(
     payload.contract.period,
-    ReportSchema
+    "report"
   );
 
   const partnerIds = payload.partners.map((item) => item.partnerId);
