@@ -3,6 +3,8 @@ import Terbilang from "terbilang-ts";
 import { PDFDocument } from "pdf-lib";
 import { promises as fs } from "fs";
 import { Configuration, Limits } from "@/model/configuration";
+import ContractSchema from "@/schema/contract";
+import ReportSchema from "@/schema/report";
 
 export const notEmpty = <TValue>(
   value: TValue | null | undefined
@@ -60,9 +62,19 @@ export async function findLastSequence(
 
 export const findAvailableSequence = async (
   period: string,
-  schema: any
+  model: "contract" | "report"
 ): Promise<number> => {
-  const documents = await schema.find({ period }).sort("number").exec();
+  let documents: any[] = [];
+  if (model == "contract") {
+    documents = await ContractSchema.find({ period }).sort("number").exec();
+  } else if (model == "report") {
+    documents = await ReportSchema.find({
+      "contract.period": period,
+    })
+      .sort("number")
+      .exec();
+  }
+
   let availableSeq = 1;
 
   for (let i = 0; i < documents.length; i++) {

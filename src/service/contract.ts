@@ -336,7 +336,7 @@ export const storeContract = async (
 
   const availableSeq = await findAvailableSequence(
     payload.contract.period,
-    ContractSchema
+    "contract"
   );
 
   const number = generateContractNumber(payload.contract.period, availableSeq);

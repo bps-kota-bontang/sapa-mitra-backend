@@ -226,7 +226,7 @@ export const storeReport = async (
 
   const availableSeq = await findAvailableSequence(
     payload.contract.period,
-    ReportSchema
+    "report"
   );
 
   const number = generateReportNumber(payload.contract.period, availableSeq);
