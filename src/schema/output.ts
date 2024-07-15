@@ -8,7 +8,7 @@ export const outputSchema = new Schema<Output>(
         name: { type: String, required: true },
       },
     },
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
     unit: { type: String, required: true },
   },
   {
