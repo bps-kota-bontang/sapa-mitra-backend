@@ -17,3 +17,8 @@ export type User = {
   team: Team | null;
   position: Position;
 };
+
+export type UpdatePasswordPayload = {
+  oldPassword: string;
+  newPassword: string;
+};

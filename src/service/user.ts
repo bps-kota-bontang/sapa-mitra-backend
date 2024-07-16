@@ -1,7 +1,7 @@
 import { isProduction, positionOrder } from "@/common/utils";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
-import { User } from "@/model/user";
+import { UpdatePasswordPayload, User } from "@/model/user";
 import UserSchema from "@/schema/user";
 import { parse } from "csv-parse/sync";
 
@@ -75,5 +75,67 @@ export const uploadUsers = async (
     data: outputs,
     message: "Successfully uploaded users",
     code: 201,
+  };
+};
+
+export const updatePassword = async (
+  id: string,
+  payload: UpdatePasswordPayload,
+  claims: JWT
+): Promise<Result<any>> => {
+  const user = await UserSchema.findById(id);
+
+  if (!user) {
+    return {
+      data: null,
+      message: "User not found",
+      code: 404,
+    };
+  }
+
+  if (claims.sub != id) {
+    return {
+      data: null,
+      message:
+        "Unauthorized access. You do not have permission to update this user's password.",
+      code: 401,
+    };
+  }
+
+  const { password: hashedPassword, ...restUser } = user.toObject(); // Convert the document to a plain object
+
+  const isMatch = await Bun.password.verify(
+    payload.oldPassword,
+    hashedPassword
+  );
+
+  if (!isMatch) {
+    return {
+      data: null,
+      message: "Invalid credential",
+      code: 400,
+    };
+  }
+
+  const hashedNewPassword = await Bun.password.hash(payload.newPassword, {
+    algorithm: "bcrypt",
+  });
+
+  const result = await UserSchema.findByIdAndUpdate(id, {
+    password: hashedNewPassword,
+  });
+
+  if (!result) {
+    return {
+      data: null,
+      message: "Failed to update password",
+      code: 404,
+    };
+  }
+
+  return {
+    data: null,
+    message: "Successfully changed password user",
+    code: 200,
   };
 };
