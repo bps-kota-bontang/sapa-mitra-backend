@@ -16,6 +16,7 @@ export const activitySchema = new Schema<Activity>(
       required: true,
       enum: ["SOSIAL", "PRODUKSI", "DISTRIBUSI", "NERWILIS", "IPDS", "TU"],
     },
+    isSpecial: { type: Boolean, required: true, default: false },
   },
   {
     timestamps: true,

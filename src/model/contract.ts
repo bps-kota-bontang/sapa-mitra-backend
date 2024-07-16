@@ -13,7 +13,7 @@ export type Contract = {
   period: YearMonth;
   authority: Authority;
   partner: Pick<Partner, "name" | "nik" | "address"> & Document;
-  activities: (Pick<Activity, "code" | "name" | "unit" | "category"> & {
+  activities: (Pick<Activity, "code" | "name" | "unit" | "category" | "isSpecial"> & {
     startDate: Date;
     endDate: Date;
     volume: number;
