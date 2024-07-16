@@ -64,11 +64,13 @@ export const getContracts = async (
 
   const transformedContracts = contracts.map((item, index) => {
     const limit = checkRateLimits(item, limits);
+    const hasSpecial = item.activities.some(activity => activity.isSpecial);
 
     return {
       ...item.toObject(),
       ...limit,
       index: index + 1,
+      hasSpecial: hasSpecial
     };
   });
 
@@ -103,11 +105,13 @@ export const getContract = async (
   }
 
   const limit = checkRateLimits(contract, limits);
+  const hasSpecial = contract.activities.some(activity => activity.isSpecial);
 
   return {
     data: {
       ...contract.toObject(),
       ...limit,
+      hasSpecial: hasSpecial
     },
     message: "Successfully retrieved contract",
     code: 200,
@@ -166,6 +170,7 @@ export const storeContractByActivity = async (
     "unit",
     "category",
     "team",
+    "isSpecial"
   ]);
 
   if (!activityDb) {
@@ -361,7 +366,7 @@ export const storeContract = async (
 
   const activitiesDb = await ActivitySchema.find({
     _id: { $in: activityIds },
-  }).select(["code", "name", "unit", "category", "team"]);
+  }).select(["code", "name", "unit", "category", "team", "isSpecial"]);
 
   if (activitiesDb.length == 0) {
     return {
@@ -379,11 +384,11 @@ export const storeContract = async (
       );
       return itemDb
         ? {
-            ...restPayload,
-            ...itemDb.toObject(),
-            total: restPayload.volume * restPayload.rate,
-            createdBy: itemDb.team,
-          }
+          ...restPayload,
+          ...itemDb.toObject(),
+          total: restPayload.volume * restPayload.rate,
+          createdBy: itemDb.team,
+        }
         : null;
     })
     .filter(notEmpty);
@@ -815,6 +820,16 @@ export const verifyContractActivity = async (
   activityId: string,
   claims: JWT
 ): Promise<Result<Contract>> => {
+  const limits = await ConfigurationSchema.findOne({ name: "RATE" });
+
+  if (!limits) {
+    return {
+      data: null,
+      message: "Rate limits have not been configured",
+      code: 400,
+    };
+  }
+
   const existingContract = await ContractSchema.findById(id);
 
   if (!existingContract) {
@@ -850,6 +865,26 @@ export const verifyContractActivity = async (
       data: null,
       message: `only ${activity.createdBy} team or TU team can verify`,
       code: 401,
+    };
+  }
+
+  const limit = checkRateLimits(existingContract, limits);
+
+  if (limit.isExceeded) {
+    return {
+      data: null,
+      message: `failed to verify, rate exceeds limit`,
+      code: 400,
+    };
+  }
+
+  const hasSpecial = existingContract.activities.some(activity => activity.isSpecial);
+
+  if (hasSpecial && existingContract.activities.length > 1) {
+    return {
+      data: null,
+      message: `failed to verify, contracts with special status cannot be more than 1 activity`,
+      code: 400,
     };
   }
 

@@ -29,6 +29,7 @@ export const contractSchema = new Schema<Contract>(
             required: true,
             enum: ["ENUMERATION", "SUPERVISION", "PROCESSING"],
           },
+          isSpecial: { type: Boolean, required: true, default: false },
           startDate: { type: Date, required: true },
           endDate: { type: Date, required: true },
           volume: { type: Number, required: true },
