@@ -97,6 +97,13 @@ bun run start
 
 Untuk menjalankan di lingkungan _production_ menggunakan Docker pastikan anda telah melakukan _Build Image_ lalu menyimpan ke Registry. Pada sisi _Server_ melakukan _Pull Image_ dari Registry yang digunakan.
 
+## Pengguna
+
+| Email            | Password | Tim | Posisi  |
+| ---------------- | -------- | --- | ------- |
+| ketua@mail.com   | 123456   | TU  | Ketua   |
+| anggota@mail.com | 123456   | TU  | Anggota |
+
 ## Kontribusi
 
 Kami sangat terbuka terhadap kontribusi dari siapa saja. Jika Anda ingin berkontribusi, silakan _fork repository_ ini dan kirimkan _pull request_ dengan perubahan yang Anda buat.

@@ -9,7 +9,7 @@ const users: User[] = [
     nip: "000000000000000000",
     email: "ketua@mail.com",
     password: "$2b$10$sRL4PxTRB4n8UnGT5T.EjOexHIurt9BAF1yXDCKd4AG3M3mjNm0/W",
-    team: "IPDS",
+    team: "TU",
     position: "KETUA",
   },
   {
@@ -18,7 +18,7 @@ const users: User[] = [
     nip: "111111111111111111",
     email: "anggota@mail.com",
     password: "$2b$10$sRL4PxTRB4n8UnGT5T.EjOexHIurt9BAF1yXDCKd4AG3M3mjNm0/W",
-    team: "IPDS",
+    team: "TU",
     position: "ANGGOTA",
   },
 ];
