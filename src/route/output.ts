@@ -8,10 +8,35 @@ import {
   updateOutput,
   uploadOutput,
   deleteOutputs,
+  downloadOutputs,
 } from "@/service/output";
 import { Hono } from "hono";
 
 const app = new Hono();
+
+app.post("/download", async (c) => {
+  const payload = await c.req.json<string[]>();
+  const result = await downloadOutputs(payload);
+
+  if (result.code != 200) {
+    return c.json(
+      {
+        data: result.data,
+        message: result.message,
+      },
+      result.code
+    );
+  }
+
+  c.res.headers.set("Content-Type", "text/csv");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename=Master Data Output.csv`
+  );
+
+  return c.body(toArrayBuffer(result.data));
+});
+
 
 app.post("/template", async (c) => {
   const result = await downloadTemplate("src/template/output.csv");

@@ -1,3 +1,4 @@
+import { convertToCsv } from "@/common/utils";
 import { Output, OutputPayload } from "@/model/output";
 import { Result } from "@/model/result";
 import ActivitySchema from "@/schema/activity";
@@ -192,5 +193,38 @@ export const deleteOutputs = async (
     data: null,
     message: "Successfully deleted outputs",
     code: 204,
+  };
+};
+
+export const downloadOutputs = async (
+  ids: string[] = []
+): Promise<Result<any>> => {
+  if (ids.length == 0) {
+    return {
+      data: null,
+      message: "Please select outputs",
+      code: 400,
+    };
+  }
+
+  const outputs = await OutputSchema.find({
+    _id: { $in: ids },
+  });
+
+  const transformedOutputs = outputs.map(item => {
+    const { activity, ...restItem } = item.toObject();
+
+    return {
+      ...restItem,
+      activityName: activity.name
+    }
+  })
+
+  const file = convertToCsv(transformedOutputs);
+
+  return {
+    data: file,
+    message: "Successfully downloaded outputs",
+    code: 200,
   };
 };
