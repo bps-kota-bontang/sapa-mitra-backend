@@ -870,7 +870,7 @@ export const verifyContractActivity = async (
 
   const limit = checkRateLimits(existingContract, limits);
 
-  if (limit.isExceeded) {
+  if (limit.isExceeded && !activity.isSpecial) {
     return {
       data: null,
       message: `failed to verify, rate exceeds limit`,
