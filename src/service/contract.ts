@@ -1059,6 +1059,7 @@ const generateContractPdf = async (
   });
 
   const transformedActivities = contract.activities.map((item) => ({
+    code: item.code,
     name: item.name,
     volume: item.volume,
     unit: item.unit,
