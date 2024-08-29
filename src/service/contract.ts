@@ -5,6 +5,7 @@ import {
   convertToCsv,
   findAvailableSequence,
   findLastSequence,
+  formatCurrency,
   formatDate,
   formatDateFull,
   formatDateText,
@@ -64,13 +65,13 @@ export const getContracts = async (
 
   const transformedContracts = contracts.map((item, index) => {
     const limit = checkRateLimits(item, limits);
-    const hasSpecial = item.activities.some(activity => activity.isSpecial);
+    const hasSpecial = item.activities.some((activity) => activity.isSpecial);
 
     return {
       ...item.toObject(),
       ...limit,
       index: index + 1,
-      hasSpecial: hasSpecial
+      hasSpecial: hasSpecial,
     };
   });
 
@@ -105,13 +106,13 @@ export const getContract = async (
   }
 
   const limit = checkRateLimits(contract, limits);
-  const hasSpecial = contract.activities.some(activity => activity.isSpecial);
+  const hasSpecial = contract.activities.some((activity) => activity.isSpecial);
 
   return {
     data: {
       ...contract.toObject(),
       ...limit,
-      hasSpecial: hasSpecial
+      hasSpecial: hasSpecial,
     },
     message: "Successfully retrieved contract",
     code: 200,
@@ -170,7 +171,7 @@ export const storeContractByActivity = async (
     "unit",
     "category",
     "team",
-    "isSpecial"
+    "isSpecial",
   ]);
 
   if (!activityDb) {
@@ -384,11 +385,11 @@ export const storeContract = async (
       );
       return itemDb
         ? {
-          ...restPayload,
-          ...itemDb.toObject(),
-          total: restPayload.volume * restPayload.rate,
-          createdBy: itemDb.team,
-        }
+            ...restPayload,
+            ...itemDb.toObject(),
+            total: restPayload.volume * restPayload.rate,
+            createdBy: itemDb.team,
+          }
         : null;
     })
     .filter(notEmpty);
@@ -878,7 +879,9 @@ export const verifyContractActivity = async (
     };
   }
 
-  const hasSpecial = existingContract.activities.some(activity => activity.isSpecial);
+  const hasSpecial = existingContract.activities.some(
+    (activity) => activity.isSpecial
+  );
 
   if (hasSpecial && existingContract.activities.length > 1) {
     return {
@@ -1058,16 +1061,33 @@ const generateContractPdf = async (
     footerTemplate: `<p style="margin: auto;font-size: 13px;"><span class="pageNumber"></span></p>`,
   });
 
-  const transformedActivities = contract.activities.map((item) => ({
-    code: item.code,
-    name: item.name,
-    volume: item.volume,
-    unit: item.unit,
-    category: item.category,
-    date: `${formatDate(item.startDate)} - ${formatDate(item.endDate)}`,
-    total: item.total,
-    budget: 0,
-  }));
+  const transformedActivities = contract.activities.map((item) => {
+    const codes = item.code.split(".");
+
+    let modifiedCode = "";
+
+    codes.forEach((code, index) => {
+      let separator = ".";
+      if (index === 4) {
+        separator = ". ";
+      }
+      modifiedCode += code;
+      if (index < codes.length - 1) {
+        modifiedCode += separator;
+      }
+    });
+
+    return {
+      code: modifiedCode,
+      name: item.name,
+      volume: item.volume,
+      unit: item.unit,
+      category: item.category,
+      date: `${formatDate(item.startDate)} - ${formatDate(item.endDate)}`,
+      total: formatCurrency(item.total),
+      budget: 0,
+    };
+  });
 
   const html = fs.readFileSync("src/template/contract.html", "utf8");
   const template = hbs.compile(html);
@@ -1097,7 +1117,7 @@ const generateContractPdf = async (
       dateFull: formatDateFull(contract.handOverDate),
     },
     grandTotal: {
-      nominal: contract.grandTotal,
+      nominal: formatCurrency(contract.grandTotal),
       spell: Terbilang(contract.grandTotal),
     },
     region: region,

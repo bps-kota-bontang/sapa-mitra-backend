@@ -128,14 +128,14 @@ export type ContractPdf = {
     volume: number;
     unit: string;
     date: string;
-    total: number;
+    total: string;
     budget: number;
   }[];
   handOver: {
     dateFull: string;
   };
   grandTotal: {
-    nominal: number;
+    nominal: string;
     spell: string;
   };
   region: string;
