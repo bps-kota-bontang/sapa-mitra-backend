@@ -302,3 +302,11 @@ export const convertToCsv = (objects: any[]): Buffer => {
 
   return Buffer.from(csvString, "utf-8");
 };
+
+export const formatCurrency = (number: number): string => {
+  if (!number) return "0,00";
+  const parts = number.toFixed(2).toString().split(".");
+  const formattedInteger = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  
+  return `${formattedInteger},${parts[1]}`;
+};
