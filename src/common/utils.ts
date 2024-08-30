@@ -2,6 +2,7 @@ import { Contract, YearMonth } from "@/model/contract";
 import Terbilang from "terbilang-ts";
 import { PDFDocument } from "pdf-lib";
 import { promises as fs } from "fs";
+import { randomBytes } from "crypto";
 import { Configuration, Limits } from "@/model/configuration";
 import ContractSchema from "@/schema/contract";
 import ReportSchema from "@/schema/report";
@@ -146,6 +147,12 @@ export const mode = Bun.env.APP_ENV || "development";
 export const region = Bun.env.APP_REGION || "Kota Bontang";
 
 export const regionCode = Bun.env.APP_REGION_CODE || "6474";
+
+export const APP_HOST = Bun.env.APP_HOST || "http://localhost:4000";
+
+export const CLIENT_URL = Bun.env.CLIENT_URL || "http://localhost:5173";
+
+export const GATE_URL = Bun.env.GATE_URL || "http://localhost";
 
 export const toArrayBuffer = (buffer: Buffer): ArrayBuffer => {
   const arrayBuffer = new ArrayBuffer(buffer.length);
@@ -307,6 +314,10 @@ export const formatCurrency = (number: number): string => {
   if (!number) return "0,00";
   const parts = number.toFixed(2).toString().split(".");
   const formattedInteger = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  
+
   return `${formattedInteger},${parts[1]}`;
+};
+
+export const generateState = () => {
+  return randomBytes(16).toString("hex");
 };

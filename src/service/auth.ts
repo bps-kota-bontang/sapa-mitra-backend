@@ -1,7 +1,7 @@
 import { Result } from "@/model/result";
-import { User } from "@/model/user";
 import UserSchema from "@/schema/user";
 import { generateToken } from "@/service/jwt";
+import { getUserInfo } from "@/service/sso";
 
 export const login = async (
   email: string,
@@ -18,7 +18,6 @@ export const login = async (
   }
   const { password: hashedPassword, ...restUser } = user.toObject(); // Convert the document to a plain object
 
-
   const isMatch = await Bun.password.verify(password, hashedPassword);
 
   if (!isMatch) {
@@ -32,8 +31,8 @@ export const login = async (
   const token = await generateToken(user);
 
   const result = {
-    token: token
-  }
+    token: token,
+  };
 
   return {
     data: result,
@@ -42,23 +41,28 @@ export const login = async (
   };
 };
 
-export const register = async (
-  data: User
-): Promise<Result<Omit<User, "password">>> => {
-  const hashedPassword = await Bun.password.hash(data.password, {
-    algorithm: "bcrypt",
-  });
+export const loginSso = async (tokenSso: string): Promise<Result<any>> => {
+  const userSso = await getUserInfo(tokenSso);
 
-  const user = await UserSchema.create({
-    ...data,
-    password: hashedPassword,
-  });
+  const user = await UserSchema.findOne({ email: userSso.email });
 
-  const { password, ...transformedUser } = user.toObject();
+  if (!user) {
+    return {
+      data: null,
+      message: "User not found",
+      code: 404,
+    };
+  }
+
+  const token = await generateToken(user);
+
+  const result = {
+    token: token,
+  };
 
   return {
-    data: transformedUser,
-    message: "Successfully registered user",
+    data: result,
+    message: "Successfully logged in",
     code: 200,
   };
 };
