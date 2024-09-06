@@ -36,6 +36,7 @@ import hbs from "handlebars";
 import fs from "fs";
 import PuppeteerHTMLPDF from "puppeteer-html-pdf";
 import Terbilang from "terbilang-ts";
+import OutputSchema from "@/schema/output";
 
 export const getContracts = async (
   period: string = "",
@@ -1213,6 +1214,41 @@ export const updateContract = async (
 
   return {
     data: contract,
+    message: "Successfully updated a contract",
+    code: 200,
+  };
+};
+
+export const getContractActivityVolume = async (
+  period?: string,
+  outputId?: string
+): Promise<Result<any>> => {
+  let activityId: string | undefined;
+
+  if (outputId) {
+    const output = await OutputSchema.findById(outputId).select([
+      "activity._id",
+    ]);
+    if (output) {
+      activityId = output.activity.id as string;
+    }
+  }
+
+  const contracts = await ContractSchema.find({
+    ...(period && { period: period }),
+    ...(activityId && { "activities._id": activityId }),
+  }).select(["partner._id", "period", "activities._id", "activities.volume"]);
+
+  const partnerVolume = contracts.map(({ partner, activities }) => {
+    const activity = activities.find((item) => item._id == activityId);
+    return {
+      partnerId: partner._id,
+      volume: activity?.volume || 0,
+    };
+  });
+
+  return {
+    data: partnerVolume,
     message: "Successfully updated a contract",
     code: 200,
   };

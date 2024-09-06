@@ -10,6 +10,7 @@ import {
   downloadContracts,
   getContract,
   getContractActivity,
+  getContractActivityVolume,
   getContractStatistics,
   getContracts,
   printContract,
@@ -272,6 +273,21 @@ app.get("/:id/activity/:activityId/cancel", async (c) => {
   const activityId = c.req.param("activityId");
 
   const result = await cancelContractActivity(id, activityId, claims);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.get("/activity/volume", async (c) => {
+  const outputId = c.req.query("outputId");
+  const period = c.req.query("period");
+
+  const result = await getContractActivityVolume(period, outputId);
 
   return c.json(
     {
