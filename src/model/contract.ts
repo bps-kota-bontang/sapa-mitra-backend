@@ -123,6 +123,9 @@ export type ContractPdf = {
     yearText: string;
     dateFull: string;
   };
+  final: {
+    dateFull: string;
+  };
   activities: {
     name: string;
     volume: number;

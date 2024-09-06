@@ -1088,6 +1088,8 @@ const generateContractPdf = async (
       budget: 0,
     };
   });
+  const finalDate = new Date(contract.handOverDate);
+  finalDate.setDate(finalDate.getDate() - 1);
 
   const html = fs.readFileSync("src/template/contract.html", "utf8");
   const template = hbs.compile(html);
@@ -1111,6 +1113,9 @@ const generateContractPdf = async (
       monthText: formatMonthText(contract.signDate),
       dateFull: formatDateFull(contract.signDate),
       yearText: formatYearText(contract.signDate),
+    },
+    final: {
+      dateFull: formatDateFull(finalDate),
     },
     activities: transformedActivities,
     handOver: {
