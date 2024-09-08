@@ -1,4 +1,5 @@
 import {
+  convertToCsv,
   findAvailableSequence,
   findLastSequence,
   formatDateText,
@@ -645,5 +646,41 @@ const generateReportPdf = async (
     fileName: `${payload.number}_${payload.partner.name}`,
     period: `${payload.period.month} ${payload.period.year}`,
     name: report.partner.name,
+  };
+};
+
+export const downloadReports = async (
+  ids: string[] = []
+): Promise<Result<any>> => {
+  if (ids.length == 0) {
+    return {
+      data: null,
+      message: "Please select reports",
+      code: 400,
+    };
+  }
+
+  const reports = await ReportSchema.find({
+    _id: { $in: ids },
+  });
+
+  const transformedReports = reports.flatMap((report) =>
+    report.outputs.map((output) => ({
+      partner: report.partner.name,
+      number: report.number,
+      contractNumber: report.contract.number,
+      period: report.contract.period,
+      ...output.toObject(),
+    }))
+  );
+
+ 
+
+  const file = convertToCsv(transformedReports);
+
+  return {
+    data: file,
+    message: "Successfully downloaded reports",
+    code: 200,
   };
 };

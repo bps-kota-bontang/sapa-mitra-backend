@@ -2,6 +2,7 @@ import { downloadTemplate, toArrayBuffer } from "@/common/utils";
 import {
   deleteReport,
   deleteReportOutput,
+  downloadReports,
   getReport,
   getReports,
   printReport,
@@ -152,5 +153,29 @@ app.post("/", async (c) => {
     result.code
   );
 });
+
+app.post("/download", async (c) => {
+  const payload = await c.req.json<string[]>();
+  const result = await downloadReports(payload);
+
+  if (result.code != 200) {
+    return c.json(
+      {
+        data: result.data,
+        message: result.message,
+      },
+      result.code
+    );
+  }
+
+  c.res.headers.set("Content-Type", "text/csv");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename=Master Data Contract.csv`
+  );
+
+  return c.body(toArrayBuffer(result.data));
+});
+
 
 export default app;
