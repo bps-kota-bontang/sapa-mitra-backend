@@ -70,7 +70,7 @@ app.post("/download", async (c) => {
     return c.json(
       {
         data: result.data,
-        message: result.code,
+        message: result.message,
       },
       result.code
     );
