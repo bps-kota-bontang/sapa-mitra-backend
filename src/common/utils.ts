@@ -124,7 +124,7 @@ export const calculateSignDate = (yearMonth: YearMonth) => {
   const date = new Date(year, month - 1);
 
   const signDate = new Date(date);
-  signDate.setDate(signDate.getDate() - 1);
+  signDate.setDate(signDate.getDate() + 1);
 
   return signDate;
 };
@@ -132,9 +132,9 @@ export const calculateSignDate = (yearMonth: YearMonth) => {
 export const calculateHandOverDate = (yearMonth: YearMonth) => {
   const [year, month] = yearMonth.split("-").map(Number);
 
-  const nextMonthDate = new Date(year, month);
+  const date = new Date(year, month);
 
-  const handOverDate = new Date(nextMonthDate);
+  const handOverDate = new Date(date);
   handOverDate.setDate(handOverDate.getDate());
 
   return handOverDate;
