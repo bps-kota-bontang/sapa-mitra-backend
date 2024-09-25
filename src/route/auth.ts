@@ -1,4 +1,4 @@
-import { APP_HOST, CLIENT_URL, GATE_URL, generateState } from "@/common/utils";
+import { APP_HOST, CLIENT_URL, GATE_SERVICE_ID, GATE_URL, generateState } from "@/common/utils";
 import { getCookie, setCookie } from "hono/cookie";
 import { login, loginSso } from "@/service/auth";
 
@@ -33,7 +33,7 @@ app.get("/sso", async (c) => {
   });
 
   return c.redirect(
-    `${GATE_URL}/api/v1/auth/sso?state=${state}&redirect_url=${APP_HOST}/v1/auth/callback`
+    `${GATE_URL}/api/v1/auth/sso?state=${state}&service_id=${GATE_SERVICE_ID}`
   );
 });
 
