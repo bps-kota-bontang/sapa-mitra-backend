@@ -1090,7 +1090,7 @@ const generateContractPdf = async (
     };
   });
   const finalDate = new Date(contract.handOverDate);
-  finalDate.setDate(finalDate.getDate() - 1);
+  finalDate.setDate(finalDate.getDate());
 
   const html = fs.readFileSync("src/template/contract.html", "utf8");
   const template = hbs.compile(html);
