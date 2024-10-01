@@ -124,7 +124,7 @@ export const calculateSignDate = (yearMonth: YearMonth) => {
   const date = new Date(year, month - 1);
 
   const signDate = new Date(date);
-  signDate.setDate(signDate.getDate() + 1);
+  signDate.setDate(signDate.getDate());
 
   return signDate;
 };
@@ -135,7 +135,7 @@ export const calculateHandOverDate = (yearMonth: YearMonth) => {
   const date = new Date(year, month);
 
   const handOverDate = new Date(date);
-  handOverDate.setDate(handOverDate.getDate());
+  handOverDate.setDate(handOverDate.getDate() - 1);
 
   return handOverDate;
 };
@@ -154,7 +154,8 @@ export const CLIENT_URL = Bun.env.CLIENT_URL || "http://localhost:5173";
 
 export const GATE_URL = Bun.env.GATE_URL || "http://localhost";
 
-export const GATE_SERVICE_ID = Bun.env.GATE_SERVICE_ID || "00000000-0000-0000-0000-000000000000";
+export const GATE_SERVICE_ID =
+  Bun.env.GATE_SERVICE_ID || "00000000-0000-0000-0000-000000000000";
 
 export const toArrayBuffer = (buffer: Buffer): ArrayBuffer => {
   const arrayBuffer = new ArrayBuffer(buffer.length);
