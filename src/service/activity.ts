@@ -2,8 +2,15 @@ import { convertToCsv, isProduction } from "@/common/utils";
 import { Activity } from "@/model/activity";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
-import ActivitySchema from "@/schema/activity";
+import { ActivityRepository } from "@/repository/activity";
+import { firebaseActivityRepository } from "@/repository/impl/firebase/activity";
+import { mongoActivityRepository } from "@/repository/impl/mongo/activity";
 import { parse } from "csv-parse/sync";
+
+const activityRepository: ActivityRepository =
+  Bun.env.DATABASE_PROVIDER === "firebase"
+    ? firebaseActivityRepository()
+    : mongoActivityRepository(); // Default to MongoDB
 
 export const getActivities = async (
   claims: JWT
@@ -12,11 +19,11 @@ export const getActivities = async (
 
   if (claims.team != "TU") queries.team = claims.team;
 
-  const activities = await ActivitySchema.find(queries);
+  const activities = await activityRepository.findAll(queries);
 
   const transformedActivities = activities.map((item, index) => {
     return {
-      ...item.toObject(),
+      ...item,
       index: index + 1,
     };
   });
@@ -29,7 +36,7 @@ export const getActivities = async (
 };
 
 export const getActivity = async (id: string): Promise<Result<Activity>> => {
-  const activity = await ActivitySchema.findById(id);
+  const activity = await activityRepository.findById(id);
 
   return {
     data: activity,
@@ -74,7 +81,7 @@ export const uploadActivity = async (
     skip_empty_lines: true,
   });
 
-  const activities = await ActivitySchema.create(data);
+  const activities = await activityRepository.create(data);
 
   return {
     data: activities,
@@ -94,7 +101,7 @@ export const storeActivity = async (
       code: 401,
     };
   }
-  const activity = await ActivitySchema.create(payload);
+  const activity = await activityRepository.create(payload);
 
   return {
     data: activity,
@@ -116,9 +123,7 @@ export const updateActivity = async (
     };
   }
 
-  const activity = await ActivitySchema.findByIdAndUpdate(id, payload, {
-    new: true,
-  });
+  const activity = await activityRepository.update(id, payload);
 
   return {
     data: activity,
@@ -147,9 +152,7 @@ export const deleteActivities = async (
     };
   }
 
-  await ActivitySchema.deleteMany({
-    _id: { $in: ids },
-  });
+  await activityRepository.deleteMany(ids);
 
   return {
     data: null,
@@ -170,7 +173,7 @@ export const deleteActivity = async (
     };
   }
 
-  await ActivitySchema.findByIdAndDelete(id);
+  await activityRepository.delete(id);
 
   return {
     data: null,
@@ -190,9 +193,7 @@ export const downloadActivities = async (
     };
   }
 
-  const activities = await ActivitySchema.find({
-    _id: { $in: ids },
-  });
+  const activities = await activityRepository.findManyById(ids);
 
   const file = convertToCsv(activities);
 

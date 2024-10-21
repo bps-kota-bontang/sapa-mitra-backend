@@ -5,12 +5,14 @@ import { logger } from "hono/logger";
 import { cors } from "hono/cors";
 import { prettyJSON } from "hono/pretty-json";
 import apiV1 from "@/api/v1";
-import connectDB from "@/config/db";
+import connectMongo from "@/config/mongoose";
 import withAuth from "@/middleware/withAuth";
 
 const app = new Hono();
 
-connectDB();
+if (Bun.env.DATABASE_PROVIDER === "mongodb") {
+  connectMongo();
+}
 
 app.use(prettyJSON());
 app.use(cors());

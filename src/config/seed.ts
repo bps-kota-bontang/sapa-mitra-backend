@@ -1,4 +1,4 @@
-import connectDB from "@/config/db";
+import connectDB from "@/config/mongoose";
 import { User } from "@/model/user";
 import UserSchema from "@/schema/user";
 

@@ -1,6 +1,6 @@
 import * as mongoose from "mongoose";
 
-const connectDB = async (): Promise<typeof mongoose> => {
+const connectMongo = async (): Promise<typeof mongoose> => {
   console.log("Connecting Database....");
   try {
     const uri = Bun.env.MONGO_URI;
@@ -23,4 +23,4 @@ const connectDB = async (): Promise<typeof mongoose> => {
   }
 };
 
-export default connectDB;
+export default connectMongo;
