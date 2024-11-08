@@ -41,8 +41,9 @@ export const getOutput = async (id: string): Promise<Result<Output>> => {
 export const storeOutput = async (
   payload: OutputPayload
 ): Promise<Result<Output>> => {
+  const { activity: payloadActivity, ...restPayload } = payload;
   const activity = await ActivitySchema.findById(
-    payload.activity.activityId
+    payloadActivity.activityId
   ).select(["name"]);
 
   if (!activity) {
@@ -57,8 +58,7 @@ export const storeOutput = async (
     activity: {
       ...activity,
     },
-    name: payload.name,
-    unit: payload.unit,
+    ...restPayload,
   });
 
   return {
@@ -137,8 +137,9 @@ export const updateOutput = async (
   id: string,
   payload: OutputPayload
 ): Promise<Result<Output>> => {
+  const { activity: payloadActivity, ...restPayload } = payload;
   const activity = await ActivitySchema.findById(
-    payload.activity.activityId
+    payloadActivity.activityId
   ).select(["name"]);
 
   if (!activity) {
@@ -155,8 +156,7 @@ export const updateOutput = async (
       activity: {
         ...activity,
       },
-      name: payload.name,
-      unit: payload.unit,
+      ...restPayload,
     },
     {
       new: true,
