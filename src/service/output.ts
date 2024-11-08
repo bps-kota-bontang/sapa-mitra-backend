@@ -1,4 +1,5 @@
 import { convertToCsv } from "@/common/utils";
+import { JWT } from "@/model/jwt";
 import { Output, OutputPayload } from "@/model/output";
 import { Result } from "@/model/result";
 import ActivitySchema from "@/schema/activity";
@@ -6,7 +7,8 @@ import OutputSchema from "@/schema/output";
 import { parse } from "csv-parse/sync";
 
 export const getOutputs = async (
-  year: string = ""
+  year: string = "",
+  claims: JWT
 ): Promise<Result<Output[]>> => {
   let queries: any = {};
 
@@ -14,12 +16,23 @@ export const getOutputs = async (
 
   const outputs = await OutputSchema.find(queries);
 
-  const transformedOutputs = outputs.map((item, index) => {
-    return {
-      ...item.toObject(),
-      index: index + 1,
-    };
-  });
+  const transformedOutputs = (
+    await Promise.all(
+      outputs.map(async (item, index) => {
+        const activities = await ActivitySchema.find({
+          _id: item.activity.id,
+          ...(claims.team !== "TU" ? { team: claims.team } : {}),
+        });
+
+        if (!activities.length) return null;
+
+        return {
+          ...item.toObject(),
+          index: index + 1,
+        };
+      })
+    )
+  ).filter((output) => output !== null);
 
   return {
     data: transformedOutputs,

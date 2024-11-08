@@ -78,7 +78,7 @@ export type ReportPdf = {
     year: string;
   };
   authority: Authority;
-  partner: Partner;
+  partner: Pick<Partner, "name" | "nik" | "address">;
   handOver: {
     dayText: string;
     dateText: string;

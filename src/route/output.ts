@@ -51,8 +51,9 @@ app.post("/template", async (c) => {
 });
 
 app.get("/", async (c) => {
+  const claims = c.get("jwtPayload");
   const year = c.req.query("year");
-  const result = await getOutputs(year);
+  const result = await getOutputs(year, claims);
 
   return c.json(
     {
