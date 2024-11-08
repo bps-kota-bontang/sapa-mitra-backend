@@ -8,5 +8,6 @@ export type Activity = {
   unit: string;
   category: CategoryActivity;
   team: Team;
-  isSpecial: boolean
+  isSpecial: boolean;
+  year: number;
 };

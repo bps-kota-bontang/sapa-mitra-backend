@@ -6,11 +6,14 @@ import ActivitySchema from "@/schema/activity";
 import { parse } from "csv-parse/sync";
 
 export const getActivities = async (
+  year: string = "",
   claims: JWT
 ): Promise<Result<Activity[]>> => {
   let queries: any = {};
 
   if (claims.team != "TU") queries.team = claims.team;
+
+  if (year) queries.year = year;
 
   const activities = await ActivitySchema.find(queries);
 

@@ -51,7 +51,8 @@ app.post("/template", async (c) => {
 });
 
 app.get("/", async (c) => {
-  const result = await getOutputs();
+  const year = c.req.query("year");
+  const result = await getOutputs(year);
 
   return c.json(
     {

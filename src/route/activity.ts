@@ -16,7 +16,8 @@ const app = new Hono();
 
 app.get("/", async (c) => {
   const claims = c.get("jwtPayload");
-  const result = await getActivities(claims);
+  const year = c.req.query("year");
+  const result = await getActivities(year, claims);
 
   return c.json(
     {

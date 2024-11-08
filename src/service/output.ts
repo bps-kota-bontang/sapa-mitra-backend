@@ -5,8 +5,14 @@ import ActivitySchema from "@/schema/activity";
 import OutputSchema from "@/schema/output";
 import { parse } from "csv-parse/sync";
 
-export const getOutputs = async (): Promise<Result<Output[]>> => {
-  const outputs = await OutputSchema.find();
+export const getOutputs = async (
+  year: string = ""
+): Promise<Result<Output[]>> => {
+  let queries: any = {};
+
+  if (year) queries.year = year;
+
+  const outputs = await OutputSchema.find(queries);
 
   const transformedOutputs = outputs.map((item, index) => {
     return {
@@ -211,14 +217,14 @@ export const downloadOutputs = async (
     _id: { $in: ids },
   });
 
-  const transformedOutputs = outputs.map(item => {
+  const transformedOutputs = outputs.map((item) => {
     const { activity, ...restItem } = item.toObject();
 
     return {
       ...restItem,
-      activityName: activity.name
-    }
-  })
+      activityName: activity.name,
+    };
+  });
 
   const file = convertToCsv(transformedOutputs);
 
