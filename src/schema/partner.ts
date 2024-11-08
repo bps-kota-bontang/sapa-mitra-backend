@@ -12,6 +12,7 @@ export const partnerSchema = new Schema<Partner>(
       maxlength: 16,
     },
     address: { type: String, required: true },
+    year: { type: Number, required: true },
   },
   {
     timestamps: true,

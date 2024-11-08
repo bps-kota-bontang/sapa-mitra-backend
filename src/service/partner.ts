@@ -5,8 +5,14 @@ import { Result } from "@/model/result";
 import PartnerSchema from "@/schema/partner";
 import { parse } from "csv-parse/sync";
 
-export const getPartners = async (): Promise<Result<Partner[]>> => {
-  const partners = await PartnerSchema.find();
+export const getPartners = async (
+  year: string = ""
+): Promise<Result<Partner[]>> => {
+  let queries: any = {};
+
+  if (year) queries.year = year;
+
+  const partners = await PartnerSchema.find(queries);
 
   const transformedPartners = partners.map((partner, index) => {
     return {
