@@ -16,7 +16,7 @@ export const getOutputs = async (
 
   const outputs = await OutputSchema.find(queries);
 
-  const transformedOutputs = (
+  const filterOutputs = (
     await Promise.all(
       outputs.map(async (item, index) => {
         const activities = await ActivitySchema.find({
@@ -26,13 +26,17 @@ export const getOutputs = async (
 
         if (!activities.length) return null;
 
-        return {
-          ...item.toObject(),
-          index: index + 1,
-        };
+        return item.toObject();
       })
     )
   ).filter((output) => output !== null);
+
+  const transformedOutputs = filterOutputs.map((item, index) => {
+    return {
+      ...item,
+      index: index + 1,
+    };
+  });
 
   return {
     data: transformedOutputs,
