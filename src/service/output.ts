@@ -1,16 +1,39 @@
 import { convertToCsv } from "@/common/utils";
+import { JWT } from "@/model/jwt";
 import { Output, OutputPayload } from "@/model/output";
 import { Result } from "@/model/result";
 import ActivitySchema from "@/schema/activity";
 import OutputSchema from "@/schema/output";
 import { parse } from "csv-parse/sync";
 
-export const getOutputs = async (): Promise<Result<Output[]>> => {
-  const outputs = await OutputSchema.find();
+export const getOutputs = async (
+  year: string = "",
+  claims: JWT
+): Promise<Result<Output[]>> => {
+  let queries: any = {};
 
-  const transformedOutputs = outputs.map((item, index) => {
+  if (year) queries.year = year;
+
+  const outputs = await OutputSchema.find(queries);
+
+  const filterOutputs = (
+    await Promise.all(
+      outputs.map(async (item, index) => {
+        const activities = await ActivitySchema.find({
+          _id: item.activity.id,
+          ...(claims.team !== "TU" ? { team: claims.team } : {}),
+        });
+
+        if (!activities.length) return null;
+
+        return item.toObject();
+      })
+    )
+  ).filter((output) => output !== null);
+
+  const transformedOutputs = filterOutputs.map((item, index) => {
     return {
-      ...item.toObject(),
+      ...item,
       index: index + 1,
     };
   });
@@ -35,8 +58,9 @@ export const getOutput = async (id: string): Promise<Result<Output>> => {
 export const storeOutput = async (
   payload: OutputPayload
 ): Promise<Result<Output>> => {
+  const { activity: payloadActivity, ...restPayload } = payload;
   const activity = await ActivitySchema.findById(
-    payload.activity.activityId
+    payloadActivity.activityId
   ).select(["name"]);
 
   if (!activity) {
@@ -51,8 +75,7 @@ export const storeOutput = async (
     activity: {
       ...activity,
     },
-    name: payload.name,
-    unit: payload.unit,
+    ...restPayload,
   });
 
   return {
@@ -131,8 +154,9 @@ export const updateOutput = async (
   id: string,
   payload: OutputPayload
 ): Promise<Result<Output>> => {
+  const { activity: payloadActivity, ...restPayload } = payload;
   const activity = await ActivitySchema.findById(
-    payload.activity.activityId
+    payloadActivity.activityId
   ).select(["name"]);
 
   if (!activity) {
@@ -149,8 +173,7 @@ export const updateOutput = async (
       activity: {
         ...activity,
       },
-      name: payload.name,
-      unit: payload.unit,
+      ...restPayload,
     },
     {
       new: true,
@@ -211,14 +234,14 @@ export const downloadOutputs = async (
     _id: { $in: ids },
   });
 
-  const transformedOutputs = outputs.map(item => {
+  const transformedOutputs = outputs.map((item) => {
     const { activity, ...restItem } = item.toObject();
 
     return {
       ...restItem,
-      activityName: activity.name
-    }
-  })
+      activityName: activity.name,
+    };
+  });
 
   const file = convertToCsv(transformedOutputs);
 

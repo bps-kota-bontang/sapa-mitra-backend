@@ -979,8 +979,14 @@ export const cancelContractActivity = async (
   };
 };
 
-export const getContractStatistics = async (): Promise<Result<any>> => {
-  const contracts = await ContractSchema.find()
+export const getContractStatistics = async (
+  year: string = new Date().getFullYear().toString()
+): Promise<Result<any>> => {
+  const contracts = await ContractSchema.find({
+    period: {
+      $regex: year,
+    },
+  })
     .select([
       "partner.name",
       "period",

@@ -13,6 +13,7 @@ const activityRepository: ActivityRepository =
     : mongoActivityRepository(); // Default to MongoDB
 
 export const getActivities = async (
+  year: string = "",
   claims: JWT
 ): Promise<Result<Activity[]>> => {
   let queries: any = {};

@@ -12,4 +12,5 @@ export type Activity = {
   isSpecial: boolean;
   createdAt: Date;
   updatedAt: Date;
+  year: number;
 };

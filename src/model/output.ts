@@ -5,6 +5,7 @@ export type Output = {
   activity: Pick<Activity, "name"> & Document;
   name: string;
   unit: string;
+  year: number;
 };
 
 export type OutputPayload = {
@@ -13,4 +14,5 @@ export type OutputPayload = {
   };
   name: string;
   unit: string;
+  year: number;
 };

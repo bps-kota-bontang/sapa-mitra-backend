@@ -10,6 +10,7 @@ export const outputSchema = new Schema<Output>(
     },
     name: { type: String, required: true },
     unit: { type: String, required: true },
+    year: { type: Number, required: true },
   },
   {
     timestamps: true,

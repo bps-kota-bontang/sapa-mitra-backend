@@ -111,7 +111,8 @@ app.post("/print", async (c) => {
 });
 
 app.get("/statistics", async (c) => {
-  const result = await getContractStatistics();
+  const year = c.req.query("year");
+  const result = await getContractStatistics(year);
 
   return c.json(
     {

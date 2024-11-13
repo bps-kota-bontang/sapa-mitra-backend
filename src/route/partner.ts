@@ -49,7 +49,8 @@ app.post("/download", async (c) => {
 });
 
 app.get("/", async (c) => {
-  const result = await getPartners();
+  const year = c.req.query("year");
+  const result = await getPartners(year);
 
   return c.json(
     {
