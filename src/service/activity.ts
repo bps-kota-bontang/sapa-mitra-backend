@@ -3,14 +3,15 @@ import { Activity } from "@/model/activity";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
 import { ActivityRepository } from "@/repository/activity";
-import { firebaseActivityRepository } from "@/repository/impl/firebase/activity";
+import { factoryRepository } from "@/repository/factory";
 import { mongoActivityRepository } from "@/repository/impl/mongo/activity";
+import { postgresActivityRepository } from "@/repository/impl/postgres/activity";
 import { parse } from "csv-parse/sync";
 
-const activityRepository: ActivityRepository =
-  Bun.env.DATABASE_PROVIDER === "firebase"
-    ? firebaseActivityRepository()
-    : mongoActivityRepository(); // Default to MongoDB
+const activityRepository: ActivityRepository = factoryRepository(
+  mongoActivityRepository,
+  postgresActivityRepository
+);
 
 export const getActivities = async (
   year: string = "",
@@ -19,6 +20,8 @@ export const getActivities = async (
   let queries: any = {};
 
   if (claims.team != "TU") queries.team = claims.team;
+
+  if (year) queries.year = year;
 
   const activities = await activityRepository.findAll(queries);
 

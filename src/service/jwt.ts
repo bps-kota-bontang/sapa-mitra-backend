@@ -15,18 +15,18 @@ export const generateToken = async (user: User): Promise<string> => {
   return token;
 };
 
-export const generatePayload = (user: User) => {
+export const generatePayload = (user: User | null) => {
   const now = Math.floor(Date.now() / 1000); // Current Unix timestamp
 
   const payload: JWT = {
     iss: APP_HOST,
     aud: APP_NAME,
-    sub: user.id,
-    name: user.name,
-    nip: user.nip,
-    email: user.email,
-    team: user.team,
-    position: user.position,
+    sub: user?.id ?? "1234-5678-9101",
+    name: user?.name ?? "Dummy User",
+    nip: user?.nip ?? "1111111111111111",
+    email: user?.email ?? "user@dummy.com",
+    team: user?.team ?? "TU",
+    position: user?.position ?? "KETUA",
     exp: now + JWT_DURATION, // Token expires in 5 minutes
     nbf: now, // Token is not valid before the current time
     iat: now, // Token was issued at the current time

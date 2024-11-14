@@ -324,3 +324,7 @@ export const formatCurrency = (number: number): string => {
 export const generateState = () => {
   return randomBytes(16).toString("hex");
 };
+
+export const transformModel = <T extends { id: string }>(
+  data: T | null
+): (T & { _id: string }) | null => (data ? { ...data, _id: data.id } : null);

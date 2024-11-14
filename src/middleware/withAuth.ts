@@ -2,8 +2,16 @@ import { jwt } from "hono/jwt";
 import { createMiddleware } from "hono/factory";
 import { publicRoute } from "@/config/route";
 import { isProduction } from "@/common/utils";
-import UserSchema from "@/schema/user";
 import { generatePayload } from "@/service/jwt";
+import { UserRepository } from "@/repository/user";
+import { factoryRepository } from "@/repository/factory";
+import { mongoUserRepository } from "@/repository/impl/mongo/user";
+import { postgresUserRepository } from "@/repository/impl/postgres/user";
+
+const userRepository: UserRepository = factoryRepository(
+  mongoUserRepository,
+  postgresUserRepository
+);
 
 const withAuth = createMiddleware(async (c, next) => {
   const isPublicRoute = publicRoute.some(
@@ -15,10 +23,8 @@ const withAuth = createMiddleware(async (c, next) => {
   }
 
   if (!isProduction && !c.req.header("Authorization")) {
-    const user = await UserSchema.findOne();
-    if (!user) {
-      return;
-    }
+    const user = await userRepository.findOne();
+
     const payload = generatePayload(user);
 
     c.set("jwtPayload", payload);
