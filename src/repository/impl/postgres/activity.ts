@@ -8,6 +8,7 @@ export const postgresActivityRepository = (): ActivityRepository => {
     const activity = await prisma.activity.create({
       data: {
         ...data,
+        isSpecial: Boolean(data.isSpecial),
         year: parseInt(data.year),
       },
     });
@@ -50,6 +51,7 @@ export const postgresActivityRepository = (): ActivityRepository => {
       where: { id },
       data: {
         ...data,
+        isSpecial: Boolean(data.isSpecial),
         year: parseInt(data.year),
       },
     });
@@ -73,6 +75,19 @@ export const postgresActivityRepository = (): ActivityRepository => {
     });
   };
 
+  const createMany = async (data: any[]): Promise<Activity[]> => {
+    console.log(data);
+    const activities = await prisma.activity.createManyAndReturn({
+      data: data.map((item) => ({
+        ...item,
+        isSpecial: Boolean(item.isSpecial),
+        year: parseInt(item.year),
+      })),
+    });
+
+    return activities.map((item) => transformModel(item) as Activity);
+  };
+
   return {
     create,
     findById,
@@ -81,5 +96,6 @@ export const postgresActivityRepository = (): ActivityRepository => {
     update,
     delete: deleteOne,
     deleteMany,
+    createMany,
   };
 };

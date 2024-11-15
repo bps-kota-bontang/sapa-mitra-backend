@@ -44,6 +44,12 @@ export const mongoActivityRepository = (): ActivityRepository => {
     });
   };
 
+  const createMany = async (data: any[]): Promise<Activity[]> => {
+    const activities = await ActivitySchema.create(data);
+
+    return activities.map((activity) => activity.toObject());
+  };
+
   return {
     create,
     findById,
@@ -52,5 +58,6 @@ export const mongoActivityRepository = (): ActivityRepository => {
     update,
     delete: deleteOne,
     deleteMany,
+    createMany,
   };
 };

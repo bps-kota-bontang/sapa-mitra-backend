@@ -85,7 +85,7 @@ export const uploadActivity = async (
     skip_empty_lines: true,
   });
 
-  const activities = await activityRepository.create(data);
+  const activities = await activityRepository.createMany(data);
 
   return {
     data: activities,
