@@ -52,11 +52,23 @@ export const postgresUserRepository = (): UserRepository => {
     return transformModel(user);
   };
 
+  const createMany = async (data: any[]): Promise<User[]> => {
+    const users = await prisma.user.createManyAndReturn({
+      data: data.map((item) => ({
+        ...item,
+        year: parseInt(item.year),
+      })),
+    });
+
+    return users.map((item) => transformModel(item) as User);
+  };
+
   return {
     findOne,
     findAll,
     create,
     findById,
     findByIdAndUpdate,
+    createMany,
   };
 };

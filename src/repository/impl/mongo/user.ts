@@ -35,11 +35,18 @@ export const mongoUserRepository = (): UserRepository => {
     return user?.toObject() ?? null;
   };
 
+  const createMany = async (data: any[]): Promise<User[]> => {
+    const users = await UserSchema.create(data);
+
+    return users.map((user) => user.toObject());
+  }
+
   return {
     create,
     findOne,
     findAll,
     findById,
     findByIdAndUpdate,
+    createMany,
   };
 };
