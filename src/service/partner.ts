@@ -2,8 +2,15 @@ import { convertToCsv, isProduction } from "@/common/utils";
 import { JWT } from "@/model/jwt";
 import { Partner } from "@/model/partner";
 import { Result } from "@/model/result";
-import PartnerSchema from "@/schema/partner";
+import { factoryRepository } from "@/repository/factory";
+import { mongoPartnerRepository } from "@/repository/impl/mongo/partner";
+import { postgresPartnerRepository } from "@/repository/impl/postgres/partner";
 import { parse } from "csv-parse/sync";
+
+const partnerRepository = factoryRepository(
+  mongoPartnerRepository,
+  postgresPartnerRepository
+);
 
 export const getPartners = async (
   year: string = ""
@@ -12,11 +19,11 @@ export const getPartners = async (
 
   if (year) queries.year = year;
 
-  const partners = await PartnerSchema.find(queries);
+  const partners = await partnerRepository.findAll(queries);
 
   const transformedPartners = partners.map((partner, index) => {
     return {
-      ...partner.toObject(),
+      ...partner,
       index: index + 1,
     };
   });
@@ -29,7 +36,7 @@ export const getPartners = async (
 };
 
 export const getPartner = async (id: string): Promise<Result<Partner>> => {
-  const partner = await PartnerSchema.findById(id);
+  const partner = await partnerRepository.findById(id);
 
   return {
     data: partner,
@@ -50,7 +57,7 @@ export const storePartner = async (
     };
   }
 
-  const partner = await PartnerSchema.create(payload);
+  const partner = await partnerRepository.create(payload);
 
   return {
     data: partner,
@@ -60,11 +67,7 @@ export const storePartner = async (
 };
 
 export const downloadPartner = async (): Promise<Result<any>> => {
-  const partners = await PartnerSchema.find().select([
-    "name",
-    "nik",
-    "address",
-  ]);
+  const partners = await partnerRepository.findAll();
 
   const file = convertToCsv(partners);
 
@@ -111,7 +114,7 @@ export const uploadPartner = async (
     skip_empty_lines: true,
   });
 
-  const outputs = await PartnerSchema.create(data);
+  const outputs = await partnerRepository.createMany(data);
 
   return {
     data: outputs,
@@ -133,10 +136,7 @@ export const updatePartner = async (
     };
   }
 
-  const partner = await PartnerSchema.findByIdAndUpdate(id, payload, {
-    new: true,
-    runValidators: true,
-  });
+  const partner = await partnerRepository.findByIdAndUpdate(id, payload);
 
   return {
     data: partner,
@@ -165,9 +165,7 @@ export const deletePartners = async (
     };
   }
 
-  await PartnerSchema.deleteMany({
-    _id: { $in: ids },
-  });
+  await partnerRepository.deleteMany(ids);
 
   return {
     data: null,
@@ -188,7 +186,7 @@ export const deletePartner = async (
     };
   }
 
-  await PartnerSchema.findByIdAndDelete(id);
+  await partnerRepository.delete(id);
 
   return {
     data: null,
