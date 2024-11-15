@@ -1,16 +1,27 @@
-import { isProduction, positionOrder } from "@/common/utils";
+import { isProduction } from "@/common/utils";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
 import { UpdatePasswordPayload, User } from "@/model/user";
-import UserSchema from "@/schema/user";
+import { factoryRepository } from "@/repository/factory";
+import { mongoUserRepository } from "@/repository/impl/mongo/user";
+import { postgresUserRepository } from "@/repository/impl/postgres/user";
+import { UserRepository } from "@/repository/user";
+
 import { parse } from "csv-parse/sync";
 
-export const getUsers = async (claims: JWT): Promise<Result<User[]>> => {
-  const users = await UserSchema.find().select(["-password"]);
+const userRepository: UserRepository = factoryRepository(
+  mongoUserRepository,
+  postgresUserRepository
+);
+
+export const getUsers = async (): Promise<Result<Omit<User, "password">[]>> => {
+  const users = await userRepository.findAll();
 
   const transformedUsers = users.map((item, index) => {
+    const { password, ...restUser } = item;
+
     return {
-      ...item.toObject(),
+      ...restUser,
       index: index + 1,
     };
   });
@@ -22,11 +33,23 @@ export const getUsers = async (claims: JWT): Promise<Result<User[]>> => {
   };
 };
 
-export const getUser = async (id: string): Promise<Result<User>> => {
-  const user = await UserSchema.findOne({ _id: id }).select(["-password"]);
+export const getUser = async (
+  id: string
+): Promise<Result<Omit<User, "password"> | null>> => {
+  const user = await userRepository.findById(id);
+
+  if (!user) {
+    return {
+      data: null,
+      message: "User not found",
+      code: 404,
+    };
+  }
+
+  const { password, ...restUser } = user;
 
   return {
-    data: user,
+    data: restUser,
     message: "Successfully retrieved user",
     code: 200,
   };
@@ -69,7 +92,7 @@ export const uploadUsers = async (
     cast: (value) => (value === "" ? null : value),
   });
 
-  const outputs = await UserSchema.create(data);
+  const outputs = await userRepository.create(data);
 
   return {
     data: outputs,
@@ -83,7 +106,7 @@ export const updatePassword = async (
   payload: UpdatePasswordPayload,
   claims: JWT
 ): Promise<Result<any>> => {
-  const user = await UserSchema.findById(id);
+  const user = await userRepository.findById(id);
 
   if (!user) {
     return {
@@ -102,7 +125,7 @@ export const updatePassword = async (
     };
   }
 
-  const { password: hashedPassword, ...restUser } = user.toObject(); // Convert the document to a plain object
+  const { password: hashedPassword, ...restUser } = user;
 
   const isMatch = await Bun.password.verify(
     payload.oldPassword,
@@ -121,7 +144,7 @@ export const updatePassword = async (
     algorithm: "bcrypt",
   });
 
-  const result = await UserSchema.findByIdAndUpdate(id, {
+  const result = await userRepository.findByIdAndUpdate(id, {
     password: hashedNewPassword,
   });
 

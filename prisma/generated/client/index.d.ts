@@ -1964,7 +1964,6 @@ export namespace Prisma {
     nip: string | null
     email: string | null
     password: string | null
-    role: string | null
     team: $Enums.Team | null
     position: $Enums.Position | null
     createdAt: Date | null
@@ -1977,7 +1976,6 @@ export namespace Prisma {
     nip: string | null
     email: string | null
     password: string | null
-    role: string | null
     team: $Enums.Team | null
     position: $Enums.Position | null
     createdAt: Date | null
@@ -1990,7 +1988,6 @@ export namespace Prisma {
     nip: number
     email: number
     password: number
-    role: number
     team: number
     position: number
     createdAt: number
@@ -2005,7 +2002,6 @@ export namespace Prisma {
     nip?: true
     email?: true
     password?: true
-    role?: true
     team?: true
     position?: true
     createdAt?: true
@@ -2018,7 +2014,6 @@ export namespace Prisma {
     nip?: true
     email?: true
     password?: true
-    role?: true
     team?: true
     position?: true
     createdAt?: true
@@ -2031,7 +2026,6 @@ export namespace Prisma {
     nip?: true
     email?: true
     password?: true
-    role?: true
     team?: true
     position?: true
     createdAt?: true
@@ -2117,8 +2111,7 @@ export namespace Prisma {
     nip: string
     email: string
     password: string
-    role: string
-    team: $Enums.Team
+    team: $Enums.Team | null
     position: $Enums.Position
     createdAt: Date
     updatedAt: Date
@@ -2147,7 +2140,6 @@ export namespace Prisma {
     nip?: boolean
     email?: boolean
     password?: boolean
-    role?: boolean
     team?: boolean
     position?: boolean
     createdAt?: boolean
@@ -2160,7 +2152,6 @@ export namespace Prisma {
     nip?: boolean
     email?: boolean
     password?: boolean
-    role?: boolean
     team?: boolean
     position?: boolean
     createdAt?: boolean
@@ -2173,7 +2164,6 @@ export namespace Prisma {
     nip?: boolean
     email?: boolean
     password?: boolean
-    role?: boolean
     team?: boolean
     position?: boolean
     createdAt?: boolean
@@ -2190,8 +2180,7 @@ export namespace Prisma {
       nip: string
       email: string
       password: string
-      role: string
-      team: $Enums.Team
+      team: $Enums.Team | null
       position: $Enums.Position
       createdAt: Date
       updatedAt: Date
@@ -2593,7 +2582,6 @@ export namespace Prisma {
     readonly nip: FieldRef<"User", 'String'>
     readonly email: FieldRef<"User", 'String'>
     readonly password: FieldRef<"User", 'String'>
-    readonly role: FieldRef<"User", 'String'>
     readonly team: FieldRef<"User", 'Team'>
     readonly position: FieldRef<"User", 'Position'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
@@ -2922,7 +2910,6 @@ export namespace Prisma {
     nip: 'nip',
     email: 'email',
     password: 'password',
-    role: 'role',
     team: 'team',
     position: 'position',
     createdAt: 'createdAt',
@@ -2946,6 +2933,14 @@ export namespace Prisma {
   };
 
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
   /**
@@ -3149,8 +3144,7 @@ export namespace Prisma {
     nip?: StringFilter<"User"> | string
     email?: StringFilter<"User"> | string
     password?: StringFilter<"User"> | string
-    role?: StringFilter<"User"> | string
-    team?: EnumTeamFilter<"User"> | $Enums.Team
+    team?: EnumTeamNullableFilter<"User"> | $Enums.Team | null
     position?: EnumPositionFilter<"User"> | $Enums.Position
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -3162,8 +3156,7 @@ export namespace Prisma {
     nip?: SortOrder
     email?: SortOrder
     password?: SortOrder
-    role?: SortOrder
-    team?: SortOrder
+    team?: SortOrderInput | SortOrder
     position?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -3178,8 +3171,7 @@ export namespace Prisma {
     NOT?: UserWhereInput | UserWhereInput[]
     name?: StringFilter<"User"> | string
     password?: StringFilter<"User"> | string
-    role?: StringFilter<"User"> | string
-    team?: EnumTeamFilter<"User"> | $Enums.Team
+    team?: EnumTeamNullableFilter<"User"> | $Enums.Team | null
     position?: EnumPositionFilter<"User"> | $Enums.Position
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -3191,8 +3183,7 @@ export namespace Prisma {
     nip?: SortOrder
     email?: SortOrder
     password?: SortOrder
-    role?: SortOrder
-    team?: SortOrder
+    team?: SortOrderInput | SortOrder
     position?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -3210,8 +3201,7 @@ export namespace Prisma {
     nip?: StringWithAggregatesFilter<"User"> | string
     email?: StringWithAggregatesFilter<"User"> | string
     password?: StringWithAggregatesFilter<"User"> | string
-    role?: StringWithAggregatesFilter<"User"> | string
-    team?: EnumTeamWithAggregatesFilter<"User"> | $Enums.Team
+    team?: EnumTeamNullableWithAggregatesFilter<"User"> | $Enums.Team | null
     position?: EnumPositionWithAggregatesFilter<"User"> | $Enums.Position
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -3314,8 +3304,7 @@ export namespace Prisma {
     nip: string
     email: string
     password: string
-    role: string
-    team: $Enums.Team
+    team?: $Enums.Team | null
     position: $Enums.Position
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -3327,8 +3316,7 @@ export namespace Prisma {
     nip: string
     email: string
     password: string
-    role: string
-    team: $Enums.Team
+    team?: $Enums.Team | null
     position: $Enums.Position
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -3340,8 +3328,7 @@ export namespace Prisma {
     nip?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
-    team?: EnumTeamFieldUpdateOperationsInput | $Enums.Team
+    team?: NullableEnumTeamFieldUpdateOperationsInput | $Enums.Team | null
     position?: EnumPositionFieldUpdateOperationsInput | $Enums.Position
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3353,8 +3340,7 @@ export namespace Prisma {
     nip?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
-    team?: EnumTeamFieldUpdateOperationsInput | $Enums.Team
+    team?: NullableEnumTeamFieldUpdateOperationsInput | $Enums.Team | null
     position?: EnumPositionFieldUpdateOperationsInput | $Enums.Position
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3366,8 +3352,7 @@ export namespace Prisma {
     nip: string
     email: string
     password: string
-    role: string
-    team: $Enums.Team
+    team?: $Enums.Team | null
     position: $Enums.Position
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -3379,8 +3364,7 @@ export namespace Prisma {
     nip?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
-    team?: EnumTeamFieldUpdateOperationsInput | $Enums.Team
+    team?: NullableEnumTeamFieldUpdateOperationsInput | $Enums.Team | null
     position?: EnumPositionFieldUpdateOperationsInput | $Enums.Position
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3392,8 +3376,7 @@ export namespace Prisma {
     nip?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
-    role?: StringFieldUpdateOperationsInput | string
-    team?: EnumTeamFieldUpdateOperationsInput | $Enums.Team
+    team?: NullableEnumTeamFieldUpdateOperationsInput | $Enums.Team | null
     position?: EnumPositionFieldUpdateOperationsInput | $Enums.Position
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3578,11 +3561,23 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type EnumTeamNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.Team | EnumTeamFieldRefInput<$PrismaModel> | null
+    in?: $Enums.Team[] | ListEnumTeamFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.Team[] | ListEnumTeamFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumTeamNullableFilter<$PrismaModel> | $Enums.Team | null
+  }
+
   export type EnumPositionFilter<$PrismaModel = never> = {
     equals?: $Enums.Position | EnumPositionFieldRefInput<$PrismaModel>
     in?: $Enums.Position[] | ListEnumPositionFieldRefInput<$PrismaModel>
     notIn?: $Enums.Position[] | ListEnumPositionFieldRefInput<$PrismaModel>
     not?: NestedEnumPositionFilter<$PrismaModel> | $Enums.Position
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
   }
 
   export type UserCountOrderByAggregateInput = {
@@ -3591,7 +3586,6 @@ export namespace Prisma {
     nip?: SortOrder
     email?: SortOrder
     password?: SortOrder
-    role?: SortOrder
     team?: SortOrder
     position?: SortOrder
     createdAt?: SortOrder
@@ -3604,7 +3598,6 @@ export namespace Prisma {
     nip?: SortOrder
     email?: SortOrder
     password?: SortOrder
-    role?: SortOrder
     team?: SortOrder
     position?: SortOrder
     createdAt?: SortOrder
@@ -3617,11 +3610,20 @@ export namespace Prisma {
     nip?: SortOrder
     email?: SortOrder
     password?: SortOrder
-    role?: SortOrder
     team?: SortOrder
     position?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type EnumTeamNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Team | EnumTeamFieldRefInput<$PrismaModel> | null
+    in?: $Enums.Team[] | ListEnumTeamFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.Team[] | ListEnumTeamFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumTeamNullableWithAggregatesFilter<$PrismaModel> | $Enums.Team | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumTeamNullableFilter<$PrismaModel>
+    _max?: NestedEnumTeamNullableFilter<$PrismaModel>
   }
 
   export type EnumPositionWithAggregatesFilter<$PrismaModel = never> = {
@@ -3660,6 +3662,10 @@ export namespace Prisma {
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type NullableEnumTeamFieldUpdateOperationsInput = {
+    set?: $Enums.Team | null
   }
 
   export type EnumPositionFieldUpdateOperationsInput = {
@@ -3807,11 +3813,39 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedEnumTeamNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.Team | EnumTeamFieldRefInput<$PrismaModel> | null
+    in?: $Enums.Team[] | ListEnumTeamFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.Team[] | ListEnumTeamFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumTeamNullableFilter<$PrismaModel> | $Enums.Team | null
+  }
+
   export type NestedEnumPositionFilter<$PrismaModel = never> = {
     equals?: $Enums.Position | EnumPositionFieldRefInput<$PrismaModel>
     in?: $Enums.Position[] | ListEnumPositionFieldRefInput<$PrismaModel>
     notIn?: $Enums.Position[] | ListEnumPositionFieldRefInput<$PrismaModel>
     not?: NestedEnumPositionFilter<$PrismaModel> | $Enums.Position
+  }
+
+  export type NestedEnumTeamNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Team | EnumTeamFieldRefInput<$PrismaModel> | null
+    in?: $Enums.Team[] | ListEnumTeamFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.Team[] | ListEnumTeamFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumTeamNullableWithAggregatesFilter<$PrismaModel> | $Enums.Team | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumTeamNullableFilter<$PrismaModel>
+    _max?: NestedEnumTeamNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedEnumPositionWithAggregatesFilter<$PrismaModel = never> = {

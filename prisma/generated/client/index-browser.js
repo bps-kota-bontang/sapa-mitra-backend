@@ -141,7 +141,6 @@ exports.Prisma.UserScalarFieldEnum = {
   nip: 'nip',
   email: 'email',
   password: 'password',
-  role: 'role',
   team: 'team',
   position: 'position',
   createdAt: 'createdAt',
@@ -156,6 +155,11 @@ exports.Prisma.SortOrder = {
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
 };
 exports.CategoryActivity = exports.$Enums.CategoryActivity = {
   ENUMERATION: 'ENUMERATION',

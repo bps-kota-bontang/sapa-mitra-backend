@@ -5,8 +5,7 @@ import { Hono } from "hono";
 const app = new Hono();
 
 app.get("/", async (c) => {
-  const claims = c.get("jwtPayload");
-  const result = await getUsers(claims);
+  const result = await getUsers();
 
   return c.json(
     {

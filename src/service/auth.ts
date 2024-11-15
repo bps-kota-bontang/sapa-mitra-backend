@@ -1,13 +1,21 @@
 import { Result } from "@/model/result";
-import UserSchema from "@/schema/user";
+import { factoryRepository } from "@/repository/factory";
+import { mongoUserRepository } from "@/repository/impl/mongo/user";
+import { postgresUserRepository } from "@/repository/impl/postgres/user";
+import { UserRepository } from "@/repository/user";
 import { generateToken } from "@/service/jwt";
 import { getUserInfo } from "@/service/sso";
+
+const userRepository: UserRepository = factoryRepository(
+  mongoUserRepository,
+  postgresUserRepository
+);
 
 export const login = async (
   email: string,
   password: string
 ): Promise<Result<any>> => {
-  const user = await UserSchema.findOne({ email });
+  const user = await userRepository.findOne({ email });
 
   if (!user) {
     return {
@@ -16,7 +24,7 @@ export const login = async (
       code: 404,
     };
   }
-  const { password: hashedPassword, ...restUser } = user.toObject(); // Convert the document to a plain object
+  const { password: hashedPassword, ...restUser } = user;
 
   const isMatch = await Bun.password.verify(password, hashedPassword);
 
@@ -44,7 +52,7 @@ export const login = async (
 export const loginSso = async (tokenSso: string): Promise<Result<any>> => {
   const userSso = await getUserInfo(tokenSso);
 
-  const user = await UserSchema.findOne({ email: userSso.email });
+  const user = await userRepository.findOne({ email: userSso.email });
 
   if (!user) {
     return {
