@@ -2,9 +2,22 @@ import { convertToCsv } from "@/common/utils";
 import { JWT } from "@/model/jwt";
 import { Output, OutputPayload } from "@/model/output";
 import { Result } from "@/model/result";
-import ActivitySchema from "@/schema/activity";
-import OutputSchema from "@/schema/output";
+import { factoryRepository } from "@/repository/factory";
+import { mongoActivityRepository } from "@/repository/impl/mongo/activity";
+import { mongoOutputRepository } from "@/repository/impl/mongo/output";
+import { postgresActivityRepository } from "@/repository/impl/postgres/activity";
+import { postgresOutputRepository } from "@/repository/impl/postgres/output";
 import { parse } from "csv-parse/sync";
+
+const activityrepository = factoryRepository(
+  mongoActivityRepository,
+  postgresActivityRepository
+);
+
+const outputRepository = factoryRepository(
+  mongoOutputRepository,
+  postgresOutputRepository
+);
 
 export const getOutputs = async (
   year: string = "",
@@ -14,19 +27,19 @@ export const getOutputs = async (
 
   if (year) queries.year = year;
 
-  const outputs = await OutputSchema.find(queries);
+  const outputs = await outputRepository.findAll(queries);
 
   const filterOutputs = (
     await Promise.all(
-      outputs.map(async (item, index) => {
-        const activities = await ActivitySchema.find({
-          _id: item.activity.id,
+      outputs.map(async (item) => {
+        const activities = await activityrepository.findAll({
+          _id: item.activity._id,
           ...(claims.team !== "TU" ? { team: claims.team } : {}),
         });
 
         if (!activities.length) return null;
 
-        return item.toObject();
+        return item;
       })
     )
   ).filter((output) => output !== null);
@@ -46,7 +59,7 @@ export const getOutputs = async (
 };
 
 export const getOutput = async (id: string): Promise<Result<Output>> => {
-  const output = await OutputSchema.findById(id);
+  const output = await outputRepository.findById(id);
 
   return {
     data: output,
@@ -59,9 +72,9 @@ export const storeOutput = async (
   payload: OutputPayload
 ): Promise<Result<Output>> => {
   const { activity: payloadActivity, ...restPayload } = payload;
-  const activity = await ActivitySchema.findById(
+  const activity = await activityrepository.findById(
     payloadActivity.activityId
-  ).select(["name"]);
+  );
 
   if (!activity) {
     return {
@@ -71,9 +84,10 @@ export const storeOutput = async (
     };
   }
 
-  const output = await OutputSchema.create({
+  const output = await outputRepository.create({
     activity: {
-      ...activity,
+      _id: activity._id,
+      name: activity.name,
     },
     ...restPayload,
   });
@@ -84,6 +98,8 @@ export const storeOutput = async (
     code: 201,
   };
 };
+
+///TODO: Implement uploadOutput
 
 export const uploadOutput = async (file: File): Promise<Result<any>> => {
   if (!file) {
@@ -112,16 +128,23 @@ export const uploadOutput = async (file: File): Promise<Result<any>> => {
 
   const activityIds = data.map((item: any) => item.activityId);
 
-  const activities = await ActivitySchema.find({
-    _id: { $in: activityIds },
-  }).select(["name"]);
+  const activities = await activityrepository.findManyById(activityIds);
+
+  const activitiesName = activities.map((item) => {
+    return {
+      _id: item._id,
+      name: item.name,
+    };
+  });
 
   const activityMap = new Map<string, any>();
-  activities.forEach((activity) => {
+  activitiesName.forEach((activity) => {
     activityMap.set(activity._id.toString(), activity);
   });
 
   const transformedData = data.map((item: any) => {
+    const { activityId, ...restPayload } = item;
+
     const activity = activityMap.get(item.activityId);
 
     if (!activity) {
@@ -133,15 +156,14 @@ export const uploadOutput = async (file: File): Promise<Result<any>> => {
     }
 
     return {
+      ...restPayload,
       activity: {
         ...activity,
       },
-      name: item.name,
-      unit: item.unit,
     };
   });
 
-  const outputs = await OutputSchema.create(transformedData);
+  const outputs = await outputRepository.createMany(transformedData);
 
   return {
     data: outputs,
@@ -155,9 +177,9 @@ export const updateOutput = async (
   payload: OutputPayload
 ): Promise<Result<Output>> => {
   const { activity: payloadActivity, ...restPayload } = payload;
-  const activity = await ActivitySchema.findById(
+  const activity = await activityrepository.findById(
     payloadActivity.activityId
-  ).select(["name"]);
+  );
 
   if (!activity) {
     return {
@@ -167,18 +189,13 @@ export const updateOutput = async (
     };
   }
 
-  const output = await OutputSchema.findByIdAndUpdate(
-    id,
-    {
-      activity: {
-        ...activity,
-      },
-      ...restPayload,
+  const output = await outputRepository.findByIdAndUpdate(id, {
+    activity: {
+      _id: activity._id,
+      name: activity.name,
     },
-    {
-      new: true,
-    }
-  );
+    ...restPayload,
+  });
 
   return {
     data: output,
@@ -188,7 +205,7 @@ export const updateOutput = async (
 };
 
 export const deleteOutput = async (id: string): Promise<Result<any>> => {
-  await OutputSchema.findByIdAndDelete(id);
+  await outputRepository.delete(id);
 
   return {
     data: null,
@@ -208,9 +225,7 @@ export const deleteOutputs = async (
     };
   }
 
-  await OutputSchema.deleteMany({
-    _id: { $in: ids },
-  });
+  await outputRepository.deleteMany(ids);
 
   return {
     data: null,
@@ -230,12 +245,10 @@ export const downloadOutputs = async (
     };
   }
 
-  const outputs = await OutputSchema.find({
-    _id: { $in: ids },
-  });
+  const outputs = await outputRepository.findManyById(ids);
 
   const transformedOutputs = outputs.map((item) => {
-    const { activity, ...restItem } = item.toObject();
+    const { activity, ...restItem } = item;
 
     return {
       ...restItem,

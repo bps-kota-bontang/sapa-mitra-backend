@@ -47,6 +47,7 @@ model Activity {
   year      Int
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
+  Output    Output[]
 
   @@map("activities")
 }
@@ -63,4 +64,18 @@ model User {
   updatedAt DateTime @updatedAt
 
   @@map("users")
+}
+
+model Output {
+  id         String   @id @default(uuid()) @map("_id")
+  activityId String
+  name       String
+  unit       String
+  year       Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  activity Activity @relation(fields: [activityId], references: [id])
+
+  @@map("outputs")
 }

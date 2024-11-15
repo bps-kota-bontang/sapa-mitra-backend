@@ -23,6 +23,11 @@ export type Activity = $Result.DefaultSelection<Prisma.$ActivityPayload>
  * 
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
+/**
+ * Model Output
+ * 
+ */
+export type Output = $Result.DefaultSelection<Prisma.$OutputPayload>
 
 /**
  * Enums
@@ -213,6 +218,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs>;
+
+  /**
+   * `prisma.output`: Exposes CRUD operations for the **Output** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Outputs
+    * const outputs = await prisma.output.findMany()
+    * ```
+    */
+  get output(): Prisma.OutputDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -655,7 +670,8 @@ export namespace Prisma {
 
   export const ModelName: {
     Activity: 'Activity',
-    User: 'User'
+    User: 'User',
+    Output: 'Output'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -671,7 +687,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "activity" | "user"
+      modelProps: "activity" | "user" | "output"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -812,6 +828,76 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      Output: {
+        payload: Prisma.$OutputPayload<ExtArgs>
+        fields: Prisma.OutputFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.OutputFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutputPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.OutputFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutputPayload>
+          }
+          findFirst: {
+            args: Prisma.OutputFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutputPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.OutputFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutputPayload>
+          }
+          findMany: {
+            args: Prisma.OutputFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutputPayload>[]
+          }
+          create: {
+            args: Prisma.OutputCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutputPayload>
+          }
+          createMany: {
+            args: Prisma.OutputCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.OutputCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutputPayload>[]
+          }
+          delete: {
+            args: Prisma.OutputDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutputPayload>
+          }
+          update: {
+            args: Prisma.OutputUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutputPayload>
+          }
+          deleteMany: {
+            args: Prisma.OutputDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.OutputUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.OutputUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OutputPayload>
+          }
+          aggregate: {
+            args: Prisma.OutputAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateOutput>
+          }
+          groupBy: {
+            args: Prisma.OutputGroupByArgs<ExtArgs>
+            result: $Utils.Optional<OutputGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.OutputCountArgs<ExtArgs>
+            result: $Utils.Optional<OutputCountAggregateOutputType> | number
           }
         }
       }
@@ -970,6 +1056,36 @@ export namespace Prisma {
    * Count Types
    */
 
+
+  /**
+   * Count Type ActivityCountOutputType
+   */
+
+  export type ActivityCountOutputType = {
+    Output: number
+  }
+
+  export type ActivityCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    Output?: boolean | ActivityCountOutputTypeCountOutputArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ActivityCountOutputType without action
+   */
+  export type ActivityCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityCountOutputType
+     */
+    select?: ActivityCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ActivityCountOutputType without action
+   */
+  export type ActivityCountOutputTypeCountOutputArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OutputWhereInput
+  }
 
 
   /**
@@ -1214,6 +1330,8 @@ export namespace Prisma {
     year?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    Output?: boolean | Activity$OutputArgs<ExtArgs>
+    _count?: boolean | ActivityCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["activity"]>
 
   export type ActivitySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1242,10 +1360,17 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
+  export type ActivityInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    Output?: boolean | Activity$OutputArgs<ExtArgs>
+    _count?: boolean | ActivityCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type ActivityIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $ActivityPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Activity"
-    objects: {}
+    objects: {
+      Output: Prisma.$OutputPayload<ExtArgs>[]
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       name: string
@@ -1621,6 +1746,7 @@ export namespace Prisma {
    */
   export interface Prisma__ActivityClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    Output<T extends Activity$OutputArgs<ExtArgs> = {}>(args?: Subset<T, Activity$OutputArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OutputPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1673,6 +1799,10 @@ export namespace Prisma {
      */
     select?: ActivitySelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
      * Filter, which Activity to fetch.
      */
     where: ActivityWhereUniqueInput
@@ -1687,6 +1817,10 @@ export namespace Prisma {
      */
     select?: ActivitySelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
      * Filter, which Activity to fetch.
      */
     where: ActivityWhereUniqueInput
@@ -1700,6 +1834,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the Activity
      */
     select?: ActivitySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
     /**
      * Filter, which Activity to fetch.
      */
@@ -1745,6 +1883,10 @@ export namespace Prisma {
      */
     select?: ActivitySelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
      * Filter, which Activity to fetch.
      */
     where?: ActivityWhereInput
@@ -1789,6 +1931,10 @@ export namespace Prisma {
      */
     select?: ActivitySelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
      * Filter, which Activities to fetch.
      */
     where?: ActivityWhereInput
@@ -1827,6 +1973,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the Activity
      */
     select?: ActivitySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
     /**
      * The data needed to create a Activity.
      */
@@ -1868,6 +2018,10 @@ export namespace Prisma {
      */
     select?: ActivitySelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
      * The data needed to update a Activity.
      */
     data: XOR<ActivityUpdateInput, ActivityUncheckedUpdateInput>
@@ -1900,6 +2054,10 @@ export namespace Prisma {
      */
     select?: ActivitySelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
      * The filter to search for the Activity to update in case it exists.
      */
     where: ActivityWhereUniqueInput
@@ -1922,6 +2080,10 @@ export namespace Prisma {
      */
     select?: ActivitySelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
+    /**
      * Filter which Activity to delete.
      */
     where: ActivityWhereUniqueInput
@@ -1938,6 +2100,26 @@ export namespace Prisma {
   }
 
   /**
+   * Activity.Output
+   */
+  export type Activity$OutputArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Output
+     */
+    select?: OutputSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutputInclude<ExtArgs> | null
+    where?: OutputWhereInput
+    orderBy?: OutputOrderByWithRelationInput | OutputOrderByWithRelationInput[]
+    cursor?: OutputWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OutputScalarFieldEnum | OutputScalarFieldEnum[]
+  }
+
+  /**
    * Activity without action
    */
   export type ActivityDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1945,6 +2127,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the Activity
      */
     select?: ActivitySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityInclude<ExtArgs> | null
   }
 
 
@@ -2875,6 +3061,997 @@ export namespace Prisma {
 
 
   /**
+   * Model Output
+   */
+
+  export type AggregateOutput = {
+    _count: OutputCountAggregateOutputType | null
+    _avg: OutputAvgAggregateOutputType | null
+    _sum: OutputSumAggregateOutputType | null
+    _min: OutputMinAggregateOutputType | null
+    _max: OutputMaxAggregateOutputType | null
+  }
+
+  export type OutputAvgAggregateOutputType = {
+    year: number | null
+  }
+
+  export type OutputSumAggregateOutputType = {
+    year: number | null
+  }
+
+  export type OutputMinAggregateOutputType = {
+    id: string | null
+    activityId: string | null
+    name: string | null
+    unit: string | null
+    year: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type OutputMaxAggregateOutputType = {
+    id: string | null
+    activityId: string | null
+    name: string | null
+    unit: string | null
+    year: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type OutputCountAggregateOutputType = {
+    id: number
+    activityId: number
+    name: number
+    unit: number
+    year: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type OutputAvgAggregateInputType = {
+    year?: true
+  }
+
+  export type OutputSumAggregateInputType = {
+    year?: true
+  }
+
+  export type OutputMinAggregateInputType = {
+    id?: true
+    activityId?: true
+    name?: true
+    unit?: true
+    year?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type OutputMaxAggregateInputType = {
+    id?: true
+    activityId?: true
+    name?: true
+    unit?: true
+    year?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type OutputCountAggregateInputType = {
+    id?: true
+    activityId?: true
+    name?: true
+    unit?: true
+    year?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type OutputAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Output to aggregate.
+     */
+    where?: OutputWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Outputs to fetch.
+     */
+    orderBy?: OutputOrderByWithRelationInput | OutputOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: OutputWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Outputs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Outputs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Outputs
+    **/
+    _count?: true | OutputCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: OutputAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: OutputSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: OutputMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: OutputMaxAggregateInputType
+  }
+
+  export type GetOutputAggregateType<T extends OutputAggregateArgs> = {
+        [P in keyof T & keyof AggregateOutput]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateOutput[P]>
+      : GetScalarType<T[P], AggregateOutput[P]>
+  }
+
+
+
+
+  export type OutputGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OutputWhereInput
+    orderBy?: OutputOrderByWithAggregationInput | OutputOrderByWithAggregationInput[]
+    by: OutputScalarFieldEnum[] | OutputScalarFieldEnum
+    having?: OutputScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: OutputCountAggregateInputType | true
+    _avg?: OutputAvgAggregateInputType
+    _sum?: OutputSumAggregateInputType
+    _min?: OutputMinAggregateInputType
+    _max?: OutputMaxAggregateInputType
+  }
+
+  export type OutputGroupByOutputType = {
+    id: string
+    activityId: string
+    name: string
+    unit: string
+    year: number
+    createdAt: Date
+    updatedAt: Date
+    _count: OutputCountAggregateOutputType | null
+    _avg: OutputAvgAggregateOutputType | null
+    _sum: OutputSumAggregateOutputType | null
+    _min: OutputMinAggregateOutputType | null
+    _max: OutputMaxAggregateOutputType | null
+  }
+
+  type GetOutputGroupByPayload<T extends OutputGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<OutputGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof OutputGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], OutputGroupByOutputType[P]>
+            : GetScalarType<T[P], OutputGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type OutputSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    activityId?: boolean
+    name?: boolean
+    unit?: boolean
+    year?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    activity?: boolean | ActivityDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["output"]>
+
+  export type OutputSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    activityId?: boolean
+    name?: boolean
+    unit?: boolean
+    year?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    activity?: boolean | ActivityDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["output"]>
+
+  export type OutputSelectScalar = {
+    id?: boolean
+    activityId?: boolean
+    name?: boolean
+    unit?: boolean
+    year?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type OutputInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    activity?: boolean | ActivityDefaultArgs<ExtArgs>
+  }
+  export type OutputIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    activity?: boolean | ActivityDefaultArgs<ExtArgs>
+  }
+
+  export type $OutputPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Output"
+    objects: {
+      activity: Prisma.$ActivityPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      activityId: string
+      name: string
+      unit: string
+      year: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["output"]>
+    composites: {}
+  }
+
+  type OutputGetPayload<S extends boolean | null | undefined | OutputDefaultArgs> = $Result.GetResult<Prisma.$OutputPayload, S>
+
+  type OutputCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<OutputFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: OutputCountAggregateInputType | true
+    }
+
+  export interface OutputDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Output'], meta: { name: 'Output' } }
+    /**
+     * Find zero or one Output that matches the filter.
+     * @param {OutputFindUniqueArgs} args - Arguments to find a Output
+     * @example
+     * // Get one Output
+     * const output = await prisma.output.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends OutputFindUniqueArgs>(args: SelectSubset<T, OutputFindUniqueArgs<ExtArgs>>): Prisma__OutputClient<$Result.GetResult<Prisma.$OutputPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one Output that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {OutputFindUniqueOrThrowArgs} args - Arguments to find a Output
+     * @example
+     * // Get one Output
+     * const output = await prisma.output.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends OutputFindUniqueOrThrowArgs>(args: SelectSubset<T, OutputFindUniqueOrThrowArgs<ExtArgs>>): Prisma__OutputClient<$Result.GetResult<Prisma.$OutputPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first Output that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OutputFindFirstArgs} args - Arguments to find a Output
+     * @example
+     * // Get one Output
+     * const output = await prisma.output.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends OutputFindFirstArgs>(args?: SelectSubset<T, OutputFindFirstArgs<ExtArgs>>): Prisma__OutputClient<$Result.GetResult<Prisma.$OutputPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first Output that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OutputFindFirstOrThrowArgs} args - Arguments to find a Output
+     * @example
+     * // Get one Output
+     * const output = await prisma.output.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends OutputFindFirstOrThrowArgs>(args?: SelectSubset<T, OutputFindFirstOrThrowArgs<ExtArgs>>): Prisma__OutputClient<$Result.GetResult<Prisma.$OutputPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more Outputs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OutputFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Outputs
+     * const outputs = await prisma.output.findMany()
+     * 
+     * // Get first 10 Outputs
+     * const outputs = await prisma.output.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const outputWithIdOnly = await prisma.output.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends OutputFindManyArgs>(args?: SelectSubset<T, OutputFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OutputPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a Output.
+     * @param {OutputCreateArgs} args - Arguments to create a Output.
+     * @example
+     * // Create one Output
+     * const Output = await prisma.output.create({
+     *   data: {
+     *     // ... data to create a Output
+     *   }
+     * })
+     * 
+     */
+    create<T extends OutputCreateArgs>(args: SelectSubset<T, OutputCreateArgs<ExtArgs>>): Prisma__OutputClient<$Result.GetResult<Prisma.$OutputPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many Outputs.
+     * @param {OutputCreateManyArgs} args - Arguments to create many Outputs.
+     * @example
+     * // Create many Outputs
+     * const output = await prisma.output.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends OutputCreateManyArgs>(args?: SelectSubset<T, OutputCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Outputs and returns the data saved in the database.
+     * @param {OutputCreateManyAndReturnArgs} args - Arguments to create many Outputs.
+     * @example
+     * // Create many Outputs
+     * const output = await prisma.output.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Outputs and only return the `id`
+     * const outputWithIdOnly = await prisma.output.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends OutputCreateManyAndReturnArgs>(args?: SelectSubset<T, OutputCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OutputPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a Output.
+     * @param {OutputDeleteArgs} args - Arguments to delete one Output.
+     * @example
+     * // Delete one Output
+     * const Output = await prisma.output.delete({
+     *   where: {
+     *     // ... filter to delete one Output
+     *   }
+     * })
+     * 
+     */
+    delete<T extends OutputDeleteArgs>(args: SelectSubset<T, OutputDeleteArgs<ExtArgs>>): Prisma__OutputClient<$Result.GetResult<Prisma.$OutputPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one Output.
+     * @param {OutputUpdateArgs} args - Arguments to update one Output.
+     * @example
+     * // Update one Output
+     * const output = await prisma.output.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends OutputUpdateArgs>(args: SelectSubset<T, OutputUpdateArgs<ExtArgs>>): Prisma__OutputClient<$Result.GetResult<Prisma.$OutputPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more Outputs.
+     * @param {OutputDeleteManyArgs} args - Arguments to filter Outputs to delete.
+     * @example
+     * // Delete a few Outputs
+     * const { count } = await prisma.output.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends OutputDeleteManyArgs>(args?: SelectSubset<T, OutputDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Outputs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OutputUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Outputs
+     * const output = await prisma.output.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends OutputUpdateManyArgs>(args: SelectSubset<T, OutputUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Output.
+     * @param {OutputUpsertArgs} args - Arguments to update or create a Output.
+     * @example
+     * // Update or create a Output
+     * const output = await prisma.output.upsert({
+     *   create: {
+     *     // ... data to create a Output
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Output we want to update
+     *   }
+     * })
+     */
+    upsert<T extends OutputUpsertArgs>(args: SelectSubset<T, OutputUpsertArgs<ExtArgs>>): Prisma__OutputClient<$Result.GetResult<Prisma.$OutputPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of Outputs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OutputCountArgs} args - Arguments to filter Outputs to count.
+     * @example
+     * // Count the number of Outputs
+     * const count = await prisma.output.count({
+     *   where: {
+     *     // ... the filter for the Outputs we want to count
+     *   }
+     * })
+    **/
+    count<T extends OutputCountArgs>(
+      args?: Subset<T, OutputCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], OutputCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Output.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OutputAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends OutputAggregateArgs>(args: Subset<T, OutputAggregateArgs>): Prisma.PrismaPromise<GetOutputAggregateType<T>>
+
+    /**
+     * Group by Output.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OutputGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends OutputGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: OutputGroupByArgs['orderBy'] }
+        : { orderBy?: OutputGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, OutputGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetOutputGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Output model
+   */
+  readonly fields: OutputFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Output.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__OutputClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    activity<T extends ActivityDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ActivityDefaultArgs<ExtArgs>>): Prisma__ActivityClient<$Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Output model
+   */ 
+  interface OutputFieldRefs {
+    readonly id: FieldRef<"Output", 'String'>
+    readonly activityId: FieldRef<"Output", 'String'>
+    readonly name: FieldRef<"Output", 'String'>
+    readonly unit: FieldRef<"Output", 'String'>
+    readonly year: FieldRef<"Output", 'Int'>
+    readonly createdAt: FieldRef<"Output", 'DateTime'>
+    readonly updatedAt: FieldRef<"Output", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Output findUnique
+   */
+  export type OutputFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Output
+     */
+    select?: OutputSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutputInclude<ExtArgs> | null
+    /**
+     * Filter, which Output to fetch.
+     */
+    where: OutputWhereUniqueInput
+  }
+
+  /**
+   * Output findUniqueOrThrow
+   */
+  export type OutputFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Output
+     */
+    select?: OutputSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutputInclude<ExtArgs> | null
+    /**
+     * Filter, which Output to fetch.
+     */
+    where: OutputWhereUniqueInput
+  }
+
+  /**
+   * Output findFirst
+   */
+  export type OutputFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Output
+     */
+    select?: OutputSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutputInclude<ExtArgs> | null
+    /**
+     * Filter, which Output to fetch.
+     */
+    where?: OutputWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Outputs to fetch.
+     */
+    orderBy?: OutputOrderByWithRelationInput | OutputOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Outputs.
+     */
+    cursor?: OutputWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Outputs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Outputs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Outputs.
+     */
+    distinct?: OutputScalarFieldEnum | OutputScalarFieldEnum[]
+  }
+
+  /**
+   * Output findFirstOrThrow
+   */
+  export type OutputFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Output
+     */
+    select?: OutputSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutputInclude<ExtArgs> | null
+    /**
+     * Filter, which Output to fetch.
+     */
+    where?: OutputWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Outputs to fetch.
+     */
+    orderBy?: OutputOrderByWithRelationInput | OutputOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Outputs.
+     */
+    cursor?: OutputWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Outputs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Outputs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Outputs.
+     */
+    distinct?: OutputScalarFieldEnum | OutputScalarFieldEnum[]
+  }
+
+  /**
+   * Output findMany
+   */
+  export type OutputFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Output
+     */
+    select?: OutputSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutputInclude<ExtArgs> | null
+    /**
+     * Filter, which Outputs to fetch.
+     */
+    where?: OutputWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Outputs to fetch.
+     */
+    orderBy?: OutputOrderByWithRelationInput | OutputOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Outputs.
+     */
+    cursor?: OutputWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Outputs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Outputs.
+     */
+    skip?: number
+    distinct?: OutputScalarFieldEnum | OutputScalarFieldEnum[]
+  }
+
+  /**
+   * Output create
+   */
+  export type OutputCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Output
+     */
+    select?: OutputSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutputInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Output.
+     */
+    data: XOR<OutputCreateInput, OutputUncheckedCreateInput>
+  }
+
+  /**
+   * Output createMany
+   */
+  export type OutputCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Outputs.
+     */
+    data: OutputCreateManyInput | OutputCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Output createManyAndReturn
+   */
+  export type OutputCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Output
+     */
+    select?: OutputSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many Outputs.
+     */
+    data: OutputCreateManyInput | OutputCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutputIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Output update
+   */
+  export type OutputUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Output
+     */
+    select?: OutputSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutputInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Output.
+     */
+    data: XOR<OutputUpdateInput, OutputUncheckedUpdateInput>
+    /**
+     * Choose, which Output to update.
+     */
+    where: OutputWhereUniqueInput
+  }
+
+  /**
+   * Output updateMany
+   */
+  export type OutputUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Outputs.
+     */
+    data: XOR<OutputUpdateManyMutationInput, OutputUncheckedUpdateManyInput>
+    /**
+     * Filter which Outputs to update
+     */
+    where?: OutputWhereInput
+  }
+
+  /**
+   * Output upsert
+   */
+  export type OutputUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Output
+     */
+    select?: OutputSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutputInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Output to update in case it exists.
+     */
+    where: OutputWhereUniqueInput
+    /**
+     * In case the Output found by the `where` argument doesn't exist, create a new Output with this data.
+     */
+    create: XOR<OutputCreateInput, OutputUncheckedCreateInput>
+    /**
+     * In case the Output was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<OutputUpdateInput, OutputUncheckedUpdateInput>
+  }
+
+  /**
+   * Output delete
+   */
+  export type OutputDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Output
+     */
+    select?: OutputSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutputInclude<ExtArgs> | null
+    /**
+     * Filter which Output to delete.
+     */
+    where: OutputWhereUniqueInput
+  }
+
+  /**
+   * Output deleteMany
+   */
+  export type OutputDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Outputs to delete
+     */
+    where?: OutputWhereInput
+  }
+
+  /**
+   * Output without action
+   */
+  export type OutputDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Output
+     */
+    select?: OutputSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OutputInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -2917,6 +4094,19 @@ export namespace Prisma {
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+  export const OutputScalarFieldEnum: {
+    id: 'id',
+    activityId: 'activityId',
+    name: 'name',
+    unit: 'unit',
+    year: 'year',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type OutputScalarFieldEnum = (typeof OutputScalarFieldEnum)[keyof typeof OutputScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -3070,6 +4260,7 @@ export namespace Prisma {
     year?: IntFilter<"Activity"> | number
     createdAt?: DateTimeFilter<"Activity"> | Date | string
     updatedAt?: DateTimeFilter<"Activity"> | Date | string
+    Output?: OutputListRelationFilter
   }
 
   export type ActivityOrderByWithRelationInput = {
@@ -3083,6 +4274,7 @@ export namespace Prisma {
     year?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    Output?: OutputOrderByRelationAggregateInput
   }
 
   export type ActivityWhereUniqueInput = Prisma.AtLeast<{
@@ -3099,6 +4291,7 @@ export namespace Prisma {
     year?: IntFilter<"Activity"> | number
     createdAt?: DateTimeFilter<"Activity"> | Date | string
     updatedAt?: DateTimeFilter<"Activity"> | Date | string
+    Output?: OutputListRelationFilter
   }, "id">
 
   export type ActivityOrderByWithAggregationInput = {
@@ -3207,6 +4400,73 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
 
+  export type OutputWhereInput = {
+    AND?: OutputWhereInput | OutputWhereInput[]
+    OR?: OutputWhereInput[]
+    NOT?: OutputWhereInput | OutputWhereInput[]
+    id?: StringFilter<"Output"> | string
+    activityId?: StringFilter<"Output"> | string
+    name?: StringFilter<"Output"> | string
+    unit?: StringFilter<"Output"> | string
+    year?: IntFilter<"Output"> | number
+    createdAt?: DateTimeFilter<"Output"> | Date | string
+    updatedAt?: DateTimeFilter<"Output"> | Date | string
+    activity?: XOR<ActivityRelationFilter, ActivityWhereInput>
+  }
+
+  export type OutputOrderByWithRelationInput = {
+    id?: SortOrder
+    activityId?: SortOrder
+    name?: SortOrder
+    unit?: SortOrder
+    year?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    activity?: ActivityOrderByWithRelationInput
+  }
+
+  export type OutputWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: OutputWhereInput | OutputWhereInput[]
+    OR?: OutputWhereInput[]
+    NOT?: OutputWhereInput | OutputWhereInput[]
+    activityId?: StringFilter<"Output"> | string
+    name?: StringFilter<"Output"> | string
+    unit?: StringFilter<"Output"> | string
+    year?: IntFilter<"Output"> | number
+    createdAt?: DateTimeFilter<"Output"> | Date | string
+    updatedAt?: DateTimeFilter<"Output"> | Date | string
+    activity?: XOR<ActivityRelationFilter, ActivityWhereInput>
+  }, "id">
+
+  export type OutputOrderByWithAggregationInput = {
+    id?: SortOrder
+    activityId?: SortOrder
+    name?: SortOrder
+    unit?: SortOrder
+    year?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: OutputCountOrderByAggregateInput
+    _avg?: OutputAvgOrderByAggregateInput
+    _max?: OutputMaxOrderByAggregateInput
+    _min?: OutputMinOrderByAggregateInput
+    _sum?: OutputSumOrderByAggregateInput
+  }
+
+  export type OutputScalarWhereWithAggregatesInput = {
+    AND?: OutputScalarWhereWithAggregatesInput | OutputScalarWhereWithAggregatesInput[]
+    OR?: OutputScalarWhereWithAggregatesInput[]
+    NOT?: OutputScalarWhereWithAggregatesInput | OutputScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Output"> | string
+    activityId?: StringWithAggregatesFilter<"Output"> | string
+    name?: StringWithAggregatesFilter<"Output"> | string
+    unit?: StringWithAggregatesFilter<"Output"> | string
+    year?: IntWithAggregatesFilter<"Output"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"Output"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Output"> | Date | string
+  }
+
   export type ActivityCreateInput = {
     id?: string
     name: string
@@ -3218,6 +4478,7 @@ export namespace Prisma {
     year: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    Output?: OutputCreateNestedManyWithoutActivityInput
   }
 
   export type ActivityUncheckedCreateInput = {
@@ -3231,6 +4492,7 @@ export namespace Prisma {
     year: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    Output?: OutputUncheckedCreateNestedManyWithoutActivityInput
   }
 
   export type ActivityUpdateInput = {
@@ -3244,6 +4506,7 @@ export namespace Prisma {
     year?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    Output?: OutputUpdateManyWithoutActivityNestedInput
   }
 
   export type ActivityUncheckedUpdateInput = {
@@ -3257,6 +4520,7 @@ export namespace Prisma {
     year?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    Output?: OutputUncheckedUpdateManyWithoutActivityNestedInput
   }
 
   export type ActivityCreateManyInput = {
@@ -3382,6 +4646,75 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type OutputCreateInput = {
+    id?: string
+    name: string
+    unit: string
+    year: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    activity: ActivityCreateNestedOneWithoutOutputInput
+  }
+
+  export type OutputUncheckedCreateInput = {
+    id?: string
+    activityId: string
+    name: string
+    unit: string
+    year: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OutputUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    unit?: StringFieldUpdateOperationsInput | string
+    year?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activity?: ActivityUpdateOneRequiredWithoutOutputNestedInput
+  }
+
+  export type OutputUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    activityId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    unit?: StringFieldUpdateOperationsInput | string
+    year?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OutputCreateManyInput = {
+    id?: string
+    activityId: string
+    name: string
+    unit: string
+    year: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OutputUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    unit?: StringFieldUpdateOperationsInput | string
+    year?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OutputUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    activityId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    unit?: StringFieldUpdateOperationsInput | string
+    year?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -3436,6 +4769,16 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type OutputListRelationFilter = {
+    every?: OutputWhereInput
+    some?: OutputWhereInput
+    none?: OutputWhereInput
+  }
+
+  export type OutputOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type ActivityCountOrderByAggregateInput = {
@@ -3636,6 +4979,63 @@ export namespace Prisma {
     _max?: NestedEnumPositionFilter<$PrismaModel>
   }
 
+  export type ActivityRelationFilter = {
+    is?: ActivityWhereInput
+    isNot?: ActivityWhereInput
+  }
+
+  export type OutputCountOrderByAggregateInput = {
+    id?: SortOrder
+    activityId?: SortOrder
+    name?: SortOrder
+    unit?: SortOrder
+    year?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OutputAvgOrderByAggregateInput = {
+    year?: SortOrder
+  }
+
+  export type OutputMaxOrderByAggregateInput = {
+    id?: SortOrder
+    activityId?: SortOrder
+    name?: SortOrder
+    unit?: SortOrder
+    year?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OutputMinOrderByAggregateInput = {
+    id?: SortOrder
+    activityId?: SortOrder
+    name?: SortOrder
+    unit?: SortOrder
+    year?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OutputSumOrderByAggregateInput = {
+    year?: SortOrder
+  }
+
+  export type OutputCreateNestedManyWithoutActivityInput = {
+    create?: XOR<OutputCreateWithoutActivityInput, OutputUncheckedCreateWithoutActivityInput> | OutputCreateWithoutActivityInput[] | OutputUncheckedCreateWithoutActivityInput[]
+    connectOrCreate?: OutputCreateOrConnectWithoutActivityInput | OutputCreateOrConnectWithoutActivityInput[]
+    createMany?: OutputCreateManyActivityInputEnvelope
+    connect?: OutputWhereUniqueInput | OutputWhereUniqueInput[]
+  }
+
+  export type OutputUncheckedCreateNestedManyWithoutActivityInput = {
+    create?: XOR<OutputCreateWithoutActivityInput, OutputUncheckedCreateWithoutActivityInput> | OutputCreateWithoutActivityInput[] | OutputUncheckedCreateWithoutActivityInput[]
+    connectOrCreate?: OutputCreateOrConnectWithoutActivityInput | OutputCreateOrConnectWithoutActivityInput[]
+    createMany?: OutputCreateManyActivityInputEnvelope
+    connect?: OutputWhereUniqueInput | OutputWhereUniqueInput[]
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -3664,12 +5064,54 @@ export namespace Prisma {
     set?: Date | string
   }
 
+  export type OutputUpdateManyWithoutActivityNestedInput = {
+    create?: XOR<OutputCreateWithoutActivityInput, OutputUncheckedCreateWithoutActivityInput> | OutputCreateWithoutActivityInput[] | OutputUncheckedCreateWithoutActivityInput[]
+    connectOrCreate?: OutputCreateOrConnectWithoutActivityInput | OutputCreateOrConnectWithoutActivityInput[]
+    upsert?: OutputUpsertWithWhereUniqueWithoutActivityInput | OutputUpsertWithWhereUniqueWithoutActivityInput[]
+    createMany?: OutputCreateManyActivityInputEnvelope
+    set?: OutputWhereUniqueInput | OutputWhereUniqueInput[]
+    disconnect?: OutputWhereUniqueInput | OutputWhereUniqueInput[]
+    delete?: OutputWhereUniqueInput | OutputWhereUniqueInput[]
+    connect?: OutputWhereUniqueInput | OutputWhereUniqueInput[]
+    update?: OutputUpdateWithWhereUniqueWithoutActivityInput | OutputUpdateWithWhereUniqueWithoutActivityInput[]
+    updateMany?: OutputUpdateManyWithWhereWithoutActivityInput | OutputUpdateManyWithWhereWithoutActivityInput[]
+    deleteMany?: OutputScalarWhereInput | OutputScalarWhereInput[]
+  }
+
+  export type OutputUncheckedUpdateManyWithoutActivityNestedInput = {
+    create?: XOR<OutputCreateWithoutActivityInput, OutputUncheckedCreateWithoutActivityInput> | OutputCreateWithoutActivityInput[] | OutputUncheckedCreateWithoutActivityInput[]
+    connectOrCreate?: OutputCreateOrConnectWithoutActivityInput | OutputCreateOrConnectWithoutActivityInput[]
+    upsert?: OutputUpsertWithWhereUniqueWithoutActivityInput | OutputUpsertWithWhereUniqueWithoutActivityInput[]
+    createMany?: OutputCreateManyActivityInputEnvelope
+    set?: OutputWhereUniqueInput | OutputWhereUniqueInput[]
+    disconnect?: OutputWhereUniqueInput | OutputWhereUniqueInput[]
+    delete?: OutputWhereUniqueInput | OutputWhereUniqueInput[]
+    connect?: OutputWhereUniqueInput | OutputWhereUniqueInput[]
+    update?: OutputUpdateWithWhereUniqueWithoutActivityInput | OutputUpdateWithWhereUniqueWithoutActivityInput[]
+    updateMany?: OutputUpdateManyWithWhereWithoutActivityInput | OutputUpdateManyWithWhereWithoutActivityInput[]
+    deleteMany?: OutputScalarWhereInput | OutputScalarWhereInput[]
+  }
+
   export type NullableEnumTeamFieldUpdateOperationsInput = {
     set?: $Enums.Team | null
   }
 
   export type EnumPositionFieldUpdateOperationsInput = {
     set?: $Enums.Position
+  }
+
+  export type ActivityCreateNestedOneWithoutOutputInput = {
+    create?: XOR<ActivityCreateWithoutOutputInput, ActivityUncheckedCreateWithoutOutputInput>
+    connectOrCreate?: ActivityCreateOrConnectWithoutOutputInput
+    connect?: ActivityWhereUniqueInput
+  }
+
+  export type ActivityUpdateOneRequiredWithoutOutputNestedInput = {
+    create?: XOR<ActivityCreateWithoutOutputInput, ActivityUncheckedCreateWithoutOutputInput>
+    connectOrCreate?: ActivityCreateOrConnectWithoutOutputInput
+    upsert?: ActivityUpsertWithoutOutputInput
+    connect?: ActivityWhereUniqueInput
+    update?: XOR<XOR<ActivityUpdateToOneWithWhereWithoutOutputInput, ActivityUpdateWithoutOutputInput>, ActivityUncheckedUpdateWithoutOutputInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -3858,11 +5300,176 @@ export namespace Prisma {
     _max?: NestedEnumPositionFilter<$PrismaModel>
   }
 
+  export type OutputCreateWithoutActivityInput = {
+    id?: string
+    name: string
+    unit: string
+    year: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OutputUncheckedCreateWithoutActivityInput = {
+    id?: string
+    name: string
+    unit: string
+    year: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OutputCreateOrConnectWithoutActivityInput = {
+    where: OutputWhereUniqueInput
+    create: XOR<OutputCreateWithoutActivityInput, OutputUncheckedCreateWithoutActivityInput>
+  }
+
+  export type OutputCreateManyActivityInputEnvelope = {
+    data: OutputCreateManyActivityInput | OutputCreateManyActivityInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OutputUpsertWithWhereUniqueWithoutActivityInput = {
+    where: OutputWhereUniqueInput
+    update: XOR<OutputUpdateWithoutActivityInput, OutputUncheckedUpdateWithoutActivityInput>
+    create: XOR<OutputCreateWithoutActivityInput, OutputUncheckedCreateWithoutActivityInput>
+  }
+
+  export type OutputUpdateWithWhereUniqueWithoutActivityInput = {
+    where: OutputWhereUniqueInput
+    data: XOR<OutputUpdateWithoutActivityInput, OutputUncheckedUpdateWithoutActivityInput>
+  }
+
+  export type OutputUpdateManyWithWhereWithoutActivityInput = {
+    where: OutputScalarWhereInput
+    data: XOR<OutputUpdateManyMutationInput, OutputUncheckedUpdateManyWithoutActivityInput>
+  }
+
+  export type OutputScalarWhereInput = {
+    AND?: OutputScalarWhereInput | OutputScalarWhereInput[]
+    OR?: OutputScalarWhereInput[]
+    NOT?: OutputScalarWhereInput | OutputScalarWhereInput[]
+    id?: StringFilter<"Output"> | string
+    activityId?: StringFilter<"Output"> | string
+    name?: StringFilter<"Output"> | string
+    unit?: StringFilter<"Output"> | string
+    year?: IntFilter<"Output"> | number
+    createdAt?: DateTimeFilter<"Output"> | Date | string
+    updatedAt?: DateTimeFilter<"Output"> | Date | string
+  }
+
+  export type ActivityCreateWithoutOutputInput = {
+    id?: string
+    name: string
+    code: string
+    unit: string
+    category: $Enums.CategoryActivity
+    team: $Enums.Team
+    isSpecial: boolean
+    year: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ActivityUncheckedCreateWithoutOutputInput = {
+    id?: string
+    name: string
+    code: string
+    unit: string
+    category: $Enums.CategoryActivity
+    team: $Enums.Team
+    isSpecial: boolean
+    year: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ActivityCreateOrConnectWithoutOutputInput = {
+    where: ActivityWhereUniqueInput
+    create: XOR<ActivityCreateWithoutOutputInput, ActivityUncheckedCreateWithoutOutputInput>
+  }
+
+  export type ActivityUpsertWithoutOutputInput = {
+    update: XOR<ActivityUpdateWithoutOutputInput, ActivityUncheckedUpdateWithoutOutputInput>
+    create: XOR<ActivityCreateWithoutOutputInput, ActivityUncheckedCreateWithoutOutputInput>
+    where?: ActivityWhereInput
+  }
+
+  export type ActivityUpdateToOneWithWhereWithoutOutputInput = {
+    where?: ActivityWhereInput
+    data: XOR<ActivityUpdateWithoutOutputInput, ActivityUncheckedUpdateWithoutOutputInput>
+  }
+
+  export type ActivityUpdateWithoutOutputInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    unit?: StringFieldUpdateOperationsInput | string
+    category?: EnumCategoryActivityFieldUpdateOperationsInput | $Enums.CategoryActivity
+    team?: EnumTeamFieldUpdateOperationsInput | $Enums.Team
+    isSpecial?: BoolFieldUpdateOperationsInput | boolean
+    year?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityUncheckedUpdateWithoutOutputInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    unit?: StringFieldUpdateOperationsInput | string
+    category?: EnumCategoryActivityFieldUpdateOperationsInput | $Enums.CategoryActivity
+    team?: EnumTeamFieldUpdateOperationsInput | $Enums.Team
+    isSpecial?: BoolFieldUpdateOperationsInput | boolean
+    year?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OutputCreateManyActivityInput = {
+    id?: string
+    name: string
+    unit: string
+    year: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OutputUpdateWithoutActivityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    unit?: StringFieldUpdateOperationsInput | string
+    year?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OutputUncheckedUpdateWithoutActivityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    unit?: StringFieldUpdateOperationsInput | string
+    year?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OutputUncheckedUpdateManyWithoutActivityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    unit?: StringFieldUpdateOperationsInput | string
+    year?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
 
 
   /**
    * Aliases for legacy arg types
    */
+    /**
+     * @deprecated Use ActivityCountOutputTypeDefaultArgs instead
+     */
+    export type ActivityCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ActivityCountOutputTypeDefaultArgs<ExtArgs>
     /**
      * @deprecated Use ActivityDefaultArgs instead
      */
@@ -3871,6 +5478,10 @@ export namespace Prisma {
      * @deprecated Use UserDefaultArgs instead
      */
     export type UserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = UserDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use OutputDefaultArgs instead
+     */
+    export type OutputArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = OutputDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany
