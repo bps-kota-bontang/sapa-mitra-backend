@@ -3,31 +3,35 @@ import { ActivityRepository } from "@/repository/activity";
 import ActivitySchema from "@/schema/activity";
 
 export const mongoActivityRepository = (): ActivityRepository => {
-  const create = async (activity: Activity): Promise<Activity> => {
-    return await ActivitySchema.create(activity);
+  const create = async (data: any): Promise<Activity> => {
+    const activity = await ActivitySchema.create(data);
+
+    return activity.toObject();
   };
 
   const findById = async (id: string): Promise<Activity | null> => {
-    return await ActivitySchema.findById(id);
+    const activity = await ActivitySchema.findById(id);
+
+    return activity?.toObject() ?? null;
   };
 
   const findManyById = async (ids: string[]): Promise<Activity[]> => {
-    return (await ActivitySchema.find({ _id: { $in: ids } })).map((activity) => {
-      return activity.toObject();
-    });
-  }
-
-  const findAll = async (queries: any = {}): Promise<Activity[]> => {
-    return (await ActivitySchema.find(queries)).map((activity) => {
-      return activity.toObject();
-    });
+    return (await ActivitySchema.find({ _id: { $in: ids } })).map((activity) =>
+      activity.toObject()
+    );
   };
 
-  const update = async (
-    id: string,
-    activity: Partial<Activity>
-  ): Promise<Activity | null> => {
-    return await ActivitySchema.findByIdAndUpdate(id, activity, { new: true });
+  const findAll = async (queries: any = {}): Promise<Activity[]> => {
+    return (await ActivitySchema.find(queries)).map((activity) =>
+      activity.toObject()
+    );
+  };
+
+  const update = async (id: string, data: any): Promise<Activity | null> => {
+    const activity = await ActivitySchema.findByIdAndUpdate(id, data, {
+      new: true,
+    });
+    return activity?.toObject() ?? null;
   };
 
   const deleteOne = async (id: string): Promise<void> => {

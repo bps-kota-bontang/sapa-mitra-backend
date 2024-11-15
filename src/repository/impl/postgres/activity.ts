@@ -4,12 +4,15 @@ import { Activity } from "@/model/activity";
 import { ActivityRepository } from "@/repository/activity";
 
 export const postgresActivityRepository = (): ActivityRepository => {
-  const create = async (activity: Activity): Promise<Activity> => {
-    const data = await prisma.activity.create({
-      data: activity,
+  const create = async (data: any): Promise<Activity> => {
+    const activity = await prisma.activity.create({
+      data: {
+        ...data,
+        year: parseInt(data.year),
+      },
     });
 
-    return transformModel(data) as Activity;
+    return transformModel(activity) as Activity;
   };
 
   const findById = async (id: string): Promise<Activity | null> => {
@@ -42,16 +45,16 @@ export const postgresActivityRepository = (): ActivityRepository => {
     return data.map((item) => transformModel(item) as Activity);
   };
 
-  const update = async (
-    id: string,
-    activity: Partial<Activity>
-  ): Promise<Activity | null> => {
-    const data = await prisma.activity.update({
+  const update = async (id: string, data: any): Promise<Activity | null> => {
+    const activity = await prisma.activity.update({
       where: { id },
-      data: activity,
+      data: {
+        ...data,
+        year: parseInt(data.year),
+      },
     });
 
-    return transformModel(data);
+    return transformModel(activity);
   };
 
   const deleteOne = async (id: string): Promise<void> => {
