@@ -13,6 +13,11 @@ export const postgresUserRepository = (): UserRepository => {
   };
 
   const findAll = async (queries?: any): Promise<User[]> => {
+    if (queries._id) {
+      queries.id = queries._id;
+      delete queries._id;
+    }
+
     const users = await prisma.user.findMany({
       where: queries,
     });

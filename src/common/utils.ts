@@ -327,4 +327,5 @@ export const generateState = () => {
 
 export const transformModel = <T extends { id: string }>(
   data: T | null
-): (T & { _id: string }) | null => (data ? { ...data, _id: data.id } : null);
+): (Omit<T, "id"> & { _id: string }) | null =>
+  data ? { ...(({ id, ...rest }) => rest)(data), _id: data.id } : null;

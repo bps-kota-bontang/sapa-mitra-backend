@@ -21,7 +21,7 @@ export const generatePayload = (user: User | null) => {
   const payload: JWT = {
     iss: APP_HOST,
     aud: APP_NAME,
-    sub: user?.id ?? "1234-5678-9101",
+    sub: user?._id ?? "1234-5678-9101",
     name: user?.name ?? "Dummy User",
     nip: user?.nip ?? "1111111111111111",
     email: user?.email ?? "user@dummy.com",

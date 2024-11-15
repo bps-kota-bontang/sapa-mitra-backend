@@ -4,7 +4,7 @@ import UserSchema from "@/schema/user";
 
 const users: User[] = [
   {
-    id: "1",
+    _id: "1",
     name: "ketua",
     nip: "000000000000000000",
     email: "ketua@mail.com",
@@ -13,7 +13,7 @@ const users: User[] = [
     position: "KETUA",
   },
   {
-    id: "2",
+    _id: "2",
     name: "anggota",
     nip: "111111111111111111",
     email: "anggota@mail.com",

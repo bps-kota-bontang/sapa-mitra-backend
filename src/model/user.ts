@@ -9,7 +9,7 @@ export type Team =
 export type Position = "ANGGOTA" | "KETUA" | "KEPALA";
 
 export type User = {
-  id: string;
+  _id: string;
   name: string;
   nip: string;
   email: string;
