@@ -39,6 +39,11 @@ export const postgresActivityRepository = (): ActivityRepository => {
   };
 
   const findAll = async (queries: any = {}): Promise<Activity[]> => {
+    if (queries._id) {
+      queries.id = queries._id;
+      delete queries._id;
+    }
+
     const data = await prisma.activity.findMany({
       where: queries,
     });
@@ -76,7 +81,6 @@ export const postgresActivityRepository = (): ActivityRepository => {
   };
 
   const createMany = async (data: any[]): Promise<Activity[]> => {
-    console.log(data);
     const activities = await prisma.activity.createManyAndReturn({
       data: data.map((item) => ({
         ...item,

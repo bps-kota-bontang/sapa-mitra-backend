@@ -1236,7 +1236,7 @@ export const getContractActivityVolume = async (
       "activity._id",
     ]);
     if (output) {
-      activityId = output.activity.id as string;
+      activityId = output.activity._id as string;
     }
   }
 
