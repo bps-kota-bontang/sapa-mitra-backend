@@ -4,7 +4,12 @@ import { User } from "@/model/user";
 import { UserRepository } from "@/repository/user";
 
 export const postgresUserRepository = (): UserRepository => {
-  const findOne = async (queries?: any): Promise<User | null> => {
+  const findOne = async (queries: any = {}): Promise<User | null> => {
+    if (queries._id) {
+      queries.id = queries._id;
+      delete queries._id;
+    }
+
     const user = await prisma.user.findFirst({
       where: queries,
     });
@@ -12,7 +17,7 @@ export const postgresUserRepository = (): UserRepository => {
     return transformModel(user);
   };
 
-  const findAll = async (queries?: any): Promise<User[]> => {
+  const findAll = async (queries: any = {}): Promise<User[]> => {
     if (queries._id) {
       queries.id = queries._id;
       delete queries._id;
