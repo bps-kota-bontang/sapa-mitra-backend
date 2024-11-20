@@ -167,9 +167,21 @@ exports.Prisma.PartnerScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ConfigurationScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  value: 'value',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -180,6 +192,12 @@ exports.Prisma.QueryMode = {
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
 };
 exports.CategoryActivity = exports.$Enums.CategoryActivity = {
   ENUMERATION: 'ENUMERATION',
@@ -202,11 +220,18 @@ exports.Position = exports.$Enums.Position = {
   KEPALA: 'KEPALA'
 };
 
+exports.TypeConfiguration = exports.$Enums.TypeConfiguration = {
+  AUTHORITY: 'AUTHORITY',
+  REGION: 'REGION',
+  RATE: 'RATE'
+};
+
 exports.Prisma.ModelName = {
   Activity: 'Activity',
   User: 'User',
   Output: 'Output',
-  Partner: 'Partner'
+  Partner: 'Partner',
+  Configuration: 'Configuration'
 };
 
 /**

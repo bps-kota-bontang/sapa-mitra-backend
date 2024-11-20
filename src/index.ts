@@ -10,7 +10,7 @@ import withAuth from "@/middleware/withAuth";
 
 const app = new Hono();
 
-if (Bun.env.DATABASE_PROVIDER === "mongodb") {
+if (Bun.env.DATABASE_PROVIDER === "mongo") {
   connectMongo();
 }
 

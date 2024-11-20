@@ -2,12 +2,20 @@ import { isValidStructure } from "@/common/utils";
 import { Configuration } from "@/model/configuration";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
-import ConfigurationSchema from "@/schema/configuration";
+import { ConfigurationRepository } from "@/repository/configuration";
+import { factoryRepository } from "@/repository/factory";
+import { mongoConfigurationRepository } from "@/repository/impl/mongo/configuration";
+import { postgresConfigurationRepository } from "@/repository/impl/postgres/configuration";
+
+const configurationRepository: ConfigurationRepository = factoryRepository(
+  mongoConfigurationRepository,
+  postgresConfigurationRepository
+);
 
 export const getConfigurations = async (): Promise<
   Result<Configuration<any>[]>
 > => {
-  const configurations = await ConfigurationSchema.find();
+  const configurations = await configurationRepository.findAll();
 
   return {
     data: configurations,
@@ -19,7 +27,7 @@ export const getConfigurations = async (): Promise<
 export const getConfiguration = async (
   name: string
 ): Promise<Result<Configuration<any>>> => {
-  const configuration = await ConfigurationSchema.findOne({ name: name });
+  const configuration = await configurationRepository.findOne({ name: name });
 
   return {
     data: configuration,
@@ -74,7 +82,7 @@ export const storeConfiguration = async (
     };
   }
 
-  const configuration = await ConfigurationSchema.create({
+  const configuration = await configurationRepository.create({
     name: payload.name,
     value: value,
   });
@@ -133,14 +141,9 @@ export const updateConfiguration = async (
     };
   }
 
-  const configuration = await ConfigurationSchema.findOneAndUpdate(
+  const configuration = await configurationRepository.findOneAndUpdate(
     { name: name },
-    { value: value },
-    {
-      new: true,
-      runValidators: true,
-      upsert: true,
-    }
+    { value: value }
   );
 
   return {
@@ -162,7 +165,7 @@ export const deleteConfiguration = async (
     };
   }
 
-  await ConfigurationSchema.findOneAndDelete({ name: name });
+  await configurationRepository.findOneAndDelete({ name: name });
 
   return {
     data: null,
