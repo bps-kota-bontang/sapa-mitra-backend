@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "start": "tsx src/index.ts",
+    "start": "tsc && ts-node -r tsconfig-paths/register dist/index.js",
     "seed": "npx --loader ts-node/esm src/config/seed.ts"
   },
   "dependencies": {
@@ -16,6 +16,7 @@
     "puppeteer-html-pdf": "^4.0.8",
     "terbilang-ts": "^2.1.0",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.2"
   },
   "devDependencies": {
