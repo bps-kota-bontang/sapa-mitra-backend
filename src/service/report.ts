@@ -641,6 +641,8 @@ const generateReportPdf = async (
 
   const pdfBuffer = await htmlPDF.create(content);
 
+  await htmlPDF.closeBrowser();
+
   return {
     file: pdfBuffer,
     fileName: `${payload.number}_${payload.partner.name}`,
@@ -673,8 +675,6 @@ export const downloadReports = async (
       ...output.toObject(),
     }))
   );
-
- 
 
   const file = convertToCsv(transformedReports);
 
