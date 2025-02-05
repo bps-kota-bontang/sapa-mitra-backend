@@ -1,3 +1,4 @@
+import { downloadTemplate, toArrayBuffer } from "@/common/utils";
 import { UpdatePasswordPayload } from "@/model/user";
 import { getUsers, getUser, uploadUsers, updatePassword } from "@/service/user";
 import { Hono } from "hono";
@@ -59,6 +60,18 @@ app.put("/:id/password", async (c) => {
     },
     result.code
   );
+});
+
+app.post("/template", async (c) => {
+  const result = await downloadTemplate("src/template/user.csv");
+
+  c.res.headers.set("Content-Type", "text/csv");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename=Template User.csv`
+  );
+
+  return c.body(toArrayBuffer(result));
 });
 
 export default app;

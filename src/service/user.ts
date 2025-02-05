@@ -69,7 +69,18 @@ export const uploadUsers = async (
     cast: (value) => (value === "" ? null : value),
   });
 
-  const outputs = await UserSchema.create(data);
+  const hashedData = await Promise.all(
+    data.map(async (user: any) => {
+      if (user.password) {
+        user.password = await Bun.password.hash(user.password, {
+          algorithm: "bcrypt",
+        });
+      }
+      return user;
+    })
+  );
+
+  const outputs = await UserSchema.create(hashedData);
 
   return {
     data: outputs,
