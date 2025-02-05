@@ -148,6 +148,12 @@ export const region = Bun.env.APP_REGION || "Kota Bontang";
 
 export const regionCode = Bun.env.APP_REGION_CODE || "6474";
 
+export const address = Bun.env.APP_REGION_ADDRESS || "Jl. Awang Long No 2, Bontang Baru, Kec. Bontang Utara, Kota Bontang";
+
+export const website = Bun.env.APP_REGION_WEBSITE || "https://bontangkota.bps.go.id";
+
+export const email = Bun.env.APP_REGION_EMAIL ||"bps6474@bps.go.id";
+
 export const APP_HOST = Bun.env.APP_HOST || "http://localhost:4000";
 
 export const CLIENT_URL = Bun.env.CLIENT_URL || "http://localhost:5173";

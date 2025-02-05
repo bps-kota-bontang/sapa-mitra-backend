@@ -91,4 +91,8 @@ export type ReportPdf = {
     total: number;
   }[];
   region: string;
+  address: string;
+  website: string;
+  email: string;
+  app: string;
 };

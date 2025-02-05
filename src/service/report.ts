@@ -1,5 +1,8 @@
 import {
+  address,
+  CLIENT_URL,
   convertToCsv,
+  email,
   findAvailableSequence,
   findLastSequence,
   formatDateText,
@@ -13,6 +16,7 @@ import {
   mergeBuffer,
   notEmpty,
   region,
+  website,
 } from "@/common/utils";
 import { JWT } from "@/model/jwt";
 import {
@@ -636,6 +640,10 @@ const generateReportPdf = async (
     },
     outputs: transformedOutputs,
     region: region,
+    address: address,
+    website: website,
+    email: email,
+    app: CLIENT_URL,
   };
   const content = template(payload);
 
