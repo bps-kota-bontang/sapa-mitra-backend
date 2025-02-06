@@ -138,6 +138,7 @@ export const uploadOutput = async (file: File): Promise<Result<any>> => {
       },
       name: item.name,
       unit: item.unit,
+      year: item.year,
     };
   });
 
