@@ -1,6 +1,6 @@
 FROM oven/bun:1.1.12-alpine
 
-RUN apk update && apk add --no-cache \
+RUN apk --no-cache --update-cache upgrade && apk add --no-cache \
     chromium \
     nss \
     freetype \
@@ -10,8 +10,8 @@ RUN apk update && apk add --no-cache \
     curl
 
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-ENV CHROME_BIN=/usr/bin/chromium-browser \
-    CHROME_PATH=/usr/lib/chromium/
+ENV CHROME_BIN=/usr/bin/chromium-browser 
+ENV CHROME_PATH=/usr/lib/chromium/
 
 WORKDIR /app
 

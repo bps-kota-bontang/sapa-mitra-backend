@@ -62,7 +62,9 @@ export const getContracts = async (
     };
   }
 
-  const contracts = await ContractSchema.find(queries);
+  const contracts = await ContractSchema.find(queries).sort({
+    period: "descending",
+  });
 
   const transformedContracts = contracts.map((item, index) => {
     const limit = checkRateLimits(item, limits);
