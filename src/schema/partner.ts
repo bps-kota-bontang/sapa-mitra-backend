@@ -7,7 +7,6 @@ export const partnerSchema = new Schema<Partner>(
     nik: {
       type: String,
       required: true,
-      unique: true,
       minlength: 16,
       maxlength: 16,
     },
@@ -18,6 +17,8 @@ export const partnerSchema = new Schema<Partner>(
     timestamps: true,
   }
 );
+
+partnerSchema.index({ nik: 1, year: 1 }, { unique: true });
 
 const PartnerSchema = model("partners", partnerSchema);
 
