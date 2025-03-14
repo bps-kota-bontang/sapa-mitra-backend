@@ -37,6 +37,7 @@ import fs from "fs";
 import PuppeteerHTMLPDF from "puppeteer-html-pdf";
 import Terbilang from "terbilang-ts";
 import OutputSchema from "@/schema/output";
+import StatusSchema from "@/schema/status";
 
 export const getContracts = async (
   period: string = "",
@@ -131,6 +132,18 @@ export const storeContractByActivity = async (
       data: null,
       message: "Only member can create contracts",
       code: 401,
+    };
+  }
+
+  const status = await StatusSchema.findOne({
+    period: payload.contract.period,
+  });
+
+  if (status && status.contract) {
+    return {
+      data: null,
+      message: "Contract has been locked",
+      code: 400,
     };
   }
 
@@ -325,6 +338,18 @@ export const storeContract = async (
       data: null,
       message: "Only member can create contracts",
       code: 401,
+    };
+  }
+
+  const status = await StatusSchema.findOne({
+    period: payload.contract.period,
+  });
+
+  if (status && status.contract) {
+    return {
+      data: null,
+      message: "Contract has been locked",
+      code: 400,
     };
   }
 

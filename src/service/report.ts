@@ -34,6 +34,7 @@ import ReportSchema from "@/schema/report";
 import hbs from "handlebars";
 import fs from "fs";
 import PuppeteerHTMLPDF from "puppeteer-html-pdf";
+import StatusSchema from "@/schema/status";
 
 export const getReports = async (
   period: string = ""
@@ -221,6 +222,18 @@ export const storeReport = async (
       data: null,
       message: "Head office can't create a report",
       code: 401,
+    };
+  }
+
+  const status = await StatusSchema.findOne({
+    period: payload.contract.period,
+  });
+
+  if (status && status.output) {
+    return {
+      data: null,
+      message: "Report has been locked",
+      code: 400,
     };
   }
 
@@ -417,8 +430,20 @@ export const storeReportByOutput = async (
   if (claims.position == "KEPALA") {
     return {
       data: null,
-      message: "Head office can't create contracts",
+      message: "Head office can't create reports",
       code: 401,
+    };
+  }
+
+  const status = await StatusSchema.findOne({
+    period: payload.contract.period,
+  });
+
+  if (status && status.output) {
+    return {
+      data: null,
+      message: "Report has been locked",
+      code: 400,
     };
   }
 
