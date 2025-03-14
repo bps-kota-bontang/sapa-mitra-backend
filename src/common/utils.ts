@@ -70,6 +70,19 @@ export async function findLastSequence(
   return sequenceNumber;
 }
 
+export const generatePeriods = (startYear: number = 2024): YearMonth[] => {
+  const periods: YearMonth[] = [];
+  const currentYear = new Date().getFullYear();
+  for (let year = currentYear; year >= startYear; year--) {
+    for (let month = 12; month >= 1; month--) {
+      const monthString = month.toString().padStart(2, "0");
+      const period = `${year}-${monthString}` as YearMonth;
+      periods.push(period);
+    }
+  }
+  return periods;
+};
+
 export const findAvailableSequence = async (
   period: string,
   model: "contract" | "report"
@@ -148,11 +161,14 @@ export const region = Bun.env.APP_REGION || "Kota Bontang";
 
 export const regionCode = Bun.env.APP_REGION_CODE || "6474";
 
-export const address = Bun.env.APP_REGION_ADDRESS || "Jl. Awang Long No 2, Bontang Baru, Kec. Bontang Utara, Kota Bontang";
+export const address =
+  Bun.env.APP_REGION_ADDRESS ||
+  "Jl. Awang Long No 2, Bontang Baru, Kec. Bontang Utara, Kota Bontang";
 
-export const website = Bun.env.APP_REGION_WEBSITE || "https://bontangkota.bps.go.id";
+export const website =
+  Bun.env.APP_REGION_WEBSITE || "https://bontangkota.bps.go.id";
 
-export const email = Bun.env.APP_REGION_EMAIL ||"bps6474@bps.go.id";
+export const email = Bun.env.APP_REGION_EMAIL || "bps6474@bps.go.id";
 
 export const APP_HOST = Bun.env.APP_HOST || "http://localhost:4000";
 

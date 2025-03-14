@@ -1,22 +1,40 @@
-import { isProduction } from "@/common/utils";
+import { generatePeriods, isProduction } from "@/common/utils";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
 import { Status } from "@/model/status";
 import StatusSchema from "@/schema/status";
 
 export const getStatuses = async (claims: JWT): Promise<Result<Status[]>> => {
+  // Ambil data status dari database
   const statuses = await StatusSchema.find();
 
-  const transformedStatuses = statuses.map((item, index) => {
-    return {
-      ...item.toObject(),
-      index: index + 1,
-    };
+  // Konversi data dari database ke objek dengan properti yang benar
+  const existingStatuses = statuses.map((item) => item.toObject());
+
+  // Generate daftar periode
+  const periods = generatePeriods();
+
+  // Gabungkan data dari database dengan periode yang dihasilkan
+  const mergedStatuses = periods.map((period, index) => {
+    const existingStatus = existingStatuses.find((s) => s.period === period);
+    return existingStatus
+      ? {
+          period: period,
+          contract: existingStatus.contract,
+          output: existingStatus.output,
+          index: index + 1,
+        }
+      : {
+          period: period,
+          contract: false,
+          output: false,
+          index: index + 1,
+        };
   });
 
   return {
-    data: transformedStatuses,
-    message: "Successfully retrieved status",
+    data: mergedStatuses,
+    message: "Successfully retrieved statuses",
     code: 200,
   };
 };
