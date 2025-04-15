@@ -290,7 +290,7 @@ export const storeReport = async (
 
   const outputsDb = await OutputSchema.find({
     _id: { $in: outputIds },
-  }).select(["name", "unit"]);
+  }).select(["name", "unit", "activity"]);
 
   if (outputsDb.length == 0) {
     return {
@@ -482,6 +482,7 @@ export const storeReportByOutput = async (
   const ouputDb = await OutputSchema.findById(payload.output.outputId).select([
     "name",
     "unit",
+    "activity",
   ]);
 
   if (!ouputDb) {
@@ -700,13 +701,19 @@ export const downloadReports = async (
   });
 
   const transformedReports = reports.flatMap((report) =>
-    report.outputs.map((output) => ({
-      partner: report.partner.name,
-      number: report.number,
-      contractNumber: report.contract.number,
-      period: report.contract.period,
-      ...output.toObject(),
-    }))
+    report.outputs.map((output) => {
+      const { activity, ...restOutput } = output.toObject();
+
+      return {
+        partner: report.partner.name,
+        number: report.number,
+        contractNumber: report.contract.number,
+        period: report.contract.period,
+        activity: activity.name,
+        team: activity.team,
+        ...restOutput,
+      };
+    })
   );
 
   const file = convertToCsv(transformedReports);

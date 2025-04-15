@@ -2,7 +2,7 @@ import { Activity } from "@/model/activity";
 import { Document } from "mongoose";
 
 export type Output = {
-  activity: Pick<Activity, "name"> & Document;
+  activity: Pick<Activity, "name" | "team"> & Document;
   name: string;
   unit: string;
   year: number;

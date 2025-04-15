@@ -9,7 +9,7 @@ export type Report = {
   authority: Authority;
   partner: Pick<Partner, "name" | "nik" | "address"> & Document;
   contract: Pick<Contract, "number" | "period" | "handOverDate">;
-  outputs: (Pick<Output, "name" | "unit"> & {
+  outputs: (Pick<Output, "name" | "unit" | "activity"> & {
     total: number;
   } & Document)[];
 };

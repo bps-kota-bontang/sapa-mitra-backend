@@ -6,6 +6,11 @@ export const outputSchema = new Schema<Output>(
     activity: {
       type: {
         name: { type: String, required: true },
+        team: {
+          type: String,
+          required: true,
+          enum: ["SOSIAL", "PRODUKSI", "DISTRIBUSI", "NERWILIS", "IPDS", "TU"],
+        },
       },
     },
     name: { type: String, required: true },

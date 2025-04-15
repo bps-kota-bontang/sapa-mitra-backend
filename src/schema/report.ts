@@ -28,6 +28,23 @@ export const reportSchema = new Schema<Report>(
     outputs: [
       {
         type: {
+          activity: {
+            type: {
+              name: { type: String, required: true },
+              team: {
+                type: String,
+                required: true,
+                enum: [
+                  "SOSIAL",
+                  "PRODUKSI",
+                  "DISTRIBUSI",
+                  "NERWILIS",
+                  "IPDS",
+                  "TU",
+                ],
+              },
+            },
+          },
           name: { type: String, required: true },
           unit: { type: String, required: true },
           total: { type: Number, required: true },
