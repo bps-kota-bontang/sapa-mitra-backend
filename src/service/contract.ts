@@ -1126,6 +1126,9 @@ const generateContractPdf = async (
   finalDate.setDate(finalDate.getDate());
 
   const html = fs.readFileSync("src/template/contract.html", "utf8");
+  hbs.registerHelper("cleanRegion", function (region) {
+    return region.replace(/^(Kota|Kabupaten)\s+/i, "");
+  });
   const template = hbs.compile(html);
   const payload: ContractPdf = {
     number: contract.number,
