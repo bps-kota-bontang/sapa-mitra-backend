@@ -34,11 +34,8 @@ jobs:
 
           # Tag for GHCR
           docker tag sapa-mitra-backend ghcr.io/bps-kota-bontang/sapa-mitra-backend:latest
-
-      - name: Push to Custom Docker Registry
+      - name: Push to Both Registries (Parallel)
         run: |
-          docker push ${{ secrets.DOCKER_REGISTRY_URL }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/sapa-mitra-backend:latest
-
-      - name: Push to GHCR
-        run: |
-          docker push ghcr.io/bps-kota-bontang/sapa-mitra-backend:latest
+          docker push ghcr.io/bps-kota-bontang/sapa-mitra-backend:latest &
+          docker push ${{ secrets.DOCKER_REGISTRY_URL }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/sapa-mitra-backend:latest &
+          wait
