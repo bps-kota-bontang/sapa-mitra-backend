@@ -6,6 +6,9 @@ on:
   pull_request:
     types: ["closed"]
     branches: ["main"]
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build:
@@ -18,8 +21,24 @@ jobs:
       - name: Docker Auth
         run: |
           echo "${{ secrets.DOCKER_REGISTRY_PASSWORD }}" | docker login ${{ secrets.DOCKER_REGISTRY_URL }} --username ${{ secrets.DOCKER_REGISTRY_USERNAME }} --password-stdin
-      - name: Build and Push Docker Image
+      - name: Login to GitHub Container Registry (GHCR)
         run: |
-          docker build --build-arg BUILD_HASH=$(git rev-parse --short HEAD) -t sapa-mitra-backend -f Dockerfile.production .
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Build Docker Image
+        run: |
+          BUILD_HASH=$(git rev-parse --short HEAD)
+          docker build --build-arg BUILD_HASH=$BUILD_HASH -t sapa-mitra-backend -f Dockerfile.production .
+
+          # Tag for custom Docker registry
           docker tag sapa-mitra-backend ${{ secrets.DOCKER_REGISTRY_URL }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/sapa-mitra-backend:latest
+
+          # Tag for GHCR
+          docker tag sapa-mitra-backend ghcr.io/bps-kota-bontang/sapa-mitra-backend:latest
+
+      - name: Push to Custom Docker Registry
+        run: |
           docker push ${{ secrets.DOCKER_REGISTRY_URL }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/sapa-mitra-backend:latest
+
+      - name: Push to GHCR
+        run: |
+          docker push ghcr.io/bps-kota-bontang/sapa-mitra-backend:latest
