@@ -20,6 +20,6 @@ jobs:
           echo "${{ secrets.DOCKER_REGISTRY_PASSWORD }}" | docker login ${{ secrets.DOCKER_REGISTRY_URL }} --username ${{ secrets.DOCKER_REGISTRY_USERNAME }} --password-stdin
       - name: Build and Push Docker Image
         run: |
-          docker build --build-arg BUILD_HASH=$(git rev-parse --short HEAD) --no-cache -t sapa-mitra-backend -f Dockerfile.production .
+          docker build --build-arg BUILD_HASH=$(git rev-parse --short HEAD) -t sapa-mitra-backend -f Dockerfile.production .
           docker tag sapa-mitra-backend ${{ secrets.DOCKER_REGISTRY_URL }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/sapa-mitra-backend:latest
           docker push ${{ secrets.DOCKER_REGISTRY_URL }}/${{ secrets.DOCKER_REGISTRY_USERNAME }}/sapa-mitra-backend:latest

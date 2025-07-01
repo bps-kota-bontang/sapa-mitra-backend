@@ -1,0 +1,11 @@
+.git
+node_modules
+bun.lockb.backup
+Dockerfile
+.dockerignore
+tests
+tmp
+*.log
+.env*
+*.md
+.github
