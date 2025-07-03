@@ -64,6 +64,18 @@ app.post("/partner/template", async (c) => {
   return c.body(toArrayBuffer(result));
 });
 
+app.post("/cost/template", async (c) => {
+  const result = await downloadTemplate("src/template/partner-cost-in-contract.csv");
+
+  c.res.headers.set("Content-Type", "text/csv");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename=Template Partner Cost in Contract.csv`
+  );
+
+  return c.body(toArrayBuffer(result));
+});
+
 app.put("/activity/cost", async (c) => {
   const claims = c.get("jwtPayload");
   const payload = await c.req.json();
