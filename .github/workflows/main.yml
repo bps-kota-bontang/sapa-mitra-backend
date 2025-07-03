@@ -18,9 +18,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-      - name: Docker Auth
-        run: |
-          echo "${{ secrets.DOCKER_REGISTRY_PASSWORD }}" | docker login ${{ secrets.DOCKER_REGISTRY_URL }} --username ${{ secrets.DOCKER_REGISTRY_USERNAME }} --password-stdin
       - name: Login to GitHub Container Registry (GHCR)
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
@@ -29,6 +26,6 @@ jobs:
           BUILD_HASH=$(git rev-parse --short HEAD)
           docker build --build-arg BUILD_HASH=$BUILD_HASH -t sapa-mitra-backend -f Dockerfile.production .
           docker tag sapa-mitra-backend ghcr.io/bps-kota-bontang/sapa-mitra-backend:latest
-      - name: Push to Both Registries (Parallel)
+      - name: Push to GitHub Container Registry (GHCR)
         run: |
           docker push ghcr.io/bps-kota-bontang/sapa-mitra-backend:latest
