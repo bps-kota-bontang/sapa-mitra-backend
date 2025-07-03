@@ -10,6 +10,7 @@ import {
   downloadContracts,
   getContract,
   getContractActivity,
+  getContractActivityCost,
   getContractActivityVolume,
   getContractStatistics,
   getContracts,
@@ -19,6 +20,7 @@ import {
   storeContractByActivity,
   updateContract,
   updateContractActivity,
+  updateContractActivityCost,
   verifyContractActivity,
 } from "@/service/contract";
 import { Hono } from "hono";
@@ -60,6 +62,21 @@ app.post("/partner/template", async (c) => {
   );
 
   return c.body(toArrayBuffer(result));
+});
+
+app.put("/activity/cost", async (c) => {
+  const claims = c.get("jwtPayload");
+  const payload = await c.req.json();
+
+  const result = await updateContractActivityCost(payload, claims);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
 });
 
 app.post("/download", async (c) => {
@@ -289,6 +306,21 @@ app.get("/activity/volume", async (c) => {
   const period = c.req.query("period");
 
   const result = await getContractActivityVolume(period, outputId);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.get("/activity/cost", async (c) => {
+  const activityId = c.req.query("activityId");
+  const period = c.req.query("period");
+
+  const result = await getContractActivityCost(period, activityId);
 
   return c.json(
     {

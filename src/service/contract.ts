@@ -1119,6 +1119,7 @@ const generateContractPdf = async (
       category: item.category,
       date: `${formatDate(item.startDate)} - ${formatDate(item.endDate)}`,
       total: formatCurrency(item.total),
+      cost: formatCurrency(item.cost),
       budget: 0,
     };
   });
@@ -1287,7 +1288,88 @@ export const getContractActivityVolume = async (
 
   return {
     data: partnerVolume,
-    message: "Successfully updated a contract",
+    message: "Retrieved partner volume successfully",
+    code: 200,
+  };
+};
+
+export const getContractActivityCost = async (
+  period?: string,
+  activityId?: string
+): Promise<Result<any>> => {
+  if (!period && !activityId) {
+    return {
+      data: null,
+      message: "Period or Activity ID is required",
+      code: 400,
+    };
+  }
+
+  const contracts = await ContractSchema.find({
+    ...(period && { period: period }),
+    ...(activityId && { "activities._id": activityId }),
+  }).select(["partner._id", "period", "activities._id", "activities.cost"]);
+
+  const partnerVolume = contracts.map(({ partner, activities }) => {
+    const activity = activities.find((item) => item._id == activityId);
+    return {
+      partnerId: partner._id,
+      cost: activity?.cost || 212,
+    };
+  });
+
+  return {
+    data: partnerVolume,
+    message: "Retrieved partner successfully",
+    code: 200,
+  };
+};
+
+export const updateContractActivityCost = async (
+  payload: any,
+  claims: JWT
+): Promise<Result<any>> => {
+  if (claims.team !== "TU" || claims.position !== "KETUA") {
+    return {
+      data: null,
+      message: "only TU lead can edit",
+      code: 401,
+    };
+  }
+
+  const partners = payload.partners;
+
+  // Ambil semua kontrak dengan periode dan activityId
+  const contracts = await ContractSchema.find({
+    period: payload.contract.period,
+    "activities._id": payload.activity.activityId,
+  });
+
+  let updatedCount = 0;
+
+  for (const contract of contracts) {
+    const isTargetPartner = partners.find(
+      (partner: { partnerId: string }) =>
+        partner.partnerId ===
+        (contract.partner as { _id: string })._id.toString()
+    );
+    if (!isTargetPartner) continue;
+
+    const activity = contract.activities.find(
+      (activity) =>
+        (activity._id as any).toString() === payload.activity.activityId
+    );
+    if (activity) {
+      activity.cost = Number(isTargetPartner.cost);
+      updatedCount++;
+    }
+
+    await contract.save(); // simpan perubahan
+  }
+
+  return {
+    data: { updated: updatedCount },
+    message: "Updated partner cost successfully",
     code: 200,
   };
 };

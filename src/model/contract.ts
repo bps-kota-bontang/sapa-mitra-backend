@@ -17,6 +17,7 @@ export type Contract = {
     startDate: Date;
     endDate: Date;
     volume: number;
+    cost: number;
     rate: number;
     total: number;
     createdBy: Team;

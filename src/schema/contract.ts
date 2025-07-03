@@ -36,6 +36,7 @@ export const contractSchema = new Schema<Contract>(
           unit: { type: String, required: true },
           rate: { type: Number, required: true },
           total: { type: Number, required: true },
+          cost: { type: Number, required: false, default: 0 },
           createdBy: {
             type: String,
             required: true,
