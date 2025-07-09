@@ -61,7 +61,7 @@ export const storeOutput = async (
   const { activity: payloadActivity, ...restPayload } = payload;
   const activity = await ActivitySchema.findById(
     payloadActivity.activityId
-  ).select(["name"]);
+  ).select(["name", "team"]);
 
   if (!activity) {
     return {
