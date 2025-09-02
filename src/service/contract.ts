@@ -1085,8 +1085,8 @@ const generateContractPdf = async (
     displayHeaderFooter: true,
     format: "A4",
     margin: {
-      left: "95",
-      right: "95",
+      left: "100",
+      right: "100",
       top: "60",
       bottom: "60",
     },
