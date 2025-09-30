@@ -369,9 +369,6 @@ app.post("/activity/recap", async (c) => {
 
   const result = await downloadContractActivityRecap(payload, claims);
 
-  console.log(result.data.fileName);
-  console.log(result.data.file);
-
   if (result.code != 200) {
     return c.json(
       {
