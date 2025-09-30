@@ -17,6 +17,7 @@ export const contractSchema = new Schema<Contract>(
         name: { type: String, required: true },
         nik: { type: String, required: true },
         address: { type: String, required: true },
+        accountNumber: { type: String, required: false },
       },
     },
     activities: [

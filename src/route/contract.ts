@@ -11,6 +11,7 @@ import {
   getContract,
   getContractActivity,
   getContractActivityCost,
+  getContractActivityAccount,
   getContractActivityVolume,
   getContractStatistics,
   getContracts,
@@ -22,6 +23,8 @@ import {
   updateContractActivity,
   updateContractActivityCost,
   verifyContractActivity,
+  updateContractActivityRecap,
+  downloadContractActivityRecap,
 } from "@/service/contract";
 import { Hono } from "hono";
 
@@ -65,7 +68,9 @@ app.post("/partner/template", async (c) => {
 });
 
 app.post("/cost/template", async (c) => {
-  const result = await downloadTemplate("src/template/partner-cost-in-contract.csv");
+  const result = await downloadTemplate(
+    "src/template/partner-cost-in-contract.csv"
+  );
 
   c.res.headers.set("Content-Type", "text/csv");
   c.res.headers.set(
@@ -333,6 +338,64 @@ app.get("/activity/cost", async (c) => {
   const period = c.req.query("period");
 
   const result = await getContractActivityCost(period, activityId);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.get("/activity/account", async (c) => {
+  const activityId = c.req.query("activityId");
+  const period = c.req.query("period");
+
+  const result = await getContractActivityAccount(period, activityId);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+});
+
+app.post("/activity/recap", async (c) => {
+  const claims = c.get("jwtPayload");
+  const payload = await c.req.json();
+
+  const result = await downloadContractActivityRecap(payload, claims);
+
+  console.log(result.data.fileName);
+  console.log(result.data.file);
+
+  if (result.code != 200) {
+    return c.json(
+      {
+        data: result.data,
+        message: result.message,
+      },
+      result.code
+    );
+  }
+
+  c.res.headers.set("Content-Type", "application/pdf");
+  c.res.headers.set(
+    "Content-Disposition",
+    `attachment; filename="${result.data.fileName}.pdf"`
+  );
+
+  return c.body(toArrayBuffer(result.data.file));
+});
+
+app.put("/activity/recap", async (c) => {
+  const claims = c.get("jwtPayload");
+  const payload = await c.req.json();
+
+  const result = await updateContractActivityRecap(payload, claims);
 
   return c.json(
     {

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekapitulasi Honor {{activity.name}}</title>
+    <style>
+        .bordered-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            /* seragam ukuran */
+        }
+
+        .bordered-table th,
+        .bordered-table td {
+            border: 1px solid #444;
+            /* lebih gelap sedikit biar kontras */
+            padding: 6px 8px;
+            /* agak lega */
+            text-align: center;
+        }
+
+        .bordered-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+
+        .bordered-table tbody tr:nth-child(even) {
+            background-color: #fafafa;
+            /* striping */
+        }
+
+        .bordered-table tfoot td {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+
+        .bordered-table .text-left {
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="page-break-before: always;">
+        <p style="text-align: center; text-transform: uppercase; font-size: 14px;"><strong>DAFTAR HONOR
+                {{activity.category}}
+                <br>DALAM RANGKA PENYELENGGARAAN {{activity.main}}</br>TAHUN ANGGARAN {{period.year}}</strong></p>
+        <br>
+        <table style="font-size: 12px;">
+            <tr>
+                <td>Program</td>
+                <td>:</td>
+                <td>{{pok.program}}</td>
+            </tr>
+            <tr>
+                <td>Kegiatan</td>
+                <td>:</td>
+                <td>{{pok.activity}}</td>
+            </tr>
+            <tr>
+                <td>KRO</td>
+                <td>:</td>
+                <td>{{pok.kro}}</td>
+            </tr>
+            <tr>
+                <td>RO</td>
+                <td>:</td>
+                <td>{{pok.ro}}</td>
+            </tr>
+            <tr>
+                <td>Komponen</td>
+                <td>:</td>
+                <td>{{pok.component}}</td>
+            </tr>
+            <tr>
+                <td>Sub Komponen</td>
+                <td>:</td>
+                <td>{{pok.subComponent}}</td>
+            </tr>
+            <tr>
+                <td>Akun</td>
+                <td>:</td>
+                <td>{{pok.account}}</td>
+            </tr>
+            <tr>
+                <td>Bulan</td>
+                <td>:</td>
+                <td>{{period.month}}</td>
+            </tr>
+            <tr>
+                <td>Kota</td>
+                <td>:</td>
+                <td>{{region}}</td>
+            </tr>
+            <tr>
+                <td>Tahun Anggaran</td>
+                <td>:</td>
+                <td>{{period.year}}</td>
+            </tr>
+        </table>
+
+
+    </div>
+    <br>
+    <div>
+
+        <table class="bordered-table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>Honor per {{activity.unit}}</th>
+                    <th>Banyaknya {{activity.unit}}</th>
+                    <th>Jumlah Bruto (Rp)</th>
+                    <th>Potongan PPh 21 (Rp)</th>
+                    <th>Jumlah yang diterima (Rp)</th>
+                    <th>Nomor Rekening</th>
+                </tr>
+                <tr style="font-size: 9px; font-weight: normal;">
+                    <td>(1)</td>
+                    <td>(2)</td>
+                    <td>(3)</td>
+                    <td>(4)</td>
+                    <td>(5)</td>
+                    <td>(6)</td>
+                    <td>(7)</td>
+                    <td>(8)</td>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each partners}}
+                <tr>
+                    <td>{{number}}</td>
+                    <td class="text-left">Arif Rahman Hakim</td>
+                    <td>{{rate}}</td>
+                    <td>{{volume}}</td>
+                    <td>{{total}}</td>
+                    <td>{{tax}}</td>
+                    <td>{{grandTotal}}</td>
+                    <td>{{accountNumber}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-left">
+                        Jumlah: {{grandTotal.spell}} Rupiah
+                    </td>
+                    <td><strong>{{grandTotal.volume}}</strong></td>
+                    <td><strong>{{grandTotal.nominal}}</strong></td>
+                    <td><strong>{{grandTotal.tax}}</strong></td>
+                    <td><strong>{{grandTotal.nominal}}</strong></td>
+                    <td class="disabled"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <br>
+    <div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+            <tbody>
+                <tr style="height: 20px;">
+                    <td style="border: 0px; padding: 8px; text-align: center; height: 20px;">
+                        <p style="text-align: center;">Bendahara Pengeluaran</p>
+                    </td>
+                    <td style="border: 0px; padding: 8px; text-align: center; height: 20px;">
+                        <p style="text-align: center;">Pejabat Pembuat Komitmen</p>
+                    </td>
+                    <td style="border: 0px; padding: 8px; text-align: center; height: 20px;">
+                        <p style="text-align: center;">Pembuat Daftar</p>
+                    </td>
+                </tr>
+                <tr style="height: 50px;">
+                </tr>
+                <tr style="height: 20px;">
+                    <td style="border: 0px; padding: 0px; text-align: center; height: 20px;">
+                        <p style="text-align: center; margin: 0;"><u><strong>{{treasurer.name}}</strong></u></p>
+                        <p style="text-align: center; margin: 0;"><strong>NIP. {{treasurer.nip}}</strong></p>
+                    </td>
+                    <td style="border: 0px; padding: 0px; text-align: center; height: 20px;">
+                        <p style="text-align: center; margin: 0;"><u><strong>{{authority.name}}</strong></u></p>
+                        <p style="text-align: center; margin: 0;"><strong>NIP. {{treasurer.nip}}</strong></p>
+                    </td>
+                    <td style="border: 0px; padding: 0px; text-align: center; height: 20px;">
+                        <p style="text-align: center; margin: 0;"><u><strong>{{user.name}}</strong></u></p>
+                        <p style="text-align: center; margin: 0;"><strong>NIP. {{user.nip}}</strong></p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+
+</html>

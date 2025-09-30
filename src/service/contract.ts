@@ -38,6 +38,9 @@ import PuppeteerHTMLPDF from "puppeteer-html-pdf";
 import Terbilang from "terbilang-ts";
 import OutputSchema from "@/schema/output";
 import StatusSchema from "@/schema/status";
+import { ReportPdf } from "@/model/report";
+import { RecapPdf } from "@/model/recap";
+import { format } from "path";
 
 export const getContracts = async (
   period: string = "",
@@ -1314,7 +1317,7 @@ export const getContractActivityCost = async (
     const activity = activities.find((item) => item._id == activityId);
     return {
       partnerId: partner._id,
-      cost: activity?.cost || 212,
+      cost: activity?.cost || 0,
     };
   });
 
@@ -1370,6 +1373,267 @@ export const updateContractActivityCost = async (
   return {
     data: { updated: updatedCount },
     message: "Updated partner cost successfully",
+    code: 200,
+  };
+};
+
+export const getContractActivityAccount = async (
+  period?: string,
+  activityId?: string
+): Promise<Result<any>> => {
+  if (!period && !activityId) {
+    return {
+      data: null,
+      message: "Period or Activity ID is required",
+      code: 400,
+    };
+  }
+
+  const contracts = await ContractSchema.find({
+    ...(period && { period: period }),
+    ...(activityId && { "activities._id": activityId }),
+  }).select(["partner._id", "partner.accountNumber", "period"]);
+
+  const partnerAccounts = contracts.map(({ partner }) => ({
+    partnerId: partner._id as Document,
+    accountNumber: partner.accountNumber,
+  }));
+
+  // cari partnerId yang kosong accountNumber-nya
+  const emptyAccountPartnerIDs = partnerAccounts
+    .filter((item) => !item.accountNumber || item.accountNumber.trim() === "")
+    .map((item) => item.partnerId);
+
+  // ambil dari PartnerSchema
+  let partnerFallbacks: any[] = [];
+  if (emptyAccountPartnerIDs.length > 0) {
+    partnerFallbacks = await PartnerSchema.find({
+      _id: { $in: emptyAccountPartnerIDs },
+    }).select(["_id", "accountNumber"]);
+  }
+
+  // buat map biar cepat lookup
+  const partnerMap = new Map(
+    partnerFallbacks.map((p) => [p._id.toString(), p.accountNumber])
+  );
+
+  // pastikan setiap partnerAccount punya accountNumber
+  const finalPartnerAccounts = partnerAccounts.map((item) => {
+    if (!item.accountNumber || item.accountNumber.trim() === "") {
+      return {
+        ...item,
+        accountNumber: partnerMap.get(item.partnerId.toString()) || null,
+      };
+    }
+    return item;
+  });
+
+  return {
+    data: finalPartnerAccounts,
+    message: "Retrieved partners successfully",
+    code: 200,
+  };
+};
+
+export const updateContractActivityRecap = async (
+  payload: any,
+  claims: JWT
+): Promise<Result<any>> => {
+  const partners = payload.partners;
+
+  // Ambil semua kontrak dengan periode dan activityId
+  const contracts = await ContractSchema.find({
+    period: payload.contract.period,
+    "activities._id": payload.activity.activityId,
+  });
+
+  let updatedCount = 0;
+
+  for (const contract of contracts) {
+    const isTargetPartner = partners.find(
+      (partner: { partnerId: string }) =>
+        partner.partnerId ===
+        (contract.partner as { _id: string })._id.toString()
+    );
+    if (!isTargetPartner) continue;
+
+    const activity = contract.activities.find(
+      (activity) =>
+        (activity._id as any).toString() === payload.activity.activityId
+    );
+    if (activity) {
+      contract.partner.accountNumber = isTargetPartner.accountNumber;
+      updatedCount++;
+    }
+
+    await contract.save(); // simpan perubahan
+  }
+
+  return {
+    data: { updated: updatedCount },
+    message: "Updated partner account number successfully",
+    code: 200,
+  };
+};
+
+export const downloadContractActivityRecap = async (
+  payloads: any,
+  claims: JWT
+) => {
+  const response = await updateContractActivityRecap(payloads, claims);
+
+  const activity = await ActivitySchema.findById(
+    payloads.activity.activityId
+  ).select(["name", "main", "category", "unit", "pok"]);
+
+  if (!activity) {
+    return {
+      data: null,
+      message: "Activity not found",
+      code: 404,
+    };
+  }
+
+  const contracts = await ContractSchema.find({
+    period: payloads.contract.period,
+    "activities._id": payloads.activity.activityId,
+  });
+
+  if (contracts.length == 0) {
+    return {
+      data: null,
+      message: "Contracts not found",
+      code: 404,
+    };
+  }
+
+  const authority = contracts[0].authority;
+
+  const htmlPDF = new PuppeteerHTMLPDF();
+  htmlPDF.setOptions({
+    displayHeaderFooter: true,
+    format: "A4",
+    margin: {
+      left: "95",
+      right: "95",
+      top: "20",
+      bottom: "20",
+    },
+    landscape: true,
+    headless: true,
+    headerTemplate: `<p style="margin: auto;font-size: 12px;"></p>`,
+    footerTemplate: `<p style="margin: auto;font-size: 12px;"></p>`,
+  });
+
+  const transformedPartners = contracts.reduce((acc, item, index) => {
+    const activity = item.activities.find(
+      (a) => a.id === payloads.activity.activityId
+    );
+
+    if (!activity) {
+      return acc; // skip kalau tidak ketemu
+    }
+
+    acc.push({
+      number: acc.length + 1, // urutan berdasarkan hasil, bukan index asli
+      name: item.partner.name,
+      gol: "-",
+      npwp: "-",
+      rate: activity.rate,
+      volume: activity.volume,
+      total: activity.total,
+      tax: 0,
+      grandTotal: activity.total,
+      accountNumber: item.partner.accountNumber,
+    });
+
+    return acc;
+  }, [] as any[]);
+
+  const html = fs.readFileSync("src/template/recap.html", "utf8");
+  hbs.registerHelper("cleanRegion", function (region) {
+    return region.replace(/^(Kota|Kabupaten)\s+/i, "");
+  });
+
+  let categoryText;
+
+  if (activity.category === "ENUMERATION") {
+    categoryText = "Petugas Pendataan Lapangan";
+  }
+
+  if (activity.category == "SUPERVISION") {
+    categoryText = "Petugas Pemeriksaan Lapangan";
+  }
+
+  if (activity.category == "PROCESSING") {
+    categoryText = "Petugas Pengolahan";
+  }
+
+  const grandTotal = transformedPartners.reduce((sum, item) => {
+    return sum + item.grandTotal;
+  }, 0);
+
+  const template = hbs.compile(html);
+  const payloadPdf: RecapPdf = {
+    partners: transformedPartners.map((item) => ({
+      ...item,
+      rate: formatCurrency(item.rate),
+      total: formatCurrency(item.total),
+      tax: formatCurrency(item.tax),
+      grandTotal: formatCurrency(item.grandTotal),
+    })),
+    activity: {
+      main: activity.main,
+      name: activity.name,
+      category: categoryText ?? "",
+      unit: activity.unit,
+    },
+    period: {
+      month: formatMonth(payloads.contract.period),
+      year: formatYear(payloads.contract.period),
+    },
+    region: region,
+    pok: {
+      program: activity.pok.program,
+      activity: activity.pok.activity,
+      kro: activity.pok.kro,
+      ro: activity.pok.ro,
+      component: activity.pok.component,
+      subComponent: activity.pok.subComponent,
+      account: activity.pok.account,
+    },
+    authority: {
+      name: authority.name,
+      nip: authority.nip,
+    },
+    grandTotal: {
+      nominal: formatCurrency(grandTotal),
+      spell: Terbilang(grandTotal),
+      volume: transformedPartners.reduce((sum, item) => sum + item.volume, 0),
+      tax: formatCurrency(0),
+    },
+    treasurer: {
+      name: "Ilmiah Sukanthi",
+      nip: "197507162006042002",
+    },
+    user: {
+      name: claims.name,
+      nip: claims.nip,
+    },
+  };
+
+  const content = template(payloadPdf);
+
+  const pdfBuffer = await htmlPDF.create(content);
+
+  await htmlPDF.closeBrowser();
+
+  return {
+    data: {
+      file: pdfBuffer,
+      fileName: `Recap_Activity_${payloads.activity.activityId}`,
+    },
+    message: "Successfully print contract",
     code: 200,
   };
 };

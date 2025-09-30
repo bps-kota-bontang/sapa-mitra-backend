@@ -11,6 +11,7 @@ export const partnerSchema = new Schema<Partner>(
       maxlength: 16,
     },
     address: { type: String, required: true },
+    accountNumber: { type: String, required: false },
     year: { type: Number, required: true },
   },
   {
