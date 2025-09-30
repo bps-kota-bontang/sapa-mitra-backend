@@ -111,14 +111,6 @@ export const updateActivity = async (
   payload: Activity,
   claims: JWT
 ): Promise<Result<Activity>> => {
-  if (claims.team != "TU" && isProduction) {
-    return {
-      data: null,
-      message: "Only TU can update an activity",
-      code: 401,
-    };
-  }
-
   const activity = await ActivitySchema.findByIdAndUpdate(id, payload, {
     new: true,
   });

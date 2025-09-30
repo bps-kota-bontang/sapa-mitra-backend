@@ -21,7 +21,8 @@ export const getOutputs = async (
       outputs.map(async (item, index) => {
         const activities = await ActivitySchema.find({
           _id: item.activity.id,
-          ...(claims.team !== "TU" ? { team: claims.team } : {}),
+          team: item.activity.team,
+          //...(claims.team !== "TU" ? { team: claims.team } : {}),
         });
 
         if (!activities.length) return null;
