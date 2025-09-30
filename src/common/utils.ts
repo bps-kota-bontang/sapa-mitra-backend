@@ -111,6 +111,24 @@ export const findAvailableSequence = async (
   return availableSeq;
 };
 
+export const extractPokCode = (code: string) => {
+  const parts = code.split(".");
+
+  return {
+    program: parts[0] + "." + parts[1] + "." + parts[2],
+    activity: parts[3],
+    kro: parts[4],
+    ro: parts[5],
+    component: parts[6],
+    subComponent: parts[7],
+    account: parts[8],
+  };
+};
+
+export const formatPok = (code: string, name: string) => {
+  return `(${code}) ${name}`;
+};
+
 const generateFormattedNumber = (
   period: string,
   type: string,

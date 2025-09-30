@@ -3,6 +3,7 @@ import {
   calculateSignDate,
   checkRateLimits,
   convertToCsv,
+  extractPokCode,
   findAvailableSequence,
   findLastSequence,
   formatCurrency,
@@ -12,6 +13,7 @@ import {
   formatDayText,
   formatMonth,
   formatMonthText,
+  formatPok,
   formatYear,
   formatYearText,
   generateContractNumber,
@@ -1484,7 +1486,7 @@ export const downloadContractActivityRecap = async (
 
   const activity = await ActivitySchema.findById(
     payloads.activity.activityId
-  ).select(["name", "main", "category", "unit", "pok"]);
+  ).select(["name", "main", "code", "category", "unit", "pok"]);
 
   if (!activity) {
     return {
@@ -1573,6 +1575,8 @@ export const downloadContractActivityRecap = async (
     return sum + item.grandTotal;
   }, 0);
 
+  const pokCodes = extractPokCode(activity.code);
+
   const template = hbs.compile(html);
   const payloadPdf: RecapPdf = {
     partners: transformedPartners.map((item) => ({
@@ -1594,13 +1598,13 @@ export const downloadContractActivityRecap = async (
     },
     region: region,
     pok: {
-      program: activity.pok.program,
-      activity: activity.pok.activity,
-      kro: activity.pok.kro,
-      ro: activity.pok.ro,
-      component: activity.pok.component,
-      subComponent: activity.pok.subComponent,
-      account: activity.pok.account,
+      program: formatPok(pokCodes.program, activity.pok.program),
+      activity: formatPok(pokCodes.activity, activity.pok.activity),
+      kro: formatPok(pokCodes.kro, activity.pok.kro),
+      ro: formatPok(pokCodes.ro, activity.pok.ro),
+      component: formatPok(pokCodes.component, activity.pok.component),
+      subComponent: formatPok(pokCodes.subComponent, activity.pok.subComponent),
+      account: formatPok(pokCodes.account, activity.pok.account),
     },
     authority: {
       name: authority.name,
