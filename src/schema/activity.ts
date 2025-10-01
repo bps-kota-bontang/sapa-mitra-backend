@@ -3,7 +3,7 @@ import { Schema, model } from "mongoose";
 
 export const activitySchema = new Schema<Activity>(
   {
-    main: { type: String, required: true },
+    main: { type: String, required: false },
     name: { type: String, required: true },
     code: { type: String, required: true },
     unit: { type: String, required: true },
@@ -19,13 +19,13 @@ export const activitySchema = new Schema<Activity>(
     },
     pok: {
       type: {
-        program: { type: String, required: true },
-        activity: { type: String, required: true },
-        kro: { type: String, required: true },
-        ro: { type: String, required: true },
-        component: { type: String, required: true },
-        subComponent: { type: String, required: true },
-        account: { type: String, required: true },
+        program: { type: String, required: false },
+        activity: { type: String, required: false },
+        kro: { type: String, required: false },
+        ro: { type: String, required: false },
+        component: { type: String, required: false },
+        subComponent: { type: String, required: false },
+        account: { type: String, required: false },
       },
     },
     isSpecial: { type: Boolean, required: true, default: false },
