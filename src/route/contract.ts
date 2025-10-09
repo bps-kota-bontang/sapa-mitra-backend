@@ -36,23 +36,33 @@ app.post("/:id/print", async (c) => {
 
   const result = await printContract(id, claims);
 
-  if (result.code != 200) {
-    return c.json(
-      {
-        data: result.data,
-        message: result.message,
-      },
-      result.code
-    );
-  }
+  console.log('Here')
 
-  c.res.headers.set("Content-Type", "application/pdf");
-  c.res.headers.set(
-    "Content-Disposition",
-    `attachment; filename="${result.data.fileName}.pdf"`
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
   );
 
-  return c.body(toArrayBuffer(result.data.file));
+  // if (result.code != 200) {
+  //   return c.json(
+  //     {
+  //       data: result.data,
+  //       message: result.message,
+  //     },
+  //     result.code
+  //   );
+  // }
+
+  // c.res.headers.set("Content-Type", "application/pdf");
+  // c.res.headers.set(
+  //   "Content-Disposition",
+  //   `attachment; filename="${result.data.fileName}.pdf"`
+  // );
+
+  // return c.body(toArrayBuffer(result.data.file));
 });
 
 app.post("/partner/template", async (c) => {
@@ -125,23 +135,31 @@ app.post("/print", async (c) => {
 
   const result = await printContracts(payload, claims);
 
-  if (result.code != 200) {
-    return c.json(
-      {
-        data: result.data,
-        message: result.message,
-      },
-      result.code
-    );
-  }
-
-  c.res.headers.set("Content-Type", "application/pdf");
-  c.res.headers.set(
-    "Content-Disposition",
-    `attachment; filename=SPK ${new Date().valueOf()}.pdf`
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
   );
 
-  return c.body(toArrayBuffer(result.data));
+  // if (result.code != 200) {
+  //   return c.json(
+  //     {
+  //       data: result.data,
+  //       message: result.message,
+  //     },
+  //     result.code
+  //   );
+  // }
+
+  // c.res.headers.set("Content-Type", "application/pdf");
+  // c.res.headers.set(
+  //   "Content-Disposition",
+  //   `attachment; filename=SPK ${new Date().valueOf()}.pdf`
+  // );
+
+  // return c.body(toArrayBuffer(result.data));
 });
 
 app.get("/statistics", async (c) => {
@@ -369,6 +387,14 @@ app.post("/activity/recap", async (c) => {
 
   const result = await downloadContractActivityRecap(payload, claims);
 
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code
+  );
+
   if (result.code != 200) {
     return c.json(
       {
@@ -379,13 +405,13 @@ app.post("/activity/recap", async (c) => {
     );
   }
 
-  c.res.headers.set("Content-Type", "application/pdf");
-  c.res.headers.set(
-    "Content-Disposition",
-    `attachment; filename="${result.data.fileName}.pdf"`
-  );
+  // c.res.headers.set("Content-Type", "application/pdf");
+  // c.res.headers.set(
+  //   "Content-Disposition",
+  //   `attachment; filename="${result.data.fileName}.pdf"`
+  // );
 
-  return c.body(toArrayBuffer(result.data.file));
+  // return c.body(toArrayBuffer(result.data.file));
 });
 
 app.put("/activity/recap", async (c) => {

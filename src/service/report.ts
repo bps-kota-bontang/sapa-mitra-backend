@@ -13,7 +13,6 @@ import {
   formatYearText,
   generateReportNumber,
   isProduction,
-  mergeBuffer,
   notEmpty,
   region,
   website,
@@ -31,9 +30,7 @@ import ContractSchema from "@/schema/contract";
 import OutputSchema from "@/schema/output";
 import PartnerSchema from "@/schema/partner";
 import ReportSchema from "@/schema/report";
-import hbs from "handlebars";
 import fs from "fs";
-import PuppeteerHTMLPDF from "puppeteer-html-pdf";
 import StatusSchema from "@/schema/status";
 
 export const getReports = async (
@@ -179,7 +176,7 @@ export const printReports = async (
     _id: { $in: payload },
   });
 
-  let files: Buffer[] = [];
+  let payloads: ReportPdf[] = [];
 
   if (reports.length == 0) {
     return {
@@ -191,12 +188,12 @@ export const printReports = async (
 
   const promises = reports.map(async (report) => {
     const result = await generateReportPdf(report);
-    files.push(result.file);
+    payloads.push(result);
   });
 
   await Promise.all(promises);
 
-  if (files.length == 0) {
+  if (payloads.length == 0) {
     return {
       data: null,
       message: "Failed to generate contracts pdf",
@@ -204,10 +201,8 @@ export const printReports = async (
     };
   }
 
-  const mergedFile = await mergeBuffer(files);
-
   return {
-    data: mergedFile,
+    data: payloads,
     message: "Successfully print reports",
     code: 200,
   };
@@ -607,29 +602,7 @@ export const storeReportByOutput = async (
   };
 };
 
-const generateReportPdf = async (
-  report: Report
-): Promise<{
-  file: Buffer;
-  fileName: string;
-  period: string;
-  name: string;
-}> => {
-  const htmlPDF = new PuppeteerHTMLPDF();
-  htmlPDF.setOptions({
-    displayHeaderFooter: true,
-    format: "A4",
-    margin: {
-      left: "95",
-      right: "95",
-      top: "50",
-      bottom: "50",
-    },
-    headless: true,
-    headerTemplate: `<p style="margin: auto;font-size: 13px;"></p>`,
-    footerTemplate: `<p style="margin: auto;font-size: 13px;"><span class="pageNumber"></span></p>`,
-  });
-
+const generateReportPdf = async (report: Report): Promise<ReportPdf> => {
   const transformedOutputs = report.outputs.map((item, index) => ({
     number: index + 1,
     name: item.name,
@@ -637,8 +610,6 @@ const generateReportPdf = async (
     total: item.total,
   }));
 
-  const html = fs.readFileSync("src/template/report.html", "utf8");
-  const template = hbs.compile(html);
   const payload: ReportPdf = {
     number: report.number,
     contract: {
@@ -671,18 +642,8 @@ const generateReportPdf = async (
     email: email,
     app: CLIENT_URL,
   };
-  const content = template(payload);
 
-  const pdfBuffer = await htmlPDF.create(content);
-
-  await htmlPDF.closeBrowser();
-
-  return {
-    file: pdfBuffer,
-    fileName: `${payload.number}_${payload.partner.name}`,
-    period: `${payload.period.month} ${payload.period.year}`,
-    name: report.partner.name,
-  };
+  return payload;
 };
 
 export const downloadReports = async (

@@ -18,7 +18,6 @@ import {
   formatYearText,
   generateContractNumber,
   isProduction,
-  mergeBuffer,
   notEmpty,
   region,
 } from "@/common/utils";
@@ -34,9 +33,7 @@ import ActivitySchema from "@/schema/activity";
 import ConfigurationSchema from "@/schema/configuration";
 import ContractSchema from "@/schema/contract";
 import PartnerSchema from "@/schema/partner";
-import hbs from "handlebars";
 import fs from "fs";
-import PuppeteerHTMLPDF from "puppeteer-html-pdf";
 import Terbilang from "terbilang-ts";
 import OutputSchema from "@/schema/output";
 import StatusSchema from "@/schema/status";
@@ -815,7 +812,7 @@ export const printContracts = async (
     },
   });
 
-  let files: Buffer[] = [];
+  let payloads: ContractPdf[] = [];
 
   if (contracts.length == 0) {
     return {
@@ -827,12 +824,12 @@ export const printContracts = async (
 
   const promises = contracts.map(async (contract) => {
     const result = await generateContractPdf(contract);
-    files.push(result.file);
+    if (result) payloads.push(result);
   });
 
   await Promise.all(promises);
 
-  if (files.length == 0) {
+  if (payloads.length == 0) {
     return {
       data: null,
       message: "Failed to generate contracts pdf",
@@ -840,10 +837,8 @@ export const printContracts = async (
     };
   }
 
-  const mergedFile = await mergeBuffer(files);
-
   return {
-    data: mergedFile,
+    data: payloads,
     message: "Successfully print contracts",
     code: 200,
   };
@@ -1079,27 +1074,7 @@ export const getContractStatistics = async (
 
 const generateContractPdf = async (
   contract: Contract
-): Promise<{
-  file: Buffer;
-  fileName: string;
-  period: string;
-  name: string;
-}> => {
-  const htmlPDF = new PuppeteerHTMLPDF();
-  htmlPDF.setOptions({
-    displayHeaderFooter: true,
-    format: "A4",
-    margin: {
-      left: "100",
-      right: "100",
-      top: "60",
-      bottom: "60",
-    },
-    headless: true,
-    headerTemplate: `<p style="margin: auto;font-size: 13px;"></p>`,
-    footerTemplate: `<p style="margin: auto;font-size: 13px;"><span class="pageNumber"></span></p>`,
-  });
-
+): Promise<ContractPdf> => {
   const transformedActivities = contract.activities.map((item) => {
     const codes = item.code.split(".");
 
@@ -1130,12 +1105,6 @@ const generateContractPdf = async (
   });
   const finalDate = new Date(contract.handOverDate);
   finalDate.setDate(finalDate.getDate());
-
-  const html = fs.readFileSync("src/template/contract.html", "utf8");
-  hbs.registerHelper("cleanRegion", function (region) {
-    return region.replace(/^(Kota|Kabupaten)\s+/i, "");
-  });
-  const template = hbs.compile(html);
   const payload: ContractPdf = {
     number: contract.number,
     period: {
@@ -1170,18 +1139,8 @@ const generateContractPdf = async (
     },
     region: region,
   };
-  const content = template(payload);
 
-  const pdfBuffer = await htmlPDF.create(content);
-
-  await htmlPDF.closeBrowser();
-
-  return {
-    file: pdfBuffer,
-    fileName: `${payload.number}_${payload.partner.name}`,
-    period: `${payload.period.month} ${payload.period.year}`,
-    name: contract.partner.name,
-  };
+  return payload;
 };
 
 export const downloadContracts = async (
@@ -1481,7 +1440,7 @@ export const updateContractActivityRecap = async (
 export const downloadContractActivityRecap = async (
   payloads: any,
   claims: JWT
-) => {
+): Promise<Result<any>> => {
   const response = await updateContractActivityRecap(payloads, claims);
 
   const activity = await ActivitySchema.findById(
@@ -1511,22 +1470,6 @@ export const downloadContractActivityRecap = async (
 
   const authority = contracts[0].authority;
 
-  const htmlPDF = new PuppeteerHTMLPDF();
-  htmlPDF.setOptions({
-    displayHeaderFooter: true,
-    format: "A4",
-    margin: {
-      left: "95",
-      right: "95",
-      top: "20",
-      bottom: "20",
-    },
-    landscape: true,
-    headless: true,
-    headerTemplate: `<p style="margin: auto;font-size: 12px;"></p>`,
-    footerTemplate: `<p style="margin: auto;font-size: 12px;"></p>`,
-  });
-
   const transformedPartners = contracts.reduce((acc, item, index) => {
     const activity = item.activities.find(
       (a) => a.id === payloads.activity.activityId
@@ -1552,11 +1495,6 @@ export const downloadContractActivityRecap = async (
     return acc;
   }, [] as any[]);
 
-  const html = fs.readFileSync("src/template/recap.html", "utf8");
-  hbs.registerHelper("cleanRegion", function (region) {
-    return region.replace(/^(Kota|Kabupaten)\s+/i, "");
-  });
-
   let categoryText;
 
   if (activity.category === "ENUMERATION") {
@@ -1577,7 +1515,6 @@ export const downloadContractActivityRecap = async (
 
   const pokCodes = extractPokCode(activity.code);
 
-  const template = hbs.compile(html);
   const payloadPdf: RecapPdf = {
     partners: transformedPartners.map((item) => ({
       ...item,
@@ -1626,18 +1563,9 @@ export const downloadContractActivityRecap = async (
     },
   };
 
-  const content = template(payloadPdf);
-
-  const pdfBuffer = await htmlPDF.create(content);
-
-  await htmlPDF.closeBrowser();
-
   return {
-    data: {
-      file: pdfBuffer,
-      fileName: `Recap_Activity_${payloads.activity.activityId}`,
-    },
-    message: "Successfully print contract",
+    data: payloadPdf,
+    message: "Successfully generate recap activity",
     code: 200,
   };
 };
