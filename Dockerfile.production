@@ -1,15 +1,14 @@
 # =========================
-# Stage 1: Build dependencies
+# Stage 1: Builder
 # =========================
 FROM oven/bun:1.2.23-alpine AS builder
 
 WORKDIR /app
-
 COPY bun.lockb package.json ./
 RUN bun install --frozen-lockfile --production
 
 # =========================
-# Stage 2: Runtime (pakai image yang sama)
+# Stage 2: Runtime
 # =========================
 FROM oven/bun:1.2.23-alpine AS runtime
 
@@ -18,8 +17,8 @@ WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
 COPY . .
 
-RUN addgroup -S bun && adduser -S bun -G bun \
-  && chown -R bun:bun /app
+# User bun sudah ada di base image
+RUN chown -R bun:bun /app
 USER bun
 
 ARG BUILD_HASH
