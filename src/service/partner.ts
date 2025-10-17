@@ -59,12 +59,10 @@ export const storePartner = async (
   };
 };
 
-export const downloadPartner = async (): Promise<Result<any>> => {
-  const partners = await PartnerSchema.find().select([
-    "name",
-    "nik",
-    "address",
-  ]);
+export const downloadPartner = async (year: number): Promise<Result<any>> => {
+  const partners = await PartnerSchema.find({
+    year: year,
+  }).select(["name", "nik", "address", "accountNumber", "year"]);
 
   const file = convertToCsv(partners);
 
@@ -111,10 +109,52 @@ export const uploadPartner = async (
     skip_empty_lines: true,
   });
 
-  const outputs = await PartnerSchema.create(data);
+  console.log(`Total records to process: ${data.length}`);
+
+  const ops = data.map((item: any) => {
+    if (item._id) {
+      return {
+        updateOne: {
+          filter: { _id: item._id },
+          update: { $set: item },
+        },
+      };
+    } else {
+      return {
+        insertOne: { document: item },
+      };
+    }
+  });
+
+  // Execute all in bulk
+  console.log("Running bulkWrite...");
+  const result = await PartnerSchema.bulkWrite(ops);
+
+  console.log("✅ BulkWrite finished!");
+  console.log("Summary:");
+  console.log({
+    insertedCount: result.insertedCount,
+    matchedCount: result.matchedCount,
+    modifiedCount: result.modifiedCount,
+    upsertedCount: result.upsertedCount,
+  });
+
+  // Friendly message
+  console.log(`
+✅ Inserted: ${result.insertedCount}
+🔄 Updated: ${result.modifiedCount}
+⚠️ No changes (same data or _id not found): ${
+    data.length - (result.insertedCount + result.modifiedCount)
+  }
+`);
+
+  // Optional: check for errors
+  if (result.hasWriteErrors() && result.getWriteErrors().length > 0) {
+    console.error("❌ Write errors:", result.getWriteErrors());
+  }
 
   return {
-    data: outputs,
+    data: null,
     message: "Successfully added partners",
     code: 201,
   };

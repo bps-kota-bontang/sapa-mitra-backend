@@ -27,7 +27,11 @@ app.post("/template", async (c) => {
 });
 
 app.post("/download", async (c) => {
-  const result = await downloadPartner();
+  const payload = await c.req.json<{
+    year: number;
+  }>();
+
+  const result = await downloadPartner(payload.year);
 
   if (result.code != 200) {
     return c.json(
