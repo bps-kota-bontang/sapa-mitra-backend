@@ -77,10 +77,81 @@ export const uploadActivity = async (
     skip_empty_lines: true,
   });
 
-  const activities = await ActivitySchema.create(data);
+  console.log(`Total records to process: ${data.length}`);
+
+  const transformed = data.map((item: any) => {
+    const pok = {
+      program: item.program,
+      activity: item.activity,
+      kro: item.kro,
+      ro: item.ro,
+      component: item.component,
+      subComponent: item.subComponent,
+      account: item.account,
+    };
+
+    // remove POK-related flat fields
+    const {
+      program,
+      activity,
+      kro,
+      ro,
+      component,
+      subComponent,
+      account,
+      ...rest
+    } = item;
+
+    return {
+      ...rest,
+      pok, // 👈 nested POK object
+    };
+  });
+
+  const ops = transformed.map((item: any) => {
+    if (item._id) {
+      return {
+        updateOne: {
+          filter: { _id: item._id },
+          update: { $set: item },
+        },
+      };
+    } else {
+      return {
+        insertOne: { document: item },
+      };
+    }
+  });
+
+  // Execute all in bulk
+  console.log("Running bulkWrite...");
+  const result = await ActivitySchema.bulkWrite(ops);
+
+  console.log("✅ BulkWrite finished!");
+  console.log("Summary:");
+  console.log({
+    insertedCount: result.insertedCount,
+    matchedCount: result.matchedCount,
+    modifiedCount: result.modifiedCount,
+    upsertedCount: result.upsertedCount,
+  });
+
+  // Friendly message
+  console.log(`
+✅ Inserted: ${result.insertedCount}
+🔄 Updated: ${result.modifiedCount}
+⚠️ No changes (same data or _id not found): ${
+    data.length - (result.insertedCount + result.modifiedCount)
+  }
+`);
+
+  // Optional: check for errors
+  if (result.hasWriteErrors() && result.getWriteErrors().length > 0) {
+    console.error("❌ Write errors:", result.getWriteErrors());
+  }
 
   return {
-    data: activities,
+    data: null,
     message: "Successfully created activities",
     code: 201,
   };
@@ -187,9 +258,52 @@ export const downloadActivities = async (
 
   const activities = await ActivitySchema.find({
     _id: { $in: ids },
+  }).select([
+    "main",
+    "name",
+    "code",
+    "unit",
+    "category",
+    "team",
+    "pok",
+    "isSpecial",
+    "year",
+  ]);
+
+  const transformedActivities = activities.map((item, index) => {
+    const { pok, ...rest } = item.toObject();
+
+    // Flatten POK if it exists
+    const flatPOK = pok
+      ? {
+          program: pok.program || "",
+          activity: pok.activity || "",
+          kro: pok.kro || "",
+          ro: pok.ro || "",
+          component: pok.component || "",
+          subComponent: pok.subComponent || "",
+          account: pok.account || "",
+        }
+      : {
+          program: "",
+          activity: "",
+          kro: "",
+          ro: "",
+          component: "",
+          subComponent: "",
+          account: "",
+        };
+
+    return {
+      ...rest,
+      ...flatPOK, // 👈 flatten nested POK fields
+    };
   });
 
-  const file = convertToCsv(activities);
+  console.log(`Total records to download: ${transformedActivities.length}`);
+  console.log("Transformed Activities:", transformedActivities);
+
+  const file = convertToCsv(transformedActivities);
 
   return {
     data: file,

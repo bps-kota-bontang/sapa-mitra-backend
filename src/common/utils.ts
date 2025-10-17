@@ -319,18 +319,50 @@ export const checkRateLimits = (
 
 const isDocument = (obj: any) => typeof obj.toObject === "function";
 
-export const convertToCsv = (objects: any[]): Buffer => {
-  const headers = Object.keys(
-    isDocument(objects[0]) ? objects[0].toObject() : objects[0]
-  ).join(";");
-  const rows = objects
-    .map((obj) => {
-      const data = isDocument(obj) ? obj.toObject() : obj;
-      return Object.values(data).join(";");
-    })
-    .join("\n");
-  const csvString = `${headers}\n${rows}`;
+/**
+ * Converts an array of objects (or mongoose docs) to CSV.
+ *
+ * @param objects - Array of plain objects or mongoose documents.
+ * @param delimiter - CSV delimiter (default: ";")
+ * @param headerOrder - Optional fixed header order (to ensure column consistency)
+ */
+export const convertToCsv = (
+  objects: any[],
+  delimiter = ";",
+  headerOrder?: string[]
+): Buffer => {
+  if (!objects || objects.length === 0) {
+    return Buffer.from("", "utf-8");
+  }
 
+  // Convert all documents to plain objects
+  const plainObjects = objects.map((obj) =>
+    isDocument(obj) ? obj.toObject() : obj
+  );
+
+  // If user didn’t specify header order, infer from all keys (union of all)
+  const allKeys = Array.from(
+    new Set(plainObjects.flatMap((obj) => Object.keys(obj)))
+  );
+
+  const headers = headerOrder && headerOrder.length > 0 ? headerOrder : allKeys;
+
+  // Build CSV rows
+  const rows = plainObjects.map((obj) =>
+    headers
+      .map((key) => {
+        const value = obj[key];
+        if (value === undefined || value === null) return "";
+        // escape semicolons and newlines safely
+        const str = String(value)
+          .replace(/[\r\n]+/g, " ")
+          .replace(/;/g, ",");
+        return `${str}`; // wrap to preserve formatting
+      })
+      .join(delimiter)
+  );
+
+  const csvString = `${headers.join(delimiter)}\n${rows.join("\n")}`;
   return Buffer.from(csvString, "utf-8");
 };
 
