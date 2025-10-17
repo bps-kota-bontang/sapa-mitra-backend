@@ -1,35 +1,41 @@
-FROM oven/bun:1.2.23-alpine
-
-RUN apk --no-cache --update-cache upgrade && apk add --no-cache \
-    chromium \
-    nss \
-    freetype \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont \
-    curl
-
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-ENV CHROME_BIN=/usr/bin/chromium-browser 
-ENV CHROME_PATH=/usr/lib/chromium/
+# =========================
+# Stage 1: Build dependencies
+# =========================
+FROM oven/bun:alpine AS builder
 
 WORKDIR /app
 
-COPY package.json bun.lockb ./
+# Copy lockfile dan package.json untuk cache build
+COPY bun.lockb package.json ./
 
-ENV NODE_ENV=production
-
-ARG BUILD_HASH
-ENV APP_BUILD_HASH=${BUILD_HASH}
-
+# Install dependencies produksi saja
 RUN bun install --frozen-lockfile --production
 
+# =========================
+# Stage 2: Runtime
+# =========================
+FROM alpine:3.20
+
+# Install hanya bun + CA certificates (untuk koneksi HTTPS, misal ke MongoDB Atlas)
+RUN apk --no-cache add bun ca-certificates
+
+WORKDIR /app
+
+# Copy hasil install dependencies
+COPY --from=builder /app/node_modules ./node_modules
+# Copy semua source code
 COPY . .
 
-RUN chown -R bun:bun /app
-
+# Jalankan sebagai non-root user
+RUN addgroup -S bun && adduser -S bun -G bun \
+  && chown -R bun:bun /app
 USER bun
 
-EXPOSE 4000/tcp
+# Env & arg build
+ARG BUILD_HASH
+ENV NODE_ENV=production
+ENV APP_BUILD_HASH=${BUILD_HASH}
+
+EXPOSE 4000
 
 ENTRYPOINT ["bun", "run", "start"]
