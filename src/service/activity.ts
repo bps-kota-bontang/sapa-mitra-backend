@@ -161,13 +161,6 @@ export const storeActivity = async (
   payload: Activity,
   claims: JWT
 ): Promise<Result<Activity>> => {
-  if (claims.team != "TU" && isProduction) {
-    return {
-      data: null,
-      message: "Only TU can create an activity",
-      code: 401,
-    };
-  }
   const activity = await ActivitySchema.create(payload);
 
   return {
