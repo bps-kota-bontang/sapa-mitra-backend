@@ -115,7 +115,7 @@ export const uploadOutput = async (file: File): Promise<Result<any>> => {
 
   const activities = await ActivitySchema.find({
     _id: { $in: activityIds },
-  }).select(["name"]);
+  }).select(["name", "team"]);
 
   const activityMap = new Map<string, any>();
   activities.forEach((activity) => {

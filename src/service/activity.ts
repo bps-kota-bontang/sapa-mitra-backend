@@ -7,7 +7,7 @@ import { parse } from "csv-parse/sync";
 
 export const getActivities = async (
   year: string = "",
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<Activity[]>> => {
   let queries: any = {};
 
@@ -43,16 +43,8 @@ export const getActivity = async (id: string): Promise<Result<Activity>> => {
 
 export const uploadActivity = async (
   file: File,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<any>> => {
-  if (claims.team != "TU" && isProduction) {
-    return {
-      data: null,
-      message: "Only TU can create an activity",
-      code: 401,
-    };
-  }
-
   if (!file) {
     return {
       data: null,
@@ -159,7 +151,7 @@ export const uploadActivity = async (
 
 export const storeActivity = async (
   payload: Activity,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<Activity>> => {
   const activity = await ActivitySchema.create(payload);
 
@@ -173,7 +165,7 @@ export const storeActivity = async (
 export const updateActivity = async (
   id: string,
   payload: Activity,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<Activity>> => {
   const activity = await ActivitySchema.findByIdAndUpdate(id, payload, {
     new: true,
@@ -188,7 +180,7 @@ export const updateActivity = async (
 
 export const deleteActivities = async (
   ids: string[] = [],
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<any>> => {
   if (claims.team != "TU" && isProduction) {
     return {
@@ -219,7 +211,7 @@ export const deleteActivities = async (
 
 export const deleteActivity = async (
   id: string,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<any>> => {
   if (claims.team != "TU" && isProduction) {
     return {
@@ -239,7 +231,7 @@ export const deleteActivity = async (
 };
 
 export const downloadActivities = async (
-  ids: string[] = []
+  ids: string[] = [],
 ): Promise<Result<any>> => {
   if (ids.length == 0) {
     return {
