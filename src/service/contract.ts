@@ -33,18 +33,15 @@ import ActivitySchema from "@/schema/activity";
 import ConfigurationSchema from "@/schema/configuration";
 import ContractSchema from "@/schema/contract";
 import PartnerSchema from "@/schema/partner";
-import fs from "fs";
 import Terbilang from "terbilang-ts";
 import OutputSchema from "@/schema/output";
 import StatusSchema from "@/schema/status";
-import { ReportPdf } from "@/model/report";
 import { RecapPdf } from "@/model/recap";
-import { format } from "path";
 
 export const getContracts = async (
   period: string = "",
   status: string = "",
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<Contract[]>> => {
   let queries: any = {};
 
@@ -89,7 +86,7 @@ export const getContracts = async (
 };
 
 export const getContract = async (
-  id: string
+  id: string,
 ): Promise<Result<Contract & { isExceeded: boolean } & any>> => {
   const limits = await ConfigurationSchema.findOne({ name: "RATE" });
 
@@ -127,7 +124,7 @@ export const getContract = async (
 
 export const storeContractByActivity = async (
   payload: ContractByActivityPayload,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<Contract[]>> => {
   if (claims.position !== "ANGGOTA" && claims.team !== "TU") {
     return {
@@ -151,7 +148,7 @@ export const storeContractByActivity = async (
 
   const lastSequence = await findLastSequence(
     payload.contract.period,
-    "contract"
+    "contract",
   );
 
   const limits = await ConfigurationSchema.findOne({ name: "RATE" });
@@ -204,11 +201,11 @@ export const storeContractByActivity = async (
     .map((item, index) => {
       const number = generateContractNumber(
         payload.contract.period,
-        lastSequence + index
+        lastSequence + index,
       );
 
       const partner = partners.find(
-        (partner) => partner._id.toString() == item.partnerId
+        (partner) => partner._id.toString() == item.partnerId,
       );
 
       if (!partner) return null;
@@ -216,7 +213,7 @@ export const storeContractByActivity = async (
       const existingContract = existingContracts.find(
         (contract) =>
           contract.partner._id == item.partnerId &&
-          contract.period == payload.contract.period
+          contract.period == payload.contract.period,
       );
 
       const activity = {
@@ -231,7 +228,7 @@ export const storeContractByActivity = async (
 
       if (existingContract) {
         const existingActivity = existingContract.activities.find(
-          (item) => item.id == activity._id
+          (item) => item.id == activity._id,
         );
 
         if (existingActivity) {
@@ -333,7 +330,7 @@ export const storeContractByActivity = async (
 
 export const storeContract = async (
   payload: ContractPayload,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<Contract>> => {
   if (claims.position !== "ANGGOTA" && claims.team !== "TU") {
     return {
@@ -372,7 +369,7 @@ export const storeContract = async (
 
   const availableSeq = await findAvailableSequence(
     payload.contract.period,
-    "contract"
+    "contract",
   );
 
   const number = generateContractNumber(payload.contract.period, availableSeq);
@@ -382,7 +379,7 @@ export const storeContract = async (
   });
 
   const partner = await PartnerSchema.findById(
-    payload.partner.partnerId
+    payload.partner.partnerId,
   ).select(["name", "nik", "address"]);
 
   if (!partner) {
@@ -411,7 +408,7 @@ export const storeContract = async (
     .map((itemPayload) => {
       const { activityId, ...restPayload } = itemPayload;
       const itemDb = activitiesDb.find(
-        (found) => found._id.toString() === activityId
+        (found) => found._id.toString() === activityId,
       );
       return itemDb
         ? {
@@ -426,7 +423,7 @@ export const storeContract = async (
 
   const grandTotal = activities.reduce(
     (total, activity) => total + activity.total,
-    0
+    0,
   );
 
   const signDate = calculateSignDate(payload.contract.period);
@@ -456,17 +453,17 @@ export const storeContract = async (
     if (activityContract) {
       const newActivities = activities.filter(
         (item) =>
-          !activityContract.activities.some((itemDb) => itemDb.id == item._id)
+          !activityContract.activities.some((itemDb) => itemDb.id == item._id),
       );
 
       const existActivities = activities.filter((item) =>
-        activityContract.activities.some((itemDb) => itemDb.id == item._id)
+        activityContract.activities.some((itemDb) => itemDb.id == item._id),
       );
 
       if (newActivities.length > 0) {
         const newGrandTotal = newActivities.reduce(
           (total, activity) => total + activity.total,
-          0
+          0,
         );
         await ContractSchema.findOneAndUpdate(
           {
@@ -480,13 +477,13 @@ export const storeContract = async (
           },
           {
             new: true,
-          }
+          },
         );
       }
 
       if (existActivities.length > 0) {
         const existingContractUpdated = await ContractSchema.findById(
-          existingContract.id
+          existingContract.id,
         );
 
         if (!existingContractUpdated) {
@@ -546,7 +543,7 @@ export const storeContract = async (
         },
         {
           new: true,
-        }
+        },
       );
     }
   } else {
@@ -580,7 +577,7 @@ export const deletContract = async (id: string): Promise<Result<any>> => {
 export const getContractActivity = async (
   id: string,
   activityId: string,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<any>> => {
   const existingContract = await ContractSchema.findById(id);
 
@@ -593,7 +590,7 @@ export const getContractActivity = async (
   }
 
   const activity = existingContract.activities.find(
-    (item) => item.id == activityId
+    (item) => item.id == activityId,
   );
 
   if (!activity) {
@@ -615,7 +612,7 @@ export const updateContractActivity = async (
   id: string,
   activityId: string,
   payload: any,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<any>> => {
   const existingContract = await ContractSchema.findById(id);
 
@@ -628,7 +625,7 @@ export const updateContractActivity = async (
   }
 
   const activity = existingContract.activities.find(
-    (item) => item.id == activityId
+    (item) => item.id == activityId,
   );
 
   if (!activity) {
@@ -671,7 +668,7 @@ export const updateContractActivity = async (
     },
     {
       upsert: true,
-    }
+    },
   );
 
   return {
@@ -684,7 +681,7 @@ export const updateContractActivity = async (
 export const deleteContractActivity = async (
   id: string,
   activityId: string,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<Contract>> => {
   const existingContract = await ContractSchema.findById(id);
 
@@ -697,7 +694,7 @@ export const deleteContractActivity = async (
   }
 
   const activity = existingContract.activities.find(
-    (item) => item.id == activityId
+    (item) => item.id == activityId,
   );
 
   if (!activity) {
@@ -732,7 +729,7 @@ export const deleteContractActivity = async (
     },
     {
       new: true,
-    }
+    },
   );
 
   return {
@@ -744,7 +741,7 @@ export const deleteContractActivity = async (
 
 export const printContract = async (
   id: string,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<any>> => {
   if (claims.team != "TU" && isProduction) {
     return {
@@ -765,7 +762,7 @@ export const printContract = async (
   }
 
   const isCompleted = contract.activities.every(
-    (item) => item.status === "VERIFIED"
+    (item) => item.status === "VERIFIED",
   );
 
   if (!isCompleted) {
@@ -787,7 +784,7 @@ export const printContract = async (
 
 export const printContracts = async (
   payload: string[] = [],
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<any>> => {
   if (!payload) {
     return {
@@ -847,7 +844,7 @@ export const printContracts = async (
 export const verifyContractActivity = async (
   id: string,
   activityId: string,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<Contract>> => {
   const limits = await ConfigurationSchema.findOne({ name: "RATE" });
 
@@ -870,7 +867,7 @@ export const verifyContractActivity = async (
   }
 
   const activity = existingContract.activities.find(
-    (item) => item.id == activityId
+    (item) => item.id == activityId,
   );
 
   if (!activity) {
@@ -908,7 +905,7 @@ export const verifyContractActivity = async (
   }
 
   const hasSpecial = existingContract.activities.some(
-    (activity) => activity.isSpecial
+    (activity) => activity.isSpecial,
   );
 
   if (hasSpecial && existingContract.activities.length > 1) {
@@ -931,7 +928,7 @@ export const verifyContractActivity = async (
     },
     {
       new: true,
-    }
+    },
   );
 
   return {
@@ -944,7 +941,7 @@ export const verifyContractActivity = async (
 export const cancelContractActivity = async (
   id: string,
   activityId: string,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<Contract>> => {
   const existingContract = await ContractSchema.findById(id);
 
@@ -957,7 +954,7 @@ export const cancelContractActivity = async (
   }
 
   const activity = existingContract.activities.find(
-    (item) => item.id == activityId
+    (item) => item.id == activityId,
   );
 
   if (!activity) {
@@ -996,7 +993,7 @@ export const cancelContractActivity = async (
     },
     {
       new: true,
-    }
+    },
   );
 
   return {
@@ -1007,7 +1004,7 @@ export const cancelContractActivity = async (
 };
 
 export const getContractStatistics = async (
-  year: string = new Date().getFullYear().toString()
+  year: string = new Date().getFullYear().toString(),
 ): Promise<Result<any>> => {
   const contracts = await ContractSchema.find({
     period: {
@@ -1073,7 +1070,7 @@ export const getContractStatistics = async (
 };
 
 const generateContractPdf = async (
-  contract: Contract
+  contract: Contract,
 ): Promise<ContractPdf> => {
   const transformedActivities = contract.activities.map((item) => {
     const codes = item.code.split(".");
@@ -1144,7 +1141,7 @@ const generateContractPdf = async (
 };
 
 export const downloadContracts = async (
-  ids: string[] = []
+  ids: string[] = [],
 ): Promise<Result<any>> => {
   if (ids.length == 0) {
     return {
@@ -1165,7 +1162,7 @@ export const downloadContracts = async (
       period: contract.period,
       grandTotal: contract.grandTotal,
       ...activity.toObject(),
-    }))
+    })),
   );
 
   const file = convertToCsv(transformedContracts);
@@ -1180,7 +1177,7 @@ export const downloadContracts = async (
 export const updateContract = async (
   id: string,
   payload: any,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<any>> => {
   if (claims.team !== "TU" || claims.position !== "KETUA") {
     return {
@@ -1212,7 +1209,7 @@ export const updateContract = async (
     },
     {
       upsert: true,
-    }
+    },
   );
 
   return {
@@ -1224,7 +1221,7 @@ export const updateContract = async (
 
 export const getContractActivityVolume = async (
   period?: string,
-  outputId?: string
+  outputId?: string,
 ): Promise<Result<any>> => {
   let activityId: string | undefined;
 
@@ -1259,7 +1256,7 @@ export const getContractActivityVolume = async (
 
 export const getContractActivityCost = async (
   period?: string,
-  activityId?: string
+  activityId?: string,
 ): Promise<Result<any>> => {
   if (!period && !activityId) {
     return {
@@ -1291,7 +1288,7 @@ export const getContractActivityCost = async (
 
 export const updateContractActivityCost = async (
   payload: any,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<any>> => {
   if (claims.team !== "TU" || claims.position !== "KETUA") {
     return {
@@ -1315,13 +1312,13 @@ export const updateContractActivityCost = async (
     const isTargetPartner = partners.find(
       (partner: { partnerId: string }) =>
         partner.partnerId ===
-        (contract.partner as { _id: string })._id.toString()
+        (contract.partner as { _id: string })._id.toString(),
     );
     if (!isTargetPartner) continue;
 
     const activity = contract.activities.find(
       (activity) =>
-        (activity._id as any).toString() === payload.activity.activityId
+        (activity._id as any).toString() === payload.activity.activityId,
     );
     if (activity) {
       activity.cost = Number(isTargetPartner.cost);
@@ -1340,7 +1337,7 @@ export const updateContractActivityCost = async (
 
 export const getContractActivityAccount = async (
   period?: string,
-  activityId?: string
+  activityId?: string,
 ): Promise<Result<any>> => {
   if (!period && !activityId) {
     return {
@@ -1375,7 +1372,7 @@ export const getContractActivityAccount = async (
 
   // buat map biar cepat lookup
   const partnerMap = new Map(
-    partnerFallbacks.map((p) => [p._id.toString(), p.accountNumber])
+    partnerFallbacks.map((p) => [p._id.toString(), p.accountNumber]),
   );
 
   // pastikan setiap partnerAccount punya accountNumber
@@ -1398,7 +1395,7 @@ export const getContractActivityAccount = async (
 
 export const updateContractActivityRecap = async (
   payload: any,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<any>> => {
   const partners = payload.partners;
 
@@ -1414,13 +1411,13 @@ export const updateContractActivityRecap = async (
     const isTargetPartner = partners.find(
       (partner: { partnerId: string }) =>
         partner.partnerId ===
-        (contract.partner as { _id: string })._id.toString()
+        (contract.partner as { _id: string })._id.toString(),
     );
     if (!isTargetPartner) continue;
 
     const activity = contract.activities.find(
       (activity) =>
-        (activity._id as any).toString() === payload.activity.activityId
+        (activity._id as any).toString() === payload.activity.activityId,
     );
     if (activity) {
       contract.partner.accountNumber = isTargetPartner.accountNumber;
@@ -1439,12 +1436,12 @@ export const updateContractActivityRecap = async (
 
 export const downloadContractActivityRecap = async (
   payloads: any,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<any>> => {
   const response = await updateContractActivityRecap(payloads, claims);
 
   const activity = await ActivitySchema.findById(
-    payloads.activity.activityId
+    payloads.activity.activityId,
   ).select(["name", "main", "code", "category", "unit", "pok"]);
 
   if (!activity) {
@@ -1472,7 +1469,7 @@ export const downloadContractActivityRecap = async (
 
   const transformedPartners = contracts.reduce((acc, item, index) => {
     const activity = item.activities.find(
-      (a) => a.id === payloads.activity.activityId
+      (a) => a.id === payloads.activity.activityId,
     );
 
     if (!activity) {
@@ -1566,6 +1563,26 @@ export const downloadContractActivityRecap = async (
   return {
     data: payloadPdf,
     message: "Successfully generate recap activity",
+    code: 200,
+  };
+};
+
+export const getContractPartners = async (
+  period: string,
+): Promise<Result<any>> => {
+  const contracts = await ContractSchema.find({
+    period: period,
+  }).select(["partner._id", "partner.name", "activities.category"]);
+
+  const partners = contracts.map(({ partner, activities }) => ({
+    partnerId: partner._id,
+    name: partner.name,
+    activities: [...new Set(activities.flatMap((activity) => activity.category))],
+  }));
+
+  return {
+    data: partners,
+    message: "Retrieved partners successfully",
     code: 200,
   };
 };

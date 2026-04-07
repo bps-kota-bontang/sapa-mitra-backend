@@ -5,8 +5,10 @@ import { logger } from "hono/logger";
 import { cors } from "hono/cors";
 import { prettyJSON } from "hono/pretty-json";
 import apiV1 from "@/api/v1";
+import publicApiV1 from "@/api/publicV1";
 import connectDB from "@/config/db";
 import withAuth from "@/middleware/withAuth";
+import withApiKey from "@/middleware/withApiKey";
 
 const app = new Hono();
 
@@ -19,10 +21,11 @@ app.use("/static/*", serveStatic({ root: "./" }));
 app.get("/", (c) =>
   c.text(
     `${Bun.env.APP_NAME} ${Bun.env.APP_ENV} API`.toUpperCase() +
-      ` (Build: ${Bun.env.APP_BUILD_HASH})`
-  )
+      ` (Build: ${Bun.env.APP_BUILD_HASH})`,
+  ),
 );
 app.get("/health", (c) => c.json("OK"));
+app.use("/public/v1/*", withApiKey);
 app.use("/v1/*", withAuth);
 
 app.notFound((c) => {
@@ -31,7 +34,7 @@ app.notFound((c) => {
       message: "invalid endpoint",
       data: null,
     },
-    404
+    404,
   );
 });
 
@@ -41,10 +44,11 @@ app.onError((err, c) => {
       message: err.message,
       data: null,
     },
-    500
+    500,
   );
 });
 
+app.route("/public/v1", publicApiV1);
 app.route("/v1", apiV1);
 
 export default {

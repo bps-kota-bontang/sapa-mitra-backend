@@ -4,7 +4,7 @@ import user from "@/route/user";
 import activity from "@/route/activity";
 import partner from "@/route/partner";
 import configuration from "@/route/configuration";
-import contract from "@/route/contract";
+import { contract } from "@/route/contract";
 import output from "@/route/output";
 import report from "@/route/report";
 import status from "@/route/status";

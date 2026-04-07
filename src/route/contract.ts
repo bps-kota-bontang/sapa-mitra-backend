@@ -25,25 +25,25 @@ import {
   verifyContractActivity,
   updateContractActivityRecap,
   downloadContractActivityRecap,
+  getContractPartners,
 } from "@/service/contract";
 import { Hono } from "hono";
 
-const app = new Hono();
+const contract = new Hono();
+const publicContract = new Hono();
 
-app.post("/:id/print", async (c) => {
+contract.post("/:id/print", async (c) => {
   const claims = c.get("jwtPayload");
   const id = c.req.param("id");
 
   const result = await printContract(id, claims);
-
-  console.log('Here')
 
   return c.json(
     {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 
   // if (result.code != 200) {
@@ -65,33 +65,33 @@ app.post("/:id/print", async (c) => {
   // return c.body(toArrayBuffer(result.data.file));
 });
 
-app.post("/partner/template", async (c) => {
+contract.post("/partner/template", async (c) => {
   const result = await downloadTemplate("src/template/partner-in-contract.csv");
 
   c.res.headers.set("Content-Type", "text/csv");
   c.res.headers.set(
     "Content-Disposition",
-    `attachment; filename=Template Partner in Contract.csv`
+    `attachment; filename=Template Partner in Contract.csv`,
   );
 
   return c.body(toArrayBuffer(result));
 });
 
-app.post("/cost/template", async (c) => {
+contract.post("/cost/template", async (c) => {
   const result = await downloadTemplate(
-    "src/template/partner-cost-in-contract.csv"
+    "src/template/partner-cost-in-contract.csv",
   );
 
   c.res.headers.set("Content-Type", "text/csv");
   c.res.headers.set(
     "Content-Disposition",
-    `attachment; filename=Template Partner Cost in Contract.csv`
+    `attachment; filename=Template Partner Cost in Contract.csv`,
   );
 
   return c.body(toArrayBuffer(result));
 });
 
-app.put("/activity/cost", async (c) => {
+contract.put("/activity/cost", async (c) => {
   const claims = c.get("jwtPayload");
   const payload = await c.req.json();
 
@@ -102,11 +102,11 @@ app.put("/activity/cost", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.post("/download", async (c) => {
+contract.post("/download", async (c) => {
   const payload = await c.req.json<string[]>();
   const result = await downloadContracts(payload);
 
@@ -116,20 +116,20 @@ app.post("/download", async (c) => {
         data: result.data,
         message: result.message,
       },
-      result.code
+      result.code,
     );
   }
 
   c.res.headers.set("Content-Type", "text/csv");
   c.res.headers.set(
     "Content-Disposition",
-    `attachment; filename=Master Data Contract.csv`
+    `attachment; filename=Master Data Contract.csv`,
   );
 
   return c.body(toArrayBuffer(result.data));
 });
 
-app.post("/print", async (c) => {
+contract.post("/print", async (c) => {
   const claims = c.get("jwtPayload");
   const payload = await c.req.json<string[]>();
 
@@ -140,7 +140,7 @@ app.post("/print", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 
   // if (result.code != 200) {
@@ -162,7 +162,7 @@ app.post("/print", async (c) => {
   // return c.body(toArrayBuffer(result.data));
 });
 
-app.get("/statistics", async (c) => {
+contract.get("/statistics", async (c) => {
   const year = c.req.query("year");
   const result = await getContractStatistics(year);
 
@@ -171,11 +171,11 @@ app.get("/statistics", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.get("/", async (c) => {
+contract.get("/", async (c) => {
   const claims = c.get("jwtPayload");
   const period = c.req.query("period");
   const status = c.req.query("status");
@@ -187,11 +187,11 @@ app.get("/", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.get("/:id", async (c) => {
+contract.get("/:id", async (c) => {
   const id = c.req.param("id");
 
   const result = await getContract(id);
@@ -201,11 +201,11 @@ app.get("/:id", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.post("/", async (c) => {
+contract.post("/", async (c) => {
   const claims = c.get("jwtPayload");
   const by = c.req.query("by");
   const payload = await c.req.json();
@@ -222,11 +222,11 @@ app.post("/", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.put("/:id", async (c) => {
+contract.put("/:id", async (c) => {
   const claims = c.get("jwtPayload");
   const id = c.req.param("id");
   const payload = await c.req.json<UpdateContractPayload>();
@@ -237,11 +237,11 @@ app.put("/:id", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.delete("/:id", async (c) => {
+contract.delete("/:id", async (c) => {
   const id = c.req.param("id");
 
   const result = await deletContract(id);
@@ -251,11 +251,11 @@ app.delete("/:id", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.get("/:id/activity/:activityId", async (c) => {
+contract.get("/:id/activity/:activityId", async (c) => {
   const claims = c.get("jwtPayload");
   const id = c.req.param("id");
   const activityId = c.req.param("activityId");
@@ -267,11 +267,11 @@ app.get("/:id/activity/:activityId", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.put("/:id/activity/:activityId", async (c) => {
+contract.put("/:id/activity/:activityId", async (c) => {
   const claims = c.get("jwtPayload");
   const id = c.req.param("id");
   const payload = await c.req.json<ContractActivityPayload>();
@@ -284,11 +284,11 @@ app.put("/:id/activity/:activityId", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.delete("/:id/activity/:activityId", async (c) => {
+contract.delete("/:id/activity/:activityId", async (c) => {
   const claims = c.get("jwtPayload");
   const id = c.req.param("id");
   const activityId = c.req.param("activityId");
@@ -300,11 +300,11 @@ app.delete("/:id/activity/:activityId", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.get("/:id/activity/:activityId/verify", async (c) => {
+contract.get("/:id/activity/:activityId/verify", async (c) => {
   const claims = c.get("jwtPayload");
   const id = c.req.param("id");
   const activityId = c.req.param("activityId");
@@ -316,11 +316,11 @@ app.get("/:id/activity/:activityId/verify", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.get("/:id/activity/:activityId/cancel", async (c) => {
+contract.get("/:id/activity/:activityId/cancel", async (c) => {
   const claims = c.get("jwtPayload");
   const id = c.req.param("id");
   const activityId = c.req.param("activityId");
@@ -332,11 +332,11 @@ app.get("/:id/activity/:activityId/cancel", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.get("/activity/volume", async (c) => {
+contract.get("/activity/volume", async (c) => {
   const outputId = c.req.query("outputId");
   const period = c.req.query("period");
 
@@ -347,11 +347,11 @@ app.get("/activity/volume", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.get("/activity/cost", async (c) => {
+contract.get("/activity/cost", async (c) => {
   const activityId = c.req.query("activityId");
   const period = c.req.query("period");
 
@@ -362,11 +362,11 @@ app.get("/activity/cost", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.get("/activity/account", async (c) => {
+contract.get("/activity/account", async (c) => {
   const activityId = c.req.query("activityId");
   const period = c.req.query("period");
 
@@ -377,11 +377,11 @@ app.get("/activity/account", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.post("/activity/recap", async (c) => {
+contract.post("/activity/recap", async (c) => {
   const claims = c.get("jwtPayload");
   const payload = await c.req.json();
 
@@ -392,7 +392,7 @@ app.post("/activity/recap", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 
   if (result.code != 200) {
@@ -401,7 +401,7 @@ app.post("/activity/recap", async (c) => {
         data: result.data,
         message: result.message,
       },
-      result.code
+      result.code,
     );
   }
 
@@ -414,7 +414,7 @@ app.post("/activity/recap", async (c) => {
   // return c.body(toArrayBuffer(result.data.file));
 });
 
-app.put("/activity/recap", async (c) => {
+contract.put("/activity/recap", async (c) => {
   const claims = c.get("jwtPayload");
   const payload = await c.req.json();
 
@@ -425,8 +425,32 @@ app.put("/activity/recap", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-export default app;
+publicContract.get("/partners", async (c) => {
+  const period = c.req.query("period");
+
+  if (!period) {
+    return c.json(
+      {
+        data: null,
+        message: "Period query parameter is required",
+      },
+      400,
+    );
+  }
+
+  const result = await getContractPartners(period);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code,
+  );
+});
+
+export { contract, publicContract };
