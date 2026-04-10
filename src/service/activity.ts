@@ -31,6 +31,48 @@ export const getActivities = async (
   };
 };
 
+export const getMainActivities = async (
+  year: string | undefined,
+): Promise<
+  Result<{ main: string; activities: { id: string; name: string }[] }[]>
+> => {
+  let queries: any = {};
+  if (year) queries.year = year;
+  const activities = await ActivitySchema.find(queries).select([
+    "main",
+    "name",
+  ]);
+
+  const groupedByMain = new Map<string, { id: string; name: string }[]>();
+
+  for (const item of activities) {
+    const main = item.main?.trim();
+    if (!main) continue;
+
+    if (!groupedByMain.has(main)) {
+      groupedByMain.set(main, []);
+    }
+
+    groupedByMain.get(main)!.push({
+      id: String(item._id),
+      name: item.name,
+    });
+  }
+
+  const mainActivities = Array.from(groupedByMain.entries()).map(
+    ([main, activities]) => ({
+      main,
+      activities,
+    }),
+  );
+
+  return {
+    data: mainActivities,
+    message: "Successfully retrieved main activities",
+    code: 200,
+  };
+};
+
 export const getActivity = async (id: string): Promise<Result<Activity>> => {
   const activity = await ActivitySchema.findById(id);
 

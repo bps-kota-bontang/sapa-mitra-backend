@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import auth from "@/route/auth";
 import user from "@/route/user";
-import activity from "@/route/activity";
+import { activity } from "@/route/activity";
 import partner from "@/route/partner";
 import configuration from "@/route/configuration";
 import { contract } from "@/route/contract";

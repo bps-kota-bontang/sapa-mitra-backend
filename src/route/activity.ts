@@ -6,15 +6,17 @@ import {
   downloadActivities,
   getActivities,
   getActivity,
+  getMainActivities,
   storeActivity,
   updateActivity,
   uploadActivity,
 } from "@/service/activity";
 import { Hono } from "hono";
 
-const app = new Hono();
+const activity = new Hono();
+const publicActivity = new Hono();
 
-app.get("/", async (c) => {
+activity.get("/", async (c) => {
   const claims = c.get("jwtPayload");
   const year = c.req.query("year");
   const result = await getActivities(year, claims);
@@ -24,11 +26,11 @@ app.get("/", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.post("/download", async (c) => {
+activity.post("/download", async (c) => {
   const payload = await c.req.json<string[]>();
   const result = await downloadActivities(payload);
 
@@ -38,32 +40,32 @@ app.post("/download", async (c) => {
         data: result.data,
         message: result.message,
       },
-      result.code
+      result.code,
     );
   }
 
   c.res.headers.set("Content-Type", "text/csv");
   c.res.headers.set(
     "Content-Disposition",
-    `attachment; filename=Master Data Activity.csv`
+    `attachment; filename=Master Data Activity.csv`,
   );
 
   return c.body(toArrayBuffer(result.data));
 });
 
-app.post("/template", async (c) => {
+activity.post("/template", async (c) => {
   const result = await downloadTemplate("src/template/activity.csv");
 
   c.res.headers.set("Content-Type", "text/csv");
   c.res.headers.set(
     "Content-Disposition",
-    `attachment; filename=Template Activity.csv`
+    `attachment; filename=Template Activity.csv`,
   );
 
   return c.body(toArrayBuffer(result));
 });
 
-app.get("/:id", async (c) => {
+activity.get("/:id", async (c) => {
   const id = c.req.param("id");
   const result = await getActivity(id);
 
@@ -72,11 +74,11 @@ app.get("/:id", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.post("/upload", async (c) => {
+activity.post("/upload", async (c) => {
   const claims = c.get("jwtPayload");
   const body = await c.req.parseBody();
 
@@ -87,11 +89,11 @@ app.post("/upload", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.post("/", async (c) => {
+activity.post("/", async (c) => {
   const claims = c.get("jwtPayload");
   const payload = await c.req.json<Activity>();
 
@@ -102,11 +104,11 @@ app.post("/", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.put("/:id", async (c) => {
+activity.put("/:id", async (c) => {
   const claims = c.get("jwtPayload");
   const payload = await c.req.json<Activity>();
   const id = c.req.param("id");
@@ -117,11 +119,11 @@ app.put("/:id", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.delete("/", async (c) => {
+activity.delete("/", async (c) => {
   const claims = c.get("jwtPayload");
   const payload = await c.req.json<string[]>();
   const result = await deleteActivities(payload, claims);
@@ -131,11 +133,11 @@ app.delete("/", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-app.delete("/:id", async (c) => {
+activity.delete("/:id", async (c) => {
   const claims = c.get("jwtPayload");
   const id = c.req.param("id");
   const result = await deleteActivity(id, claims);
@@ -145,8 +147,21 @@ app.delete("/:id", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
-export default app;
+publicActivity.get("/main", async (c) => {
+  const year = c.req.query("year");
+  const result = await getMainActivities(year);
+
+  return c.json(
+    {
+      data: result.data,
+      message: result.message,
+    },
+    result.code,
+  );
+});
+
+export { activity, publicActivity };

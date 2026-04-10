@@ -430,19 +430,19 @@ contract.put("/activity/recap", async (c) => {
 });
 
 publicContract.get("/partners", async (c) => {
-  const period = c.req.query("period");
+  const activityIds = c.req.queries("activity_ids");
 
-  if (!period) {
+  if (!activityIds || activityIds.length === 0) {
     return c.json(
       {
         data: null,
-        message: "Period query parameter is required",
+        message: "Please provide activity_ids query parameter",
       },
       400,
     );
   }
 
-  const result = await getContractPartners(period);
+  const result = await getContractPartners(activityIds);
 
   return c.json(
     {

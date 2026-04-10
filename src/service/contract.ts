@@ -1568,16 +1568,38 @@ export const downloadContractActivityRecap = async (
 };
 
 export const getContractPartners = async (
-  period: string,
+  activityIds?: string[],
 ): Promise<Result<any>> => {
   const contracts = await ContractSchema.find({
-    period: period,
+    "activities._id": { $in: activityIds },
   }).select(["partner._id", "partner.name", "activities.category"]);
 
-  const partners = contracts.map(({ partner, activities }) => ({
-    partnerId: partner._id,
-    name: partner.name,
-    activities: [...new Set(activities.flatMap((activity) => activity.category))],
+  const partnerMap = new Map<
+    string,
+    { partnerId: string; name: string; activities: Set<string> }
+  >();
+
+  for (const { partner, activities } of contracts) {
+    const partnerId = String(partner._id);
+
+    if (!partnerMap.has(partnerId)) {
+      partnerMap.set(partnerId, {
+        partnerId,
+        name: partner.name,
+        activities: new Set<string>(),
+      });
+    }
+
+    const partnerData = partnerMap.get(partnerId)!;
+    for (const activity of activities) {
+      partnerData.activities.add(activity.category);
+    }
+  }
+
+  const partners = Array.from(partnerMap.values()).map((item) => ({
+    partnerId: item.partnerId,
+    name: item.name,
+    activities: Array.from(item.activities),
   }));
 
   return {
