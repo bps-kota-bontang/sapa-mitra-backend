@@ -94,7 +94,7 @@ const byPartner: ContractPayload = {
 
 export type ContractActivityPayload = {
   volume: number;
-} & Pick<Contract["activities"][number], "startDate" | "endDate" | "rate">;
+} & Pick<Contract["activities"][number], "startDate" | "endDate" | "code" | "rate">;
 
 export type UpdateContractPayload = {
   number: string;

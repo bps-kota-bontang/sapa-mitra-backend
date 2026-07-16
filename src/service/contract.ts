@@ -649,6 +649,7 @@ export const updateContractActivity = async (
 
   activity.startDate = payload.startDate;
   activity.endDate = payload.endDate;
+  activity.code = payload.code;
   activity.volume = payload.volume;
   activity.rate = payload.rate;
   activity.total = total;
