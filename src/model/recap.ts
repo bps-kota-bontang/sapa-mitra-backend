@@ -25,6 +25,13 @@ export type RecapPdf = {
     grandTotal: number;
     accountNumber: string;
   }[];
+  csv: {
+    no: number;
+    supplierName: string;
+    accountOwnerName: string;
+    accountNumber: string;
+    amount: number;
+  }[];
   grandTotal: {
     nominal: string;
     spell: string;

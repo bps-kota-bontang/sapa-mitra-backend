@@ -1439,6 +1439,7 @@ export const downloadContractActivityRecap = async (
   payloads: any,
   claims: JWT,
 ): Promise<Result<any>> => {
+  const supplierName = "PARA MITRA BPS KOTA BONTANG (BSM)";
   const response = await updateContractActivityRecap(payloads, claims);
 
   const activity = await ActivitySchema.findById(
@@ -1520,6 +1521,13 @@ export const downloadContractActivityRecap = async (
       total: formatCurrency(item.total),
       tax: formatCurrency(item.tax),
       grandTotal: formatCurrency(item.grandTotal),
+    })),
+    csv: transformedPartners.map((item) => ({
+      no: item.number,
+      supplierName,
+      accountOwnerName: item.name,
+      accountNumber: item.accountNumber || "-",
+      amount: item.grandTotal,
     })),
     activity: {
       main: activity.main,
