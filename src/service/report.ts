@@ -40,7 +40,9 @@ export const getReports = async (
 
   if (period) queries["contract.period"] = period;
 
-  const reports = await ReportSchema.find(queries);
+  const reports = await ReportSchema.find(queries).sort({
+    "contract.period": "descending",
+  });
 
   const transformedReports = reports.map((item, index) => {
     return {
