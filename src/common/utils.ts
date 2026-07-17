@@ -309,11 +309,11 @@ export const checkRateLimits = (
     return limit;
   });
 
-  const minLimit = Math.min(...categoryLimits);
+  const limit = Math.min(...categoryLimits);
 
   return {
-    isExceeded: data.grandTotal > minLimit,
-    limit: minLimit,
+    isExceeded: data.grandTotal > limit,
+    limit: limit,
   };
 };
 
@@ -359,7 +359,7 @@ export const convertToCsv = (
           .replace(/;/g, ",");
         return `${str}`; // wrap to preserve formatting
       })
-      .join(delimiter)
+      .join(delimiter),
   );
 
   const csvString = `${headers.join(delimiter)}\n${rows.join("\n")}`;
@@ -367,11 +367,11 @@ export const convertToCsv = (
 };
 
 export const formatCurrency = (number: number): string => {
-  if (!number) return "0,00";
+  if (!number) return "0";
   const parts = number.toFixed(2).toString().split(".");
   const formattedInteger = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
-  return `${formattedInteger},${parts[1]}`;
+  return `${formattedInteger}`;
 };
 
 export const generateState = () => {

@@ -100,12 +100,12 @@
             pihak lain untuk tujuan apapun.
         </li>
     </ol>
-    <div style="page-break-before: always;">
+    <div>
         <p style="text-align: center;"><strong>Pasal 6</strong></p>
         <ol>
             <li style="text-align: justify;"><strong>PIHAK KEDUA</strong> berhak untuk mendapatkan honorarium dari
                 <strong>PIHAK
-                    PERTAMA </strong>sebesar Rp {{grandTotal.nominal}} ({{grandTotal.spell}} rupiah) untuk pekerjaan
+                    PERTAMA </strong>sebesar Rp{{grandTotal.nominal}} ({{grandTotal.spell}} rupiah) untuk pekerjaan
                 sebagaimana
                 dimaksud dalam Pasal 2, termasuk biaya pajak, bea meterai, pulsa dan kuota internet untuk komunikasi,
                 dan
@@ -183,7 +183,7 @@
             </li>
         </ol>
     </div>
-    <div style="page-break-before: always;">
+    <div>
         <p style="text-align: center;"><strong>Pasal 11</strong></p>
         <ol>
             <li style="text-align: justify;">Apabila terjadi Keadaan Kahar, yang meliputi bencana alam, bencana non
@@ -266,14 +266,24 @@
             </tbody>
         </table>
     </div>
-    <div style="page-break-before: always;">
+    <div id="contract-appendix" style="page-break-before: always;">
         <p style="text-align: left; padding-left: 280px;text-transform: uppercase;">LAMPIRAN</br>PERJANJIAN KERJA MITRA
             STATISTIK BADAN PUSAT
             STATISTIK
             {{region}}</br>NOMOR: {{number}}</p>
         <p style="text-align: center;">DAFTAR URAIAN TUGAS, TARGET PEKERJAAN, JANGKA WAKTU, NILAI PERJANJIAN, DAN BEBAN
             ANGGARAN</p>
-        <table class="bordered-table">
+        <table class="bordered-table" border="1" cellspacing="0" cellpadding="6"
+            style="width: 100%; border-collapse: collapse; border: 1px solid black; table-layout: fixed;">
+            <colgroup>
+                <col style="width: 26%;" />
+                <col style="width: 8%;" />
+                <col style="width: 8%;" />
+                <col style="width: 18%;" />
+                <col style="width: 14%;" />
+                <col style="width: 14%;" />
+                <col style="width: 12%;" />
+            </colgroup>
             <tbody>
                 <tr>
                     <td style="text-align: center;" rowspan="2">
@@ -341,10 +351,10 @@
                         <p>{{date}}</p>
                     </td>
                     <td style="text-align: center;">
-                        <p>Rp {{total}}</p>
+                        <p>Rp{{total}}</p>
                     </td>
                     <td style="text-align: center;">
-                        <p>Rp {{cost}}</p>
+                        <p>Rp{{cost}}</p>
                     </td>
                     <td style="text-align: center;">
                         <p>{{code}}</p>
@@ -356,7 +366,7 @@
                         <p>Terbilang: {{grandTotal.spell}} Rupiah</p>
                     </td>
                     <td style="text-align: center;">
-                        <p>Rp {{grandTotal.nominal}}</p>
+                        <p>Rp{{grandTotal.nominal}}</p>
                     </td>
                 </tr>
             </tbody>

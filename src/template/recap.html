@@ -107,7 +107,7 @@
     <br>
     <div>
 
-        <table class="bordered-table">
+        <table class="bordered-table" border="1" cellspacing="0" cellpadding="6" style="width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid #444;">
             <thead>
                 <tr>
                     <th>No</th>
@@ -134,7 +134,7 @@
                 {{#each partners}}
                 <tr>
                     <td>{{number}}</td>
-                    <td class="text-left">{{name}}</td>
+                    <td style="text-align: left;">{{name}}</td>
                     <td>{{rate}}</td>
                     <td>{{volume}}</td>
                     <td>{{total}}</td>
@@ -146,7 +146,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="3" class="text-left">
+                    <td colspan="3" style="text-align: left;">
                         Jumlah: {{grandTotal.spell}} Rupiah
                     </td>
                     <td><strong>{{grandTotal.volume}}</strong></td>
