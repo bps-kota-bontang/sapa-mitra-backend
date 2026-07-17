@@ -10,7 +10,7 @@ const JWT_SECRET = Bun.env.JWT_SECRET || "password";
 export const generateToken = async (user: User): Promise<string> => {
   const payload = generatePayload(user);
 
-  const token = await sign(payload, JWT_SECRET);
+  const token = await sign(payload, JWT_SECRET, "HS256");
 
   return token;
 };

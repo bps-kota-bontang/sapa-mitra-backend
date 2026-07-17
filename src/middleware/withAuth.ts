@@ -7,7 +7,7 @@ import { generatePayload } from "@/service/jwt";
 
 const withAuth = createMiddleware(async (c, next) => {
   const isPublicRoute = publicRoute.some(
-    (route) => route.path === c.req.path && route.method === c.req.method
+    (route) => route.path === c.req.path && route.method === c.req.method,
   );
 
   if (isPublicRoute) {
@@ -28,6 +28,7 @@ const withAuth = createMiddleware(async (c, next) => {
 
   const jwtMiddleware = jwt({
     secret: Bun.env.JWT_SECRET || "password",
+    alg: "HS256",
   });
 
   return jwtMiddleware(c, next);
