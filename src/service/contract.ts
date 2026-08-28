@@ -570,7 +570,7 @@ export const deletContract = async (id: string): Promise<Result<any>> => {
   return {
     data: null,
     message: "Successfully deleted contract",
-    code: 204,
+    code: 200,
   };
 };
 
@@ -736,7 +736,7 @@ export const deleteContractActivity = async (
   return {
     data: contract,
     message: "Successfully deleted contract activity",
-    code: 204,
+    code: 200,
   };
 };
 
@@ -1273,7 +1273,9 @@ export const getContractActivityCost = async (
   }).select(["partner._id", "period", "activities._id", "activities.cost"]);
 
   const partnerVolume = contracts.map(({ partner, activities }) => {
-    const activity = activities.find((item) => item._id == activityId);
+    const activity = activities.find(
+      (item) => item._id.toString() == activityId,
+    );
     return {
       partnerId: partner._id,
       cost: activity?.cost || 0,

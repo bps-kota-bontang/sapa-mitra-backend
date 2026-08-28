@@ -247,7 +247,7 @@ export const deleteActivities = async (
   return {
     data: null,
     message: "Successfully deleted activities",
-    code: 204,
+    code: 200,
   };
 };
 
@@ -268,7 +268,7 @@ export const deleteActivity = async (
   return {
     data: null,
     message: "Successfully deleted activity",
-    code: 204,
+    code: 200,
   };
 };
 

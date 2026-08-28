@@ -2,11 +2,12 @@ import { downloadTemplate, toArrayBuffer } from "@/common/utils";
 import { UpdatePasswordPayload } from "@/model/user";
 import { getUsers, getUser, uploadUsers, updatePassword } from "@/service/user";
 import { Hono } from "hono";
+import { JWT } from "@/model/jwt";
 
 const app = new Hono();
 
 app.get("/", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const result = await getUsers(claims);
 
   return c.json(
@@ -14,12 +15,12 @@ app.get("/", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
 app.get("/me", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const result = await getUser(claims.sub);
 
   return c.json(
@@ -27,12 +28,12 @@ app.get("/me", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
 app.post("/upload", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const body = await c.req.parseBody();
 
   const result = await uploadUsers(body["file"] as File, claims);
@@ -42,12 +43,12 @@ app.post("/upload", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
 app.put("/:id/password", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const id = c.req.param("id");
   const payload = await c.req.json<UpdatePasswordPayload>();
 
@@ -58,7 +59,7 @@ app.put("/:id/password", async (c) => {
       data: result.data,
       message: result.message,
     },
-    result.code
+    result.code,
   );
 });
 
@@ -68,7 +69,7 @@ app.post("/template", async (c) => {
   c.res.headers.set("Content-Type", "text/csv");
   c.res.headers.set(
     "Content-Disposition",
-    `attachment; filename=Template User.csv`
+    `attachment; filename=Template User.csv`,
   );
 
   return c.body(toArrayBuffer(result));

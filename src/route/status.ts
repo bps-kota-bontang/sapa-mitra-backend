@@ -5,11 +5,12 @@ import {
   updateStatusOutput,
 } from "@/service/status";
 import { Hono } from "hono";
+import { JWT } from "@/model/jwt";
 
 const app = new Hono();
 
 app.get("/", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const result = await getStatuses(claims);
 
   return c.json(
@@ -22,7 +23,7 @@ app.get("/", async (c) => {
 });
 
 app.get("/:period", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const period = c.req.param("period");
   const result = await getStatus(period);
 
@@ -36,7 +37,7 @@ app.get("/:period", async (c) => {
 });
 
 app.put("/:period/contract", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const period = c.req.param("period");
   const payload = await c.req.json<{
     is_locked: boolean;
@@ -54,7 +55,7 @@ app.put("/:period/contract", async (c) => {
 });
 
 app.put("/:period/output", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const period = c.req.param("period");
   const payload = await c.req.json<{
     is_locked: boolean;

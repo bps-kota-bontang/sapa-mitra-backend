@@ -11,6 +11,7 @@ import {
   downloadOutputs,
 } from "@/service/output";
 import { Hono } from "hono";
+import { JWT } from "@/model/jwt";
 
 const app = new Hono();
 
@@ -51,7 +52,7 @@ app.post("/template", async (c) => {
 });
 
 app.get("/", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const year = c.req.query("year");
   const result = await getOutputs(year, claims);
 

@@ -34,7 +34,7 @@ import fs from "fs";
 import StatusSchema from "@/schema/status";
 
 export const getReports = async (
-  period: string = ""
+  period: string = "",
 ): Promise<Result<Report[]>> => {
   let queries: any = {};
 
@@ -74,13 +74,13 @@ export const deleteReport = async (id: string): Promise<Result<any>> => {
   return {
     data: null,
     message: "Successfully deleted report",
-    code: 204,
+    code: 200,
   };
 };
 
 export const deleteReportOutput = async (
   id: string,
-  outputId: string
+  outputId: string,
 ): Promise<Result<Report>> => {
   const existingReport = await ReportSchema.findById(id);
 
@@ -113,19 +113,19 @@ export const deleteReportOutput = async (
     },
     {
       new: true,
-    }
+    },
   );
 
   return {
     data: report,
     message: "Successfully deleted report",
-    code: 204,
+    code: 200,
   };
 };
 
 export const printReport = async (
   id: string,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<any>> => {
   if (claims.team != "TU" && isProduction) {
     return {
@@ -156,7 +156,7 @@ export const printReport = async (
 
 export const printReports = async (
   payload: string[] = [],
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<any>> => {
   if (!payload) {
     return {
@@ -212,7 +212,7 @@ export const printReports = async (
 
 export const storeReport = async (
   payload: ReportPayload,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<Report>> => {
   if (claims.position == "KEPALA") {
     return {
@@ -241,7 +241,7 @@ export const storeReport = async (
 
   const availableSeq = await findAvailableSequence(
     payload.contract.period,
-    "report"
+    "report",
   );
 
   const number = generateReportNumber(payload.contract.period, availableSeq);
@@ -259,7 +259,7 @@ export const storeReport = async (
   }
 
   const partner = await PartnerSchema.findById(
-    payload.partner.partnerId
+    payload.partner.partnerId,
   ).select(["name", "nik", "address"]);
 
   if (!partner) {
@@ -301,7 +301,7 @@ export const storeReport = async (
     .map((itemPayload) => {
       const { outputId, ...restPayload } = itemPayload;
       const itemDb = outputsDb.find(
-        (found) => found._id.toString() === outputId
+        (found) => found._id.toString() === outputId,
       );
       return itemDb
         ? {
@@ -331,11 +331,11 @@ export const storeReport = async (
 
     if (outputReport) {
       const newOutputs = outputs.filter(
-        (item) => !outputReport.outputs.some((itemDb) => itemDb.id == item._id)
+        (item) => !outputReport.outputs.some((itemDb) => itemDb.id == item._id),
       );
 
       const existOutputs = outputs.filter((item) =>
-        outputReport.outputs.some((itemDb) => itemDb.id == item._id)
+        outputReport.outputs.some((itemDb) => itemDb.id == item._id),
       );
 
       if (newOutputs.length > 0) {
@@ -348,13 +348,13 @@ export const storeReport = async (
           },
           {
             new: true,
-          }
+          },
         );
       }
 
       if (existOutputs.length > 0) {
         const existingReportUpdated = await ReportSchema.findById(
-          existingReport.id
+          existingReport.id,
         );
 
         if (!existingReportUpdated) {
@@ -406,7 +406,7 @@ export const storeReport = async (
         },
         {
           new: true,
-        }
+        },
       );
     }
   } else {
@@ -422,7 +422,7 @@ export const storeReport = async (
 
 export const storeReportByOutput = async (
   payload: ReportByOutputPayload,
-  claims: JWT
+  claims: JWT,
 ): Promise<Result<Report[]>> => {
   if (claims.position == "KEPALA") {
     return {
@@ -446,7 +446,7 @@ export const storeReportByOutput = async (
 
   const lastSequence = await findLastSequence(
     payload.contract.period,
-    "report"
+    "report",
   );
 
   const partnerIds = payload.partners.map((item) => item.partnerId);
@@ -494,11 +494,11 @@ export const storeReportByOutput = async (
     .map((item, index) => {
       const number = generateReportNumber(
         payload.contract.period,
-        lastSequence + index
+        lastSequence + index,
       );
 
       const partner = partners.find(
-        (partner) => partner._id.toString() == item.partnerId
+        (partner) => partner._id.toString() == item.partnerId,
       );
 
       if (!partner) return null;
@@ -506,7 +506,7 @@ export const storeReportByOutput = async (
       const existingReport = existingReports.find(
         (report) =>
           report.partner._id == item.partnerId &&
-          report.contract.period == payload.contract.period
+          report.contract.period == payload.contract.period,
       );
 
       const output = {
@@ -518,7 +518,7 @@ export const storeReportByOutput = async (
 
       if (existingReport) {
         const existingOutput = existingReport.outputs.find(
-          (item) => item.id == output._id
+          (item) => item.id == output._id,
         );
 
         if (existingOutput) {
@@ -555,7 +555,7 @@ export const storeReportByOutput = async (
         }
       } else {
         const contract = contracts.find(
-          (itemContract) => itemContract.partner.id == item.partnerId
+          (itemContract) => itemContract.partner.id == item.partnerId,
         );
 
         if (!contract) return null;
@@ -649,7 +649,7 @@ const generateReportPdf = async (report: Report): Promise<ReportPdf> => {
 };
 
 export const downloadReports = async (
-  ids: string[] = []
+  ids: string[] = [],
 ): Promise<Result<any>> => {
   if (ids.length == 0) {
     return {
@@ -676,7 +676,7 @@ export const downloadReports = async (
         team: activity.team,
         ...restOutput,
       };
-    })
+    }),
   );
 
   const file = convertToCsv(transformedReports);

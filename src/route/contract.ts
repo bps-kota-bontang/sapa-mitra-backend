@@ -3,6 +3,7 @@ import {
   ContractActivityPayload,
   UpdateContractPayload,
 } from "@/model/contract";
+import { JWT } from "@/model/jwt";
 import {
   cancelContractActivity,
   deletContract,
@@ -33,7 +34,7 @@ const contract = new Hono();
 const publicContract = new Hono();
 
 contract.post("/:id/print", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const id = c.req.param("id");
 
   const result = await printContract(id, claims);
@@ -92,7 +93,7 @@ contract.post("/cost/template", async (c) => {
 });
 
 contract.put("/activity/cost", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const payload = await c.req.json();
 
   const result = await updateContractActivityCost(payload, claims);
@@ -130,7 +131,7 @@ contract.post("/download", async (c) => {
 });
 
 contract.post("/print", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const payload = await c.req.json<string[]>();
 
   const result = await printContracts(payload, claims);
@@ -176,7 +177,7 @@ contract.get("/statistics", async (c) => {
 });
 
 contract.get("/", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const period = c.req.query("period");
   const status = c.req.query("status");
 
@@ -206,7 +207,7 @@ contract.get("/:id", async (c) => {
 });
 
 contract.post("/", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const by = c.req.query("by");
   const payload = await c.req.json();
 
@@ -227,7 +228,7 @@ contract.post("/", async (c) => {
 });
 
 contract.put("/:id", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const id = c.req.param("id");
   const payload = await c.req.json<UpdateContractPayload>();
   const result = await updateContract(id, payload, claims);
@@ -256,7 +257,7 @@ contract.delete("/:id", async (c) => {
 });
 
 contract.get("/:id/activity/:activityId", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const id = c.req.param("id");
   const activityId = c.req.param("activityId");
 
@@ -272,7 +273,7 @@ contract.get("/:id/activity/:activityId", async (c) => {
 });
 
 contract.put("/:id/activity/:activityId", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const id = c.req.param("id");
   const payload = await c.req.json<ContractActivityPayload>();
   const activityId = c.req.param("activityId");
@@ -289,7 +290,7 @@ contract.put("/:id/activity/:activityId", async (c) => {
 });
 
 contract.delete("/:id/activity/:activityId", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const id = c.req.param("id");
   const activityId = c.req.param("activityId");
 
@@ -305,7 +306,7 @@ contract.delete("/:id/activity/:activityId", async (c) => {
 });
 
 contract.get("/:id/activity/:activityId/verify", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const id = c.req.param("id");
   const activityId = c.req.param("activityId");
 
@@ -321,7 +322,7 @@ contract.get("/:id/activity/:activityId/verify", async (c) => {
 });
 
 contract.get("/:id/activity/:activityId/cancel", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const id = c.req.param("id");
   const activityId = c.req.param("activityId");
 
@@ -382,7 +383,7 @@ contract.get("/activity/account", async (c) => {
 });
 
 contract.post("/activity/recap", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const payload = await c.req.json();
 
   const result = await downloadContractActivityRecap(payload, claims);
@@ -415,7 +416,7 @@ contract.post("/activity/recap", async (c) => {
 });
 
 contract.put("/activity/recap", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const payload = await c.req.json();
 
   const result = await updateContractActivityRecap(payload, claims);

@@ -195,7 +195,7 @@ export const deleteOutput = async (id: string): Promise<Result<any>> => {
   return {
     data: null,
     message: "Successfully deleted output",
-    code: 204,
+    code: 200,
   };
 };
 
@@ -217,7 +217,7 @@ export const deleteOutputs = async (
   return {
     data: null,
     message: "Successfully deleted outputs",
-    code: 204,
+    code: 200,
   };
 };
 

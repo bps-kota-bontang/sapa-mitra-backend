@@ -204,7 +204,7 @@ export const deletePartners = async (
   return {
     data: null,
     message: "Successfully deleted partners",
-    code: 204,
+    code: 200,
   };
 };
 
@@ -225,6 +225,6 @@ export const deletePartner = async (
   return {
     data: null,
     message: "Successfully deleted partner",
-    code: 204,
+    code: 200,
   };
 };

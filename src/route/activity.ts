@@ -1,5 +1,6 @@
 import { downloadTemplate, toArrayBuffer } from "@/common/utils";
 import { Activity } from "@/model/activity";
+import { JWT } from "@/model/jwt";
 import {
   deleteActivities,
   deleteActivity,
@@ -17,7 +18,7 @@ const activity = new Hono();
 const publicActivity = new Hono();
 
 activity.get("/", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const year = c.req.query("year");
   const result = await getActivities(year, claims);
 
@@ -79,7 +80,7 @@ activity.get("/:id", async (c) => {
 });
 
 activity.post("/upload", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const body = await c.req.parseBody();
 
   const result = await uploadActivity(body["file"] as File, claims);
@@ -94,7 +95,7 @@ activity.post("/upload", async (c) => {
 });
 
 activity.post("/", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const payload = await c.req.json<Activity>();
 
   const result = await storeActivity(payload, claims);
@@ -109,7 +110,7 @@ activity.post("/", async (c) => {
 });
 
 activity.put("/:id", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const payload = await c.req.json<Activity>();
   const id = c.req.param("id");
   const result = await updateActivity(id, payload, claims);
@@ -124,7 +125,7 @@ activity.put("/:id", async (c) => {
 });
 
 activity.delete("/", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const payload = await c.req.json<string[]>();
   const result = await deleteActivities(payload, claims);
 
@@ -138,7 +139,7 @@ activity.delete("/", async (c) => {
 });
 
 activity.delete("/:id", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const id = c.req.param("id");
   const result = await deleteActivity(id, claims);
 

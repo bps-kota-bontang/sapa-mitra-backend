@@ -167,6 +167,6 @@ export const deleteConfiguration = async (
   return {
     data: null,
     message: "Successfully deleted configuration",
-    code: 204,
+    code: 200,
   };
 };

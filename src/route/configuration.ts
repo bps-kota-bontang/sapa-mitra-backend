@@ -7,6 +7,7 @@ import {
   updateConfiguration,
 } from "@/service/configuration";
 import { Hono } from "hono";
+import { JWT } from "@/model/jwt";
 
 const app = new Hono();
 
@@ -36,7 +37,7 @@ app.get("/:name", async (c) => {
 });
 
 app.post("/", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const payload = await c.req.json<Configuration<any>>();
 
   const result = await storeConfiguration(payload, claims);
@@ -51,7 +52,7 @@ app.post("/", async (c) => {
 });
 
 app.put("/:name", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const payload = await c.req.json<Configuration<any>>();
   const name = c.req.param("name");
   const result = await updateConfiguration(name.toUpperCase(), payload, claims);
@@ -66,7 +67,7 @@ app.put("/:name", async (c) => {
 });
 
 app.delete("/:name", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const name = c.req.param("name");
   const result = await deleteConfiguration(name.toUpperCase(), claims);
 

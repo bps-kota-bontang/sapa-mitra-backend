@@ -11,6 +11,7 @@ import {
   downloadPartner,
 } from "@/service/partner";
 import { Hono } from "hono";
+import { JWT } from "@/model/jwt";
 
 const app = new Hono();
 
@@ -79,7 +80,7 @@ app.get("/:id", async (c) => {
 });
 
 app.post("/upload", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const body = await c.req.parseBody();
 
   const result = await uploadPartner(body["file"] as File, claims);
@@ -94,7 +95,7 @@ app.post("/upload", async (c) => {
 });
 
 app.post("/", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const payload = await c.req.json<Partner>();
 
   const result = await storePartner(payload, claims);
@@ -109,7 +110,7 @@ app.post("/", async (c) => {
 });
 
 app.put("/:id", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const payload = await c.req.json<Partner>();
   const id = c.req.param("id");
   const result = await updatePartner(id, payload, claims);
@@ -124,7 +125,7 @@ app.put("/:id", async (c) => {
 });
 
 app.delete("/:id", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const id = c.req.param("id");
   const result = await deletePartner(id, claims);
 
@@ -138,7 +139,7 @@ app.delete("/:id", async (c) => {
 });
 
 app.delete("/", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const payload = await c.req.json<string[]>();
   const result = await deletePartners(payload, claims);
 

@@ -11,6 +11,7 @@ import {
   storeReportByOutput,
 } from "@/service/report";
 import { Hono } from "hono";
+import { JWT } from "@/model/jwt";
 
 const app = new Hono();
 
@@ -27,7 +28,7 @@ app.post("/partner/template", async (c) => {
 });
 
 app.post("/:id/print", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const id = c.req.param("id");
 
   const result = await printReport(id, claims);
@@ -60,7 +61,7 @@ app.post("/:id/print", async (c) => {
 });
 
 app.post("/print", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const payload = await c.req.json<string[]>();
 
   const result = await printReports(payload, claims);
@@ -150,7 +151,7 @@ app.delete("/:id/output/:outputId", async (c) => {
 });
 
 app.post("/", async (c) => {
-  const claims = c.get("jwtPayload");
+  const claims = c.get("jwtPayload") as JWT;
   const by = c.req.query("by");
   const payload = await c.req.json();
 
