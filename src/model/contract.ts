@@ -12,12 +12,17 @@ export type Contract = {
   number: string;
   period: YearMonth;
   authority: Authority;
-  partner: Pick<Partner, "name" | "nik" | "address" | "accountNumber"> & Document;
-  activities: (Pick<Activity, "code" | "name" | "unit" | "category" | "isSpecial"> & {
+  partner: Pick<Partner, "name" | "nik" | "address" | "accountNumber"> &
+    Document;
+  activities: (Pick<
+    Activity,
+    "code" | "name" | "unit" | "category" | "isSpecial"
+  > & {
     startDate: Date;
     endDate: Date;
     volume: number;
     cost: number;
+    hasTelecom: boolean;
     rate: number;
     total: number;
     createdBy: Team;
@@ -32,12 +37,15 @@ export type Contract = {
 export type ContractByActivityPayload = {
   activity: {
     activityId: string;
-  } & Pick<Contract["activities"][number], "startDate" | "endDate" | "rate">;
+  } & Pick<
+    Contract["activities"][number],
+    "startDate" | "endDate" | "hasTelecom" | "rate"
+  >;
   contract: Pick<Contract, "period">;
   partners: [
     {
       partnerId: string;
-    } & Pick<Contract["activities"][number], "volume">
+    } & Pick<Contract["activities"][number], "volume">,
   ];
 };
 
@@ -51,8 +59,8 @@ export type ContractPayload = {
       activityId: string;
     } & Pick<
       Contract["activities"][number],
-      "startDate" | "endDate" | "volume" | "rate"
-    >
+      "startDate" | "endDate" | "volume" | "rate" | "hasTelecom"
+    >,
   ];
 };
 
@@ -71,6 +79,7 @@ const byActivity: ContractByActivityPayload = {
     startDate: new Date(),
     endDate: new Date(),
     rate: 1000,
+    hasTelecom: true,
   },
 };
 
@@ -88,13 +97,17 @@ const byPartner: ContractPayload = {
       endDate: new Date(),
       volume: 1,
       rate: 1000,
+      hasTelecom: true,
     },
   ],
 };
 
-export type ContractActivityPayload = {
+export type UpdateContractActivityPayload = {
   volume: number;
-} & Pick<Contract["activities"][number], "startDate" | "endDate" | "code" | "rate">;
+} & Pick<
+  Contract["activities"][number],
+  "startDate" | "endDate" | "code" | "rate" | "hasTelecom"
+>;
 
 export type UpdateContractPayload = {
   number: string;
@@ -105,7 +118,7 @@ export type DownloadContractsPayload = {
   contracts: [
     {
       contractId: string;
-    }
+    },
   ];
 };
 
@@ -145,9 +158,11 @@ export type ContractPdf = {
   region: string;
 };
 
-export const contractActivityPayload: ContractActivityPayload = {
+export const contractActivityPayload: UpdateContractActivityPayload = {
   startDate: new Date(),
   endDate: new Date(),
   volume: 1,
   rate: 200,
+  code: "ACT-001",
+  hasTelecom: true,
 };

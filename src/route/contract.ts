@@ -1,6 +1,6 @@
 import { downloadTemplate, toArrayBuffer } from "@/common/utils";
 import {
-  ContractActivityPayload,
+  UpdateContractActivityPayload,
   UpdateContractPayload,
 } from "@/model/contract";
 import { JWT } from "@/model/jwt";
@@ -275,7 +275,7 @@ contract.get("/:id/activity/:activityId", async (c) => {
 contract.put("/:id/activity/:activityId", async (c) => {
   const claims = c.get("jwtPayload") as JWT;
   const id = c.req.param("id");
-  const payload = await c.req.json<ContractActivityPayload>();
+  const payload = await c.req.json<UpdateContractActivityPayload>();
   const activityId = c.req.param("activityId");
 
   const result = await updateContractActivity(id, activityId, payload, claims);

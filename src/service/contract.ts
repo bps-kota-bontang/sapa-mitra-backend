@@ -212,7 +212,7 @@ export const storeContractByActivity = async (
 
       const existingContract = existingContracts.find(
         (contract) =>
-          contract.partner._id == item.partnerId &&
+          contract.partner._id.toString() == item.partnerId &&
           contract.period == payload.contract.period,
       );
 
@@ -652,6 +652,7 @@ export const updateContractActivity = async (
   activity.code = payload.code;
   activity.volume = payload.volume;
   activity.rate = payload.rate;
+  activity.hasTelecom = payload.hasTelecom;
   activity.total = total;
 
   const contract = await ContractSchema.findOneAndUpdate(
@@ -1099,6 +1100,7 @@ const generateContractPdf = async (
       total: formatCurrency(item.total),
       cost: formatCurrency(item.cost),
       budget: 0,
+      hasTelecom: item.hasTelecom,
     };
   });
   const finalDate = new Date(contract.handOverDate);
@@ -1241,7 +1243,9 @@ export const getContractActivityVolume = async (
   }).select(["partner._id", "period", "activities._id", "activities.volume"]);
 
   const partnerVolume = contracts.map(({ partner, activities }) => {
-    const activity = activities.find((item) => item._id == activityId);
+    const activity = activities.find(
+      (item) => item._id.toString() == activityId,
+    );
     return {
       partnerId: partner._id,
       volume: activity?.volume || 0,
@@ -1314,8 +1318,7 @@ export const updateContractActivityCost = async (
   for (const contract of contracts) {
     const isTargetPartner = partners.find(
       (partner: { partnerId: string }) =>
-        partner.partnerId ===
-        (contract.partner as { _id: string })._id.toString(),
+        partner.partnerId === contract.partner._id.toString(),
     );
     if (!isTargetPartner) continue;
 
@@ -1356,7 +1359,7 @@ export const getContractActivityAccount = async (
   }).select(["partner._id", "partner.accountNumber", "period"]);
 
   const partnerAccounts = contracts.map(({ partner }) => ({
-    partnerId: partner._id as Document,
+    partnerId: partner._id.toString(),
     accountNumber: partner.accountNumber,
   }));
 
@@ -1413,8 +1416,7 @@ export const updateContractActivityRecap = async (
   for (const contract of contracts) {
     const isTargetPartner = partners.find(
       (partner: { partnerId: string }) =>
-        partner.partnerId ===
-        (contract.partner as { _id: string })._id.toString(),
+        partner.partnerId === contract.partner._id.toString(),
     );
     if (!isTargetPartner) continue;
 

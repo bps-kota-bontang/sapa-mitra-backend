@@ -38,6 +38,7 @@ export const contractSchema = new Schema<Contract>(
           rate: { type: Number, required: true },
           total: { type: Number, required: true },
           cost: { type: Number, required: false, default: 0 },
+          hasTelecom: { type: Boolean, required: true, default: false },
           createdBy: {
             type: String,
             required: true,
@@ -66,7 +67,7 @@ export const contractSchema = new Schema<Contract>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const ContractSchema = model("contracts", contractSchema);
