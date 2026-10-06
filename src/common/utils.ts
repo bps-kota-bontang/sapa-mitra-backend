@@ -196,6 +196,10 @@ export const GATE_URL = Bun.env.GATE_URL || "http://localhost";
 export const GATE_SERVICE_ID =
   Bun.env.GATE_SERVICE_ID || "00000000-0000-0000-0000-000000000000";
 
+export const GATE_AUTH_TYPE = "accounts";
+
+export const GATE_AUTH_REALM = "pegawai";
+
 export const toArrayBuffer = (buffer: Buffer): ArrayBuffer => {
   const arrayBuffer = new ArrayBuffer(buffer.length);
   const view = new Uint8Array(arrayBuffer);

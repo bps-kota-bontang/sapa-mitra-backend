@@ -41,10 +41,15 @@ export const login = async (
   };
 };
 
-export const loginSso = async (tokenSso: string): Promise<Result<any>> => {
-  const userSso = await getUserInfo(tokenSso);
+export const loginSso = async (
+  code: string,
+  type: string,
+  realm: string,
+  userAgent: string
+): Promise<Result<any>> => {
+  const userSso = await getUserInfo(code, type, realm, userAgent);
 
-  const user = await UserSchema.findOne({ email: userSso.email });
+  const user = await UserSchema.findOne({ email: userSso.email.trim() });
 
   if (!user) {
     return {
