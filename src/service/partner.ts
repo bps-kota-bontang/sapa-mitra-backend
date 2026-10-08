@@ -165,6 +165,14 @@ export const updatePartner = async (
   payload: Partner,
   claims: JWT
 ): Promise<Result<Partner>> => {
+  if (!(claims.team == "IPDS" || claims.team == "TU") && isProduction) {
+    return {
+      data: null,
+      message: "Only TU or IPDS can update a partner",
+      code: 403,
+    };
+  }
+
   const partner = await PartnerSchema.findByIdAndUpdate(id, payload, {
     new: true,
     runValidators: true,
