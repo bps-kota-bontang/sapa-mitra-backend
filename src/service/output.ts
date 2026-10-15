@@ -63,7 +63,7 @@ export const storeOutput = async (
   const { activity: payloadActivity, ...restPayload } = payload;
   const activity = await ActivitySchema.findById(
     payloadActivity.activityId
-  ).select(["name", "team"]);
+  ).select(["name", "team", "year"]);
 
   if (!activity) {
     return {
@@ -78,6 +78,7 @@ export const storeOutput = async (
       ...activity,
     },
     ...restPayload,
+    year: activity.year,
   });
 
   return {
@@ -116,7 +117,7 @@ export const uploadOutput = async (file: File): Promise<Result<any>> => {
 
   const activities = await ActivitySchema.find({
     _id: { $in: activityIds },
-  }).select(["name", "team"]);
+  }).select(["name", "team", "year"]);
 
   const activityMap = new Map<string, any>();
   activities.forEach((activity) => {
@@ -140,7 +141,7 @@ export const uploadOutput = async (file: File): Promise<Result<any>> => {
       },
       name: item.name,
       unit: item.unit,
-      year: item.year,
+      year: activity.year,
     };
   });
 
@@ -160,7 +161,7 @@ export const updateOutput = async (
   const { activity: payloadActivity, ...restPayload } = payload;
   const activity = await ActivitySchema.findById(
     payloadActivity.activityId
-  ).select(["name"]);
+  ).select(["name", "team", "year"]);
 
   if (!activity) {
     return {
@@ -177,6 +178,7 @@ export const updateOutput = async (
         ...activity,
       },
       ...restPayload,
+      year: activity.year,
     },
     {
       new: true,
