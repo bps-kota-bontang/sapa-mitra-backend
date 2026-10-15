@@ -12,7 +12,7 @@ export const getPartners = async (
 
   if (year) queries.year = year;
 
-  const partners = await PartnerSchema.find(queries);
+  const partners = await PartnerSchema.find(queries).sort({ year: -1, _id: 1 });
 
   const transformedPartners = partners.map((partner, index) => {
     return {

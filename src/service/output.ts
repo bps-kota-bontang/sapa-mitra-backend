@@ -16,7 +16,7 @@ export const getOutputs = async (
 
   if (claims.team != "TU") queries["activity.team"] = claims.team;
 
-  const outputs = await OutputSchema.find(queries);
+  const outputs = await OutputSchema.find(queries).sort({ year: -1, _id: 1 });
 
   const filterOutputs = (
     await Promise.all(

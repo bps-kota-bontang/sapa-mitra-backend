@@ -15,7 +15,7 @@ export const getActivities = async (
 
   if (year) queries.year = year;
 
-  const activities = await ActivitySchema.find(queries);
+  const activities = await ActivitySchema.find(queries).sort({ year: -1, _id: 1 });
 
   const transformedActivities = activities.map((item, index) => {
     return {
