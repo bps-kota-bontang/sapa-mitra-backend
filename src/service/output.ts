@@ -14,6 +14,8 @@ export const getOutputs = async (
 
   if (year) queries.year = year;
 
+  if (claims.team != "TU") queries["activity.team"] = claims.team;
+
   const outputs = await OutputSchema.find(queries);
 
   const filterOutputs = (
@@ -22,7 +24,6 @@ export const getOutputs = async (
         const activities = await ActivitySchema.find({
           _id: item.activity.id,
           team: item.activity.team,
-          //...(claims.team !== "TU" ? { team: claims.team } : {}),
         });
 
         if (!activities.length) return null;
