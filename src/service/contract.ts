@@ -238,7 +238,7 @@ export const storeContractByActivity = async (
                 existingContract.grandTotal +
                 activity.total -
                 existingActivity.total,
-              "activities.$": activity,
+              "activities.$": { ...activity, cost: existingActivity.cost },
             },
           };
 
@@ -1218,6 +1218,80 @@ export const updateContract = async (
   return {
     data: contract,
     message: "Successfully updated a contract",
+    code: 200,
+  };
+};
+
+export const getContractActivityDetail = async (
+  period?: string,
+  activityId?: string,
+): Promise<Result<any>> => {
+  if (!period || !activityId) {
+    return {
+      data: null,
+      message: "Period and activityId are required",
+      code: 400,
+    };
+  }
+
+  const contracts = await ContractSchema.find({
+    period,
+    "activities._id": activityId,
+  }).select(["partner._id", "activities"]);
+
+  const partners = contracts.flatMap(({ partner, activities }) => {
+    const activity = activities.find(
+      (item) => item._id.toString() == activityId,
+    );
+
+    if (!activity) return [];
+
+    return [
+      {
+        partnerId: partner._id,
+        volume: activity.volume,
+        rate: activity.rate,
+        startDate: activity.startDate,
+        endDate: activity.endDate,
+        hasTelecom: activity.hasTelecom,
+        status: activity.status,
+      },
+    ];
+  });
+
+  if (partners.length == 0) {
+    return {
+      data: null,
+      message: "No contracts found for this activity and period",
+      code: 404,
+    };
+  }
+
+  const [first] = partners;
+  const consistent = partners.every(
+    (item) =>
+      item.rate == first.rate &&
+      item.hasTelecom == first.hasTelecom &&
+      new Date(item.startDate).getTime() == new Date(first.startDate).getTime() &&
+      new Date(item.endDate).getTime() == new Date(first.endDate).getTime(),
+  );
+
+  return {
+    data: {
+      activity: {
+        rate: first.rate,
+        startDate: first.startDate,
+        endDate: first.endDate,
+        hasTelecom: first.hasTelecom,
+      },
+      partners: partners.map(({ partnerId, volume, status }) => ({
+        partnerId,
+        volume,
+        status,
+      })),
+      consistent,
+    },
+    message: "Retrieved contract activity successfully",
     code: 200,
   };
 };

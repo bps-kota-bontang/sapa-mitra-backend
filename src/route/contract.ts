@@ -14,6 +14,7 @@ import {
   getContractActivityCost,
   getContractActivityAccount,
   getContractActivityVolume,
+  getContractActivityDetail,
   getContractStatistics,
   getContracts,
   printContract,
@@ -161,6 +162,15 @@ contract.post("/print", async (c) => {
   // );
 
   // return c.body(toArrayBuffer(result.data));
+});
+
+contract.get("/activity/detail", async (c) => {
+  const result = await getContractActivityDetail(
+    c.req.query("period"),
+    c.req.query("activityId"),
+  );
+
+  return c.json({ data: result.data, message: result.message }, result.code);
 });
 
 contract.get("/statistics", async (c) => {
