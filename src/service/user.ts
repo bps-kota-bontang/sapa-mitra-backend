@@ -1,7 +1,7 @@
 import { isProduction, positionOrder } from "@/common/utils";
 import { JWT } from "@/model/jwt";
 import { Result } from "@/model/result";
-import { UpdatePasswordPayload, User } from "@/model/user";
+import { UpdatePasswordPayload, User, UserPayload } from "@/model/user";
 import UserSchema from "@/schema/user";
 import { parse } from "csv-parse/sync";
 
@@ -30,6 +30,108 @@ export const getUser = async (id: string): Promise<Result<User>> => {
     message: "Successfully retrieved user",
     code: 200,
   };
+};
+
+const canManageUsers = (claims: JWT) =>
+  claims.team == "IPDS" || claims.team == "TU" || !isProduction;
+
+const duplicateMessage = (e: any) => {
+  if (e?.code !== 11000) return null;
+  return "email" in (e.keyPattern ?? {}) ? "Email sudah digunakan" : "NIP sudah digunakan";
+};
+
+export const createUser = async (
+  payload: UserPayload,
+  claims: JWT
+): Promise<Result<any>> => {
+  if (!canManageUsers(claims)) {
+    return { data: null, message: "Only IPDS or TU can create an user", code: 401 };
+  }
+
+  if (!payload.password) {
+    return { data: null, message: "Password is required", code: 400 };
+  }
+
+  try {
+    const user = await UserSchema.create({
+      name: payload.name,
+      nip: payload.nip,
+      email: payload.email?.trim(),
+      team: payload.team || undefined,
+      position: payload.position,
+      password: await Bun.password.hash(payload.password, { algorithm: "bcrypt" }),
+    });
+
+    const { password, ...data } = user.toObject();
+
+    return { data, message: "Successfully created user", code: 201 };
+  } catch (e: any) {
+    const message = duplicateMessage(e);
+    if (message) return { data: null, message, code: 409 };
+    throw e;
+  }
+};
+
+export const updateUser = async (
+  id: string,
+  payload: UserPayload,
+  claims: JWT
+): Promise<Result<any>> => {
+  if (!canManageUsers(claims)) {
+    return { data: null, message: "Only IPDS or TU can update an user", code: 401 };
+  }
+
+  const update: any = {
+    name: payload.name,
+    nip: payload.nip,
+    email: payload.email?.trim(),
+    team: payload.team || null,
+    position: payload.position,
+  };
+
+  if (payload.password) {
+    update.password = await Bun.password.hash(payload.password, {
+      algorithm: "bcrypt",
+    });
+  }
+
+  try {
+    const user = await UserSchema.findByIdAndUpdate(id, update, {
+      new: true,
+      runValidators: true,
+    }).select(["-password"]);
+
+    if (!user) {
+      return { data: null, message: "User not found", code: 404 };
+    }
+
+    return { data: user, message: "Successfully updated user", code: 200 };
+  } catch (e: any) {
+    const message = duplicateMessage(e);
+    if (message) return { data: null, message, code: 409 };
+    throw e;
+  }
+};
+
+export const deleteUser = async (
+  id: string,
+  claims: JWT
+): Promise<Result<any>> => {
+  if (!canManageUsers(claims)) {
+    return { data: null, message: "Only IPDS or TU can delete an user", code: 401 };
+  }
+
+  if (claims.sub == id) {
+    return { data: null, message: "Tidak dapat menghapus akun sendiri", code: 400 };
+  }
+
+  const user = await UserSchema.findByIdAndDelete(id);
+
+  if (!user) {
+    return { data: null, message: "User not found", code: 404 };
+  }
+
+  return { data: null, message: "Successfully deleted user", code: 200 };
 };
 
 export const uploadUsers = async (

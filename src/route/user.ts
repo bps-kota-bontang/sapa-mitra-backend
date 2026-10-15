@@ -1,6 +1,14 @@
 import { downloadTemplate, toArrayBuffer } from "@/common/utils";
-import { UpdatePasswordPayload } from "@/model/user";
-import { getUsers, getUser, uploadUsers, updatePassword } from "@/service/user";
+import { UpdatePasswordPayload, UserPayload } from "@/model/user";
+import {
+  getUsers,
+  getUser,
+  uploadUsers,
+  updatePassword,
+  createUser,
+  updateUser,
+  deleteUser,
+} from "@/service/user";
 import { Hono } from "hono";
 import { JWT } from "@/model/jwt";
 
@@ -30,6 +38,29 @@ app.get("/me", async (c) => {
     },
     result.code,
   );
+});
+
+app.post("/", async (c) => {
+  const claims = c.get("jwtPayload") as JWT;
+  const payload = await c.req.json<UserPayload>();
+  const result = await createUser(payload, claims);
+
+  return c.json({ data: result.data, message: result.message }, result.code);
+});
+
+app.put("/:id", async (c) => {
+  const claims = c.get("jwtPayload") as JWT;
+  const payload = await c.req.json<UserPayload>();
+  const result = await updateUser(c.req.param("id"), payload, claims);
+
+  return c.json({ data: result.data, message: result.message }, result.code);
+});
+
+app.delete("/:id", async (c) => {
+  const claims = c.get("jwtPayload") as JWT;
+  const result = await deleteUser(c.req.param("id"), claims);
+
+  return c.json({ data: result.data, message: result.message }, result.code);
 });
 
 app.post("/upload", async (c) => {

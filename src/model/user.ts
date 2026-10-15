@@ -18,6 +18,8 @@ export type User = {
   position: Position;
 };
 
+export type UserPayload = Partial<Omit<User, "id">>;
+
 export type UpdatePasswordPayload = {
   oldPassword: string;
   newPassword: string;
