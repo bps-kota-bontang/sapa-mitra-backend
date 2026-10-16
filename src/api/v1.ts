@@ -9,6 +9,7 @@ import output from "@/route/output";
 import report from "@/route/report";
 import status from "@/route/status";
 import mainActivity from "@/route/mainActivity";
+import sk from "@/route/sk";
 
 const app = new Hono();
 
@@ -22,5 +23,6 @@ app.route("/configurations", configuration);
 app.route("/contracts", contract);
 app.route("/reports", report);
 app.route("/statuses", status);
+app.route("/sk", sk);
 
 export default app;
