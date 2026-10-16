@@ -1522,7 +1522,7 @@ export const downloadContractActivityRecap = async (
 
   const activity = await ActivitySchema.findById(
     payloads.activity.activityId,
-  ).select(["name", "main", "code", "category", "unit", "pok"]);
+  ).populate("mainActivityId", "name").select(["name", "main", "mainActivityId", "code", "category", "unit", "pok"]);
 
   if (!activity) {
     return {
@@ -1608,7 +1608,7 @@ export const downloadContractActivityRecap = async (
       amount: item.grandTotal,
     })),
     activity: {
-      main: activity.main,
+      main: (activity.mainActivityId as any)?.name ?? activity.main,
       name: activity.name,
       category: categoryText ?? "",
       unit: activity.unit,

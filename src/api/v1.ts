@@ -8,6 +8,7 @@ import { contract } from "@/route/contract";
 import output from "@/route/output";
 import report from "@/route/report";
 import status from "@/route/status";
+import mainActivity from "@/route/mainActivity";
 
 const app = new Hono();
 
@@ -15,6 +16,7 @@ app.route("/auth", auth);
 app.route("/users", user);
 app.route("/outputs", output);
 app.route("/activities", activity);
+app.route("/main-activities", mainActivity);
 app.route("/partners", partner);
 app.route("/configurations", configuration);
 app.route("/contracts", contract);

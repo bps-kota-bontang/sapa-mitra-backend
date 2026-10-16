@@ -4,6 +4,7 @@ export type CategoryActivity = "ENUMERATION" | "SUPERVISION" | "PROCESSING";
 
 export type Activity = {
   main: string;
+  mainActivityId?: string;
   name: string;
   code: string;
   unit: string;

@@ -4,6 +4,7 @@ import { Schema, model } from "mongoose";
 export const activitySchema = new Schema<Activity>(
   {
     main: { type: String, required: false },
+    mainActivityId: { type: Schema.Types.ObjectId, ref: "mainActivities", required: false, index: true },
     name: { type: String, required: true },
     code: { type: String, required: true },
     unit: { type: String, required: true },
